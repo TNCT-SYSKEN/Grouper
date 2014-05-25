@@ -30,10 +30,6 @@ AudioTrack track;
 
 KetaiGesture gesture = new KetaiGesture(this);
 
-Button[] b_ = { new Button("Test1", 10, 10, 128, 60),
-                new Button("Test2", 150, 10, 128, 60) };
-ButtonArray b = new ButtonArray(b_);
-
 void setup() {
   size(displayWidth, displayHeight);
   orientation(PORTRAIT);
@@ -41,10 +37,6 @@ void setup() {
   smooth();
   background(255);
   fill(0);
-  
-  b.setFillAll(#FFFFFF);
-  b.setFillPAll(#ABCDEF);
-  b.setTextFontAll(createFont("Droid Sans", 32), 32);
   
   text("Calculating maximum amplitude...", 10, 20);
 
@@ -72,11 +64,6 @@ void setup() {
 }
 
 void draw() {
-  if(mousePressed) {
-    b.press(mouseX, mouseY);
-  } else {
-    b.release();
-  }
   
   if(offset + bufSnd >= bufSample) {
     offset = 0;
@@ -84,6 +71,6 @@ void draw() {
   } else {
     offset += bufSnd;
   }
-  //track.write( buffer, offset, bufSnd );
+  track.write( buffer, offset, bufSnd );
 }
 
