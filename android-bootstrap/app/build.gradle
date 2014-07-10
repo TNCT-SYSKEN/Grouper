@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':AndroidBootstrap')
     compile 'com.android.support:appcompat-v7:19.1.+'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.dagger:dagger:1.0.1'
