@@ -16,3 +16,9 @@
     　       　　　　／￣二二二二二二二二二二二二二二二二ヽ
     　       　　　　| 答 |　　　　G r o u p e r 　 　│|
            　　　　　＼＿二二二二二二二二二二二二二二二二ノ
+
+*使い方*
+
+Grouperフォルダを開きます
+android studioでandroid-bootstrapをインポートします
+たぶんおｋ！
