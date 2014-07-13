@@ -17,10 +17,16 @@
     　       　　　　| 答 |　　　　G r o u p e r 　 　│|
            　　　　　＼＿二二二二二二二二二二二二二二二二ノ
 
-##使い方
+##Android Studioへのインポート方法
 1. Grouperフォルダを開きます
 2. android studioでandroid-bootstrapをインポートします
 たぶんおｋ！
+
+##build時の設定
+* 最小APKは**15**
+* ターゲットAPIは**19**
+* buildToolsVersionhは**19.1.0**
+* いずれも**app/src/main/AndroidManifest.xml** や **app/build.gradle**で定義してあるから大丈夫なはず・・・？
 
 ##その他
 * アプリのパッケージ名 : 暫定的に **org.sysken.grouper**
