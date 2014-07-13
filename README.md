@@ -17,8 +17,13 @@
     　       　　　　| 答 |　　　　G r o u p e r 　 　│|
            　　　　　＼＿二二二二二二二二二二二二二二二二ノ
 
-*使い方*
-
-Grouperフォルダを開きます
-android studioでandroid-bootstrapをインポートします
+##使い方
+1. Grouperフォルダを開きます
+2. android studioでandroid-bootstrapをインポートします
 たぶんおｋ！
+
+##その他
+* アプリのパッケージ名 : 暫定的に **org.sysken.grouper**
+* サーバ : 現在調整中 - BAASBOXを利用 or MySQL
+    BAASBOX : 楽 but 資料が全部英語
+    MySQL : 資料が豊富 but らりょすの経験がない
