@@ -30,6 +30,10 @@
 
 ##その他
 * アプリのパッケージ名 : 暫定的に **org.sysken.grouper**
-* サーバ : 現在調整中 - BAASBOXを利用 or MySQL
-    BAASBOX : 楽 but 資料が全部英語
-    MySQL : 資料が豊富 but らりょすの経験がない
+* バックエンド処理には**BAASBOX**を利用します。
+    * mBaasと呼ばれるソフトウェアの一種
+    * バックエンド開発が不要
+    * ドキュメントは http://www.baasbox.com/documentation/ を参照
+    * 全部英語ですけど，書いてあることはそんなに難しくないです。
+    * サーバURL ** http://server.raryosu.info:9000/
+    * アカウントはそれぞれ発行済なのでらりょすまで聞いてください
