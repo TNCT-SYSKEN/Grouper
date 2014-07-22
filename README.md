@@ -19,7 +19,7 @@
 
 ##Android Studioへのインポート方法
 1. Grouperフォルダを開きます
-2. android studioでandroid-bootstrapをインポートします
+2. android studioで**Grouper_appをopen**します
 たぶんおｋ！
 
 ##build時の設定
