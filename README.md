@@ -30,11 +30,5 @@
 
 ##その他
 * アプリのパッケージ名 : 暫定的に **org.sysken.grouper**
-* バックエンド処理には**BAASBOX**を利用します。
-    * mBaasと呼ばれるソフトウェアの一種
-    * バックエンド開発が不要
-    * ドキュメントは http://www.baasbox.com/documentation/ を参照
-    * 全部英語ですけど，書いてあることはそんなに難しくないです。
-    * サーバURL ** http://server.raryosu.info:9000/
-    * アカウントはそれぞれ発行済なのでらりょすまで聞いてください
-##test
+* サーバはserver.raryosu.infoです。
+  * DB設計についてはDropboxにあげているER図が最新です
