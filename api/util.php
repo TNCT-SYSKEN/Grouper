@@ -3,7 +3,7 @@
  * Grouperコア コンポーネントクラス
  * 
  * Grouperの、主な処理を行うメインコンポーネント
- * @package net.sysken.grouper.core
+ * @package org.sysken.grouper.core
  * @copyright &copy; 2014- Ryosuke Hagihara
  * @create 2014/07/27
  * @auther Grouper Project Team<raryosu@sysken.org>
