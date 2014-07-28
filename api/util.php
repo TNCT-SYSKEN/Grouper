@@ -68,6 +68,90 @@ class main extends mysqli
 
     }
     
+    function paramAssign($array)
+    {
+        foreach($array as $key => $value)
+        {
+            htmlentities(preg_replace(array("\n", "\0"), "", $value));
+            self::validation($value, $key);
+            $rest[$key] = $value;
+        }
+        return $rest;
+    }
+    
+    function validation($value, $type = 'none')
+    {
+        switch($type)
+        {
+            case 'tel1', 'tel2', 'tel3', 'aleat_choice':
+                if(is_numeric($value))
+                {
+                    return true;
+                }
+                self::error('Vald Error');
+                break;
+                
+            case 'aram_time', 'group_time', 'talk_time':
+                $date_format = '%\d{4,4}/\d{2,2}/\d{2,2}\s\d{2,2}:\d{2,2}:\d{2,2}%';
+                if(preg_match($date_format, $value))
+                {
+                    $date    = preg_replace(array('/', '\s', ':'),'',$date);
+                    $date_n  = int($date);
+                    $year    = int($date_n/pow(10, 10));
+                    $month   = int($date_n/pow(10, 8) % 100);
+                    $day     = int($date_n/pow(10, 6) % 100);
+                    $hour    = int($date_n/pow(10, 4) % 100);
+                    $minute  = int($date_n/pow(10, 2) % 100);
+                    $second  = int($date_n % 100);
+                    
+                    if($year<2014 || $year>2030 || $month<1 || $month>12 ||
+                    $day<1 || $day>31 || $hour<0 || $hour>23 ||
+                    $minute<0 || minute>59 || $second<0 || $second>0)
+                        self::error('Vald Error');
+                        break;
+                    
+                    if(($month==4 || $month==6 || $month==9 || $month==11)
+                    && $day>30)
+                        self::error('Vald Error');
+                        break;
+                    
+                    if($month==2 && $year%4==1 && $day>28)
+                        self::error('Vald Error');
+                        break;
+                    else if($month==2 && $year%4==0 && $day>29)
+                        self::error('Vald Error');
+                        break;
+                    
+                    return true;
+                }
+            
+            case 'is_tel_pub', 'is_repeat', 'is_group_delete':
+                if(is_bool($value))
+                {
+                    return true;
+                }
+                self::error('Vald Error');
+                break;
+                
+            case 'alert_choise':
+                if($value=='1' || $value=='0')
+                {
+                    return true;
+                }
+                self::error('Vald Error');
+                break;
+            
+            case default:
+                if(is_string($value))
+                {
+                    return true;
+                }
+                self::error('Vald Error');
+                break;
+        }
+    }
+    
+    
     function __construct($array = '')
     {
         if(empty($array))
