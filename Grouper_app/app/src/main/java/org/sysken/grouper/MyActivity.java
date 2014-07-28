@@ -2,8 +2,13 @@ package org.sysken.grouper;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 
 
 public class MyActivity extends Activity {
@@ -12,6 +17,17 @@ public class MyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+
+        Button btn = (Button)findViewById(R.id.button_login);
+        btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // ここに処理を記述
+                EditText txtUserName  = (EditText)findViewById(R.id.user_name);
+                CheckBox numberCheck  = (CheckBox)findViewById(R.id.number_check);
+                String username = txtUserName.getText().toString();
+                String deviceId = Settings.Secure.getString(getContentResolver(), Settings.System.ANDROID_ID);
+            }
+        });
     }
 
 
