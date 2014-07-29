@@ -83,7 +83,24 @@ class main extends mysqli
     {
         switch($type)
         {
-            case 'tel1', 'tel2', 'tel3', 'aleat_choice':
+            case 'tel2':
+            case 'tel3':
+                if(is_numeric($value) && strlen($value)==4)
+                {
+                    return true;
+                }
+                self::error('Vald Error');
+                break;
+                
+            case 'tel1':
+                if(is_numeric($value) && strlen($value)==3)
+                {
+                    return true;
+                }
+                self::error('Vald Error');
+                break;
+            
+            case 'aleat_choice':
                 if(is_numeric($value))
                 {
                     return true;
@@ -91,7 +108,9 @@ class main extends mysqli
                 self::error('Vald Error');
                 break;
                 
-            case 'aram_time', 'group_time', 'talk_time':
+            case 'aram_time':
+            case 'group_time':
+            case 'talk_time':
                 $date_format = '%\d{4,4}/\d{2,2}/\d{2,2}\s\d{2,2}:\d{2,2}:\d{2,2}%';
                 if(preg_match($date_format, $value))
                 {
@@ -105,33 +124,41 @@ class main extends mysqli
                     $second  = int($date_n % 100);
                     
                     if($year<2014 || $year>2030 || $month<1 || $month>12 ||
-                    $day<1 || $day>31 || $hour<0 || $hour>23 ||
-                    $minute<0 || minute>59 || $second<0 || $second>0)
+                        $day<1 || $day>31 || $hour<0 || $hour>23 ||
+                        $minute<0 || minute>59 || $second<0 || $second>0)
+                    {
                         self::error('Vald Error');
                         break;
+                    }
                     
                     if(($month==4 || $month==6 || $month==9 || $month==11)
-                    && $day>30)
+                        && $day>30)
+                    {
                         self::error('Vald Error');
                         break;
+                    }
                     
                     if($month==2 && $year%4==1 && $day>28)
+                    {
                         self::error('Vald Error');
                         break;
-                    else if($month==2 && $year%4==0 && $day>29)
+                    }else if($month==2 && $year%4==0 && $day>29){
                         self::error('Vald Error');
                         break;
+                    }
                     
                     return true;
                 }
             
-            case 'is_tel_pub', 'is_repeat', 'is_group_delete':
+            case 'is_tel_pub':
+            case 'is_repeat':
+            case 'is_group_delete':
                 if(is_bool($value))
                 {
                     return true;
                 }
                 self::error('Vald Error');
-                break;
+            break;
                 
             case 'alert_choise':
                 if($value=='1' || $value=='0')
@@ -152,40 +179,32 @@ class main extends mysqli
     }
     
     
-    function __construct($array = '')
+    function __construct($array = '', $type)
     {
-        if(empty($array))
+        if($type=='get')
         {
             foreach($array as $key => $value)
             {
-                if(is_array($_GET[$key]))
+                if(is_array($array))
                 {
-                    self::__construct($GET_[$key]);
+                    self::__construct($array);
                 }
-                $_GET[$key] = str_replace("\0", '', str_replace(
+                $array = str_replace("\0", '', str_replace(
                     array("\\", "\0", "\n", "\r", "\xla", "'", '"'),
                     array("\\\\", "\\0", "\\n", "\\r", "\\xla", "\'", '\"'),
-                    htmlspecialchars(mb_convert_encoding($value, 'USJIS, EUC-JP'))));
+                    htmlspecialchars(mb_convert_encoding($value, 'UTF-8 EUC-JP'))));
             }
-            return true;
         }
-        foreach($_GET as $key => $value)
+        
+        if($type=='post')
         {
-            if(is_array($_GET[$key]))
+            foreach($array as $key => $value)
             {
-                self::__construct($_GET[$key]);
+                $array = str_replace("\0", '', str_replace(
+                    array("\\", "\0", "\n", "\r", "\xla", "'", '"'),
+                    array("\\\\", "\\0", "\\n", "\\r", "\\xla", "\'", '\"'),
+                    htmlspecialchars(mb_convert_encoding($value, 'UTF-8 EUC-JP'))));
             }
-            $_GET[$key] = str_replace("\0", '', str_replace(
-                array("\\", "\0", "\n", "\r", "\xla", "'", '"'),
-                array("\\\\", "\\0", "\\n", "\\r", "\\xla", "\'", '\"'),
-                htmlspecialchars(mb_convert_encoding($value, 'UTF-8 EUC-JP'))));
-        }
-        foreach($_POST as $key => $value)
-        {
-            $_POST[$key] = str_replace("\0", '', str_replace(
-                array("\\", "\0", "\n", "\r", "\xla", "'", '"'),
-                array("\\\\", "\\0", "\\n", "\\r", "\\xla", "\'", '\"'),
-                htmlspecoalchars(mb_convert_encoding($value, 'UTF-8 EUC-JP'))));
         }
     }
 }
