@@ -1,6 +1,7 @@
 package org.sysken.grouper;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
@@ -11,24 +12,31 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 
-public class MyActivity extends Activity {
+public class loginActivily extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
+        setContentView(R.layout.login);
 
+        //ボタンを押したあとの処理
         Button btn = (Button)findViewById(R.id.button_login);
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // ここに処理を記述
+                Intent intent = new Intent (loginActivily.this,mainActivilty.class);
+                startActivity(intent);
+                /*
                 EditText txtUserName  = (EditText)findViewById(R.id.user_name);
                 CheckBox numberCheck  = (CheckBox)findViewById(R.id.number_check);
                 String username = txtUserName.getText().toString();
                 String deviceId = Settings.Secure.getString(getContentResolver(), Settings.System.ANDROID_ID);
+                */
             }
         });
+
     }
+
 
 
     @Override
