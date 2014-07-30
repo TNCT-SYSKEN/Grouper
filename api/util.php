@@ -67,7 +67,7 @@ class main //extends mysqli
         {
             if($debug)
             {
-                return "Couldn't connect to SQL" . $mysqli->errno; /*{{{* Syntax : unexpected -> }}}*/
+                return "Couldn't connect to SQL" . $mysqli->errno;
             }else{
                 return false;
             }
@@ -297,7 +297,7 @@ class api //extends mysqli
     
     function __construct($host, $username, $password, $db, $port)
     {
-        $this->$_mysqli => new db($host, $username, $password, $db); /*{{{* 致命的なエラー : 空のプロパティーにはアクセス出来ません  }}}*/
+        $this->$_mysqli => new db($host, $username, $password, $db);
     }
     
     function createJson($array){
@@ -329,7 +329,7 @@ class api //extends mysqli
                                                                          'is_tel_pub'=>$is_tel_pub,
                                                                          'username'=>$username)
                                                         );
-        $query_rest = $this -> _mysqli => goQuery(array($query, true)); /*{{{* 構文解析エラー : 期待していない => *}}}*/
+        $query_rest = $this -> _mysqli => goQuery(array($query, true)); 
         if(!$query_rest)
         {
             main::error('regist', 'regist error');
