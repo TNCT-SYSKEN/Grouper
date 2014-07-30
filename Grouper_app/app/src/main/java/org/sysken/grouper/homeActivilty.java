@@ -3,16 +3,14 @@ package org.sysken.grouper;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 
 
-public class mainActivilty extends Activity {
+public class homeActivilty extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_menu);
+        setContentView(R.layout.main);
 
         //ボタンを押したあとの処理
 
