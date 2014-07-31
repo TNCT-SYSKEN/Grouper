@@ -1,5 +1,6 @@
 package org.sysken.grouper;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 
-public class loginActivily extends Activity {
+public class LoginAct extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +22,7 @@ public class loginActivily extends Activity {
         btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // ここに処理を記述
-                Intent intent = new Intent (loginActivily.this,homeActivilty.class);
+                Intent intent = new Intent (LoginAct.this,TabAct.class);
                 startActivity(intent);
                 /*
                 EditText txtUserName  = (EditText)findViewById(R.id.user_name);
