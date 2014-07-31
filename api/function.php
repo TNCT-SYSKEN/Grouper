@@ -11,7 +11,7 @@
  * @create 2014/07/27
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP 5.5 / MySQL 5+
- * @verison 0.1.20140729
+ * @verison 0.1.20140731
  * @ts 4
  * @link http://grouper.sysken.org/
  */
@@ -34,7 +34,7 @@ if($debug)
  *
  * APIのコア機能を提供します。
  *
- * @auther Grouper Project Team<raryosu@sysken.org>
+ * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5+
  * @version 0.1
  */
@@ -86,7 +86,7 @@ class main //extends mysqli
         return $rest;
     }
     
-    function validation($value, $type = 'none')
+    function validation($type = 'none', $value)
     {
         switch($type)
         {
@@ -187,7 +187,7 @@ class main //extends mysqli
     
     /**
      * Security and sanitize
-     * @auther Ryosuke Hagihara (raryosu@sysken.org)
+     * @auther Ryosuke Hagihara<raryosu@sysken.org>
      *
      * @param array|string $content User Content
      * @return array                sanitize content
@@ -287,13 +287,14 @@ class main //extends mysqli
  *
  * APIの処理を行います!!
  * 
- * @auther Ryosuke Hagihara(raryosu@sysken.org)
+ * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+
  * @version 0.1
  */
 class api //extends mysqli
 {
     protected $_mysqli;
+    $count = 0;
     
     function __construct($host, $username, $password, $db, $port)
     {
@@ -332,7 +333,7 @@ class api //extends mysqli
         $query_rest = $this -> _mysqli -> goQuery(array($query, true));
         if(!$query_rest)
         {
-            main::error('regist', 'regist error');
+            main::error('regist', 'regist error'); // error->exit()してくれるからbreak不要
         }
         return createJson(array('status'=>'200'));
     }
@@ -370,9 +371,12 @@ class api //extends mysqli
      * @param string $userID            作成者
      * @param timestamp $create_time    作成日時
      * @return array|string             JSON返す
+     * 
+     * @todo sessionIDからuserID取得
      */ 
-    function create($sessionID, $group_name, $group_desc, $userID, $create_time)
+    function create($sessionID, $group_name, $group_desc, $create_time)
     {
+        $userid = ''; // sessionIDから取得
         $query = $this -> _mysqli -> BuildQuery('INSERT', 'User', array(
                                                                          'group_name'=>$group_name,
                                                                          'group_description'=>$group_desc,
@@ -394,20 +398,25 @@ class api //extends mysqli
      * 
      * @param string $sessionID         セッションIDです
      * @param string $groupID           グループIDです
-     * @param string $inviteID          アプリで生成したランダムな招待IDです
      * @return array|string             JSON返す
      */ 
-    function invite($sessionID, $groupID, $inviteID)
+    function invite($sessionID, $groupID)
     {
+        $inviteID = ''; // 頑張って生成します
         $query = $this -> _mysqli -> BuildQuery('INSERT', 'User', array(
-                                                                         'groupID'=>$groupID,
-                                                                         'inviteID'=>inviteID
-                                                                         )
+                                                                        'groupID'=>$groupID,
+                                                                        'sessionID'=>$sessionID
+                                                                        )
                                                 );
         $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
+        if(!$query_rest)  // inviteID重複を想定
         {
-            main::error('inviteID', 'inviteID insert error');
+            function invite($sessionID, $groupID);
+            global $count++;
+        }
+        if($count >= 3) // 3回エラーが起きたらエラー返す
+        {
+            main::error('inviteID', 'create inviteID error');
         }
         return createJson(array('status'=>'200'));
     }
@@ -416,12 +425,16 @@ class api //extends mysqli
     * グループにユーザを追加します
     * 
     * @param string $sessionID         セッションIDです
-    * @param string $groupID           グループIDです
-    * @param string $userID            ユーザIDです
+    * @param string $inviteID          招待IDです
     * @return array|string             JSON返す
+    * 
+    * @todo sessionIDからgroupID取得
+    * @todo sessionIDからuserID取得
     */      
-    function addUser($sessionID, $groupID, $userID)
+    function addUser($sessionID, $inviteID)
     {
+        $groupID = ''; //sessionIDから取得
+        $userID = ''; //sessionIDから取得
         $query = $this -> _mysqli -> buildQuery('INSERT', 'Relational', array(
                                                                                'groupID'=>$groupID,
                                                                                'userID'=>$userID
@@ -445,9 +458,13 @@ class api //extends mysqli
     * @param float geo_x, geo_y       GPS座標です
     * @param binary media             画像情報です
     * @return array|string             JSON返す
+    * 
+    * @todo sessionIDからUserID取得
     */
     function talk($sessionID, $groupID, $talk_time, $talk=null, $geo_x=null, $geo_y=null, $media=null)
     {
+        $userID = ''; //sessionIDから取得
+        
         //sessionIDからuserIDを取得したい
         $query = $this -> _mysqli -> buildQuery('INSERT', 'Chat', array(
                                                                        'groupID'=>$groupID,
@@ -478,10 +495,13 @@ class api //extends mysqli
     * @param string alert_opt1        アラート選択肢1
     * @param string alerm_opt2        アラート選択肢2
     * @return array|string             JSON返す
+    * 
+    * @todo sessionIDからuserID
     */
     function alarm($sessionID, $groupID, $time_alarm, $is_repeat=false, $time_repeat=null,
                     $alert_desc, $alert_opt1, $alert_opt2)
-    {    
+    { 
+        $userID = ''; // sessionIDから生成
         $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm', array(
                                                                         'alarm_time'=>$time_alarm,
                                                                         'groupID'=>$groupID,
@@ -504,10 +524,12 @@ class api //extends mysqli
     * アラートに対する応答です
     * 
     * @param string sessionID         セッションIDです
-    * @param string groupID           グループIDです
     * @param string alarmID           アラームID
     * @param string alert_choise      選択した番号
-    *  @return array|string            JSON返す
+    * @return array|string            JSON返す
+    * 
+    * @todo sessionID から userID 取得
+    * @todo alarmID から groupID 取得
     */
     function alertchoice($sessionID, $groupID, $alarmID, $alert_choice)
     {
@@ -518,13 +540,15 @@ class api //extends mysqli
     * トーク管理用
     * 
     * @param string sessionID         セッションIDです
-    * @param string groupID           グループIDです
     * @param string talkID            トークID
     * @param string talk_del          削除するかどうか
     * @return array|string            JSON返す
+    * 
+    * @todo talkID から groupID 取得 ->必要？
     */
-    function settingTalk($sessionID, $groupID, $talkID, $talk_del)
+    function settingTalk($sessionID, $talkID, $talk_del)
     {
+        $groupID = ''; // talkIDから取得
         if($talk_del==true)
         {
                 $query = $this -> _mysqli -> buildQuery('DELETE', 'Chat', array('ID'=>$talkID));
@@ -586,11 +610,13 @@ class api //extends mysqli
     * ユーザ情報取得
     * 
     * @param string sessionID         セッションIDです
-    * @param string userID            ゆーざID 
     * @return array|string            JSON返す
+    * 
+    * @todo sessinIDからuserID取得
     */
-    function getUser($sessionID, $userID)
+    function getUser($sessionID)
     {
+        $userID = ''; // sessinID から取得
         $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array());
     } //646と同じ
       
@@ -598,13 +624,12 @@ class api //extends mysqli
     * グループ管理
     * 
     * @param string sessionID         セッションIDです
-    * @param string userID            ユーザID
-    * @param string group_name        電話番号を公開するか否か
+    * @param string group_name        グループ名
     * @param string group_desc        グループ詳細
     * @param boolean is_group_del      グループ削除
     * @return array|string            JSON返す
     */
-    function settingGroup($sessionID, $userID, $group_name='', $group_desc='', $is_group_del=false)
+    function settingGroup($sessionID, $group_name='', $group_desc='', $is_group_del=false)
     {
         $array[group_name] = $group_name;
         $array[group_desc] = $group_desc;
@@ -638,7 +663,7 @@ class api //extends mysqli
     * @param string groupID           グループID
     * @return array|string            JSON返す
     */
-    function getGroup($sessionID, $userID, $group_name, $group_desc, $is_group_del)
+    function getGroup($sessionID, $groupID)
     {
         $query = $this -> _mysql ->buildQuery('SELECT', 'group', array(
                                                                         ));
@@ -783,3 +808,4 @@ class db
     }
 }
     
+?>
