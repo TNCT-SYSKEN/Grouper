@@ -1,5 +1,5 @@
 <?php
-/** GrouperメインAPI
+/** GrouperメインAPI(?)
  * 
  * GrouperのAPI
  * 
@@ -11,14 +11,14 @@
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5 / MySQL5+
  * @version 0.1.20140731
- * @ts 4
+ * @ts 4  // tsってなに？
  * @link http://grouper.sysken.org/
  */
  
  // debug flag
  $debug = false;
  
- // デバッグ時の操作
+ // デ??
 if($debug)
 {
     error_reporting(-1);
@@ -29,7 +29,7 @@ if($debug)
 }
 
 // function.phpをinclude
-if(!include('function.php')) // 絶対パスで指定(パッケージ名?)
+if(!include('/home/raryosu/function.php')) // 絶対パスで指定(パッケージ名?)
 {
     echo 'Internal Server Error';
     exit();
@@ -37,7 +37,7 @@ if(!include('function.php')) // 絶対パスで指定(パッケージ名?)
 
 // 初期化(インスタンスを作るんじゃぁ＾～)
 $main = new main();
-$api = new api(localhost, raryosu, pass, grouper)
+$api = new api(localhost, raryosu, pass, grouper);
 
 // $_GET, $_POSTの処理 
 foreach($_GET as $key => $value)
@@ -75,14 +75,14 @@ switch($_GET[$mode])
         echo $rest;
         break;
         
-    // グループ作成 * 動作しません
+    // グループ作??しません
     case 'create':
         $rest = $api -> create($_GET['sessionID'], $_GET['group_name'], $_GET['group_desc'], $_GET['create_time']);
             // function create($sessionID, $group_name, $group_desc, $create_time)
         echo $rest;
         break;
     
-    // 招待ID生成 * 動作しません
+    // 招待ID生??しません
     case 'inviteID':
         $rest = $api -> invite($_GET['sessionID'], $_GET['groupID']);
             // function invite($sessionID, $groupID)
@@ -107,7 +107,7 @@ switch($_GET[$mode])
     // アラーム設定 * 動作しません
     case 'alarm':
         $rest = $api -> alarm($_GET['sessionID'], $_GET['groupID'], $_GET['time_alarm'], $_GET['is_repeat'],
-                             $_GET['time_repeat'], $_GET['alert_desc'], $_GET['alert_opt1'], $_GET['alert_opt2');
+                              $_GET['time_repeat'], $_GET['alert_desc'], $_GET['alert_opt1'], $_GET['alert_opt2']);
             // function alarm($sessionID, $groupID, $time_alarm, $is_repeat=false,
             //                $time_repeat=null, $alert_desc, $alert_opt1, $alert_opt2)
         echo $rest;
@@ -142,7 +142,7 @@ switch($_GET[$mode])
         echo $rest;
         break;
     
-    // グループ管理 * 動作しません
+    // グループ管?しません
     case 'settingGroup':
         $rest = $api -> settingGroup($_GET['sessionID'], $_GET['group_name'], 
                                      $_GET['group_desc'], $_GET['is_group_del']);
@@ -161,3 +161,4 @@ switch($_GET[$mode])
         echo $main -> error('query', 'query error');
 }
 ?>
+

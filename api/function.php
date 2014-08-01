@@ -293,9 +293,9 @@ class main //extends mysqli
  */
 class api //extends mysqli
 {
-    protected $_mysqli;
-    $count = 0;
-    
+    protected $_mysqlic;
+    public $count;
+
     function __construct($host, $username, $password, $db, $port)
     {
         $this->_mysqli = new db($host, $username, $password, $db);
@@ -411,8 +411,8 @@ class api //extends mysqli
         $query_rest = $this -> _mysqli -> goQuery($query, true);
         if(!$query_rest)  // inviteID重複を想定
         {
-            function invite($sessionID, $groupID);
-            global $count++;
+            invite($sessionID, $groupID);
+            $count++;
         }
         if($count >= 3) // 3回エラーが起きたらエラー返す
         {
