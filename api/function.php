@@ -109,7 +109,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error valdation');
+                self::error('other','Vald Error');
                 break;
                 
             case 'tel1':
@@ -117,7 +117,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error valdation');
+                self::error('other','Vald Error');
                 break;
             
             case 'aleat_choice':
@@ -125,7 +125,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error valdation');
+                self::error('other','Vald Error');
                 break;
                 
             case 'alarm_time':
@@ -147,23 +147,23 @@ class main //extends mysqli
                         $day<1 || $day>31 || $hour<0 || $hour>23 ||
                         $minute<0 || minute>59 || $second<0 || $second>0)
                     {
-                        self::error('other','Vald Error valdation');
+                        self::error('other','Vald Error');
                         break;
                     }
                     
                     if(($month==4 || $month==6 || $month==9 || $month==11)
                         && $day>30)
                     {
-                        self::error('other','Vald Error valdation');
+                        self::error('other','Vald Error');
                         break;
                     }
                     
                     if($month==2 && $year%4==1 && $day>28)
                     {
-                        self::error('other','Vald Error valdation');
+                        self::error('other','Vald Error');
                         break;
                     }else if($month==2 && $year%4==0 && $day>29){
-                        self::error('other','Vald Error valdation');
+                        self::error('other','Vald Error');
                         break;
                     }
                     
@@ -177,7 +177,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error valdation');
+                self::error('other','Vald Error');
             break;
                 
             case 'alert_choise':
@@ -185,7 +185,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error valdation');
+                self::error('other','Vald Error');
                 break;
             
             default:
