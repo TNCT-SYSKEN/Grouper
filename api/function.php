@@ -11,7 +11,7 @@
  * @create 2014/07/27
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP 5.5 / MySQL 5+
- * @verison 0.1.20140731
+ * @verison 0.1.20140804
  * @ts 4
  * @link http://grouper.sysken.org/
  */
@@ -74,7 +74,13 @@ class main //extends mysqli
         }
 
     }
-    
+
+    /**
+     * パラメータの処理
+     *
+     * @param  array|string         URLの末尾のパラメータ
+     * @return array|string $rest   処理後のパラメータ
+     */
     function paramAssign($array)
     {
         foreach($array as $key => $value)
@@ -86,6 +92,13 @@ class main //extends mysqli
         return $rest;
     }
     
+    /**
+     * Validationを行います
+     *
+     * @param  string $type     タイプ
+     * @param  string $value    値
+     * @return bool
+     */
     function validation($type = 'none', $value)
     {
         switch($type)
@@ -96,7 +109,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('Vald Error');
+                self::error('other','Vald Error valdation');
                 break;
                 
             case 'tel1':
@@ -104,7 +117,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('Vald Error');
+                self::error('other','Vald Error valdation');
                 break;
             
             case 'aleat_choice':
@@ -112,7 +125,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('Vald Error');
+                self::error('other','Vald Error valdation');
                 break;
                 
             case 'alarm_time':
@@ -134,23 +147,23 @@ class main //extends mysqli
                         $day<1 || $day>31 || $hour<0 || $hour>23 ||
                         $minute<0 || minute>59 || $second<0 || $second>0)
                     {
-                        self::error('Vald Error');
+                        self::error('other','Vald Error valdation');
                         break;
                     }
                     
                     if(($month==4 || $month==6 || $month==9 || $month==11)
                         && $day>30)
                     {
-                        self::error('Vald Error');
+                        self::error('other','Vald Error valdation');
                         break;
                     }
                     
                     if($month==2 && $year%4==1 && $day>28)
                     {
-                        self::error('Vald Error');
+                        self::error('other','Vald Error valdation');
                         break;
                     }else if($month==2 && $year%4==0 && $day>29){
-                        self::error('Vald Error');
+                        self::error('other','Vald Error valdation');
                         break;
                     }
                     
@@ -164,7 +177,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('Vald Error');
+                self::error('other','Vald Error valdation');
             break;
                 
             case 'alert_choise':
@@ -172,7 +185,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('Vald Error');
+                self::error('other','Vald Error valdation');
                 break;
             
             default:
@@ -180,7 +193,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('Vald Error');
+                self::error('other','Vald Error validation');
                 break;
         }
     }
@@ -221,12 +234,25 @@ class main //extends mysqli
         }
         return $result;
     }
-    
+
+    /**
+     * JSON出力用にヘッダーセット
+     *
+     * @param  string $header   取得
+     * @return bool
+     */
     function setHeader($header) {
         header($header);
         return true;
     }
-    
+
+    /**
+     * JSON出力用JSONを生成
+     *
+     * @param  string $content  コンテンツ
+     * @param  string $header   ヘッダ
+     * @return string $content  JSONを返す
+     */
     function outgoing($content, $header = '')
     {
         if(is_array($header))
@@ -242,42 +268,54 @@ class main //extends mysqli
         return $content;
     }
     
+    /**
+     * エラーを出力
+     *
+     * @param  string $type     エラー発生場所
+     * @param  string $msg      エラーメッセージ
+     */
     function error($type, $msg) 
     {
         ob_end_flush();
         self::setHeader("Content-Type: application/json; charset=utf-8");
-        $json = api::createJson(array('status' => '-1'));
+        $json = api::createJson(array('status' => '-1', 'message' => $msg));
         
         switch($type)
         {
             case 'db':
-                self::serHeader("x-status-code: 500-1");
-                $json = api::createJson(array('status' => '500'));
+                self::setHeader("x-status-code: 500-1");
+                $json = api::createJson(array('status' => '500', 'message' => $msg ));
                 break;
                 
             case 'api':
-                self::serHeader("x-status-code: 500-2");
-                $json = api::createJson(array('status' => '500'));
+                self::setHeader("x-status-code: 500-2");
+                $json = api::createJson(array('status' => '500', 'message' => $msg ));
                 break;
                 
             case 'session':
-                self::serHeader("x-status-code: 500-3");
-                $json = api::createJson(array('status' => '500'));
+                self::setHeader("x-status-code: 500-3");
+                $json = api::createJson(array('status' => '500', 'message' => $msg ));
                 break;
                 
             case 'login':
-                self::serHeader("x-status-code: 401");
-                $json = api::createJson(array('status' => '401'));
+                self::setHeader("x-status-code: 401");
+                $json = api::createJson(array('status' => '401', 'message' => $msg ));
                 break;
                 
             case 'query':
-                self::serHeader("x-status-code: 400-1");
-                $json = api::createJson(array('status' => '400'));
+                self::setHeader("x-status-code: 400-1");
+                $json = api::createJson(array('status' => '400', 'message' => $msg ));
                 break;
+
+            case 'other':
+                self::setHeader("x-status-code: 500-4");
+                $json = api::createJson(array('status' => '500', 'message' => $msg ));
+                break;
+
         }
         
         self::setHeader("x-sid: " . time());
-        echo $json; // 関数外で吐くようにした方がいいのか・・・？
+        echo $json;
         exit();
     }
 }
@@ -293,14 +331,29 @@ class main //extends mysqli
  */
 class api //extends mysqli
 {
-    protected $_mysqlic;
+    protected $_mysqli;
     public $count;
 
+    /**
+     * DBとの接続を確立します
+     * 
+     * @param string $host          ホスト名
+     * @param string $username      ユーザ名
+     * @param string $password      パスワード
+     * @param string $db            データベース名
+     * @param string $port          ポート番号
+     */
     function __construct($host, $username, $password, $db, $port)
     {
         $this->_mysqli = new db($host, $username, $password, $db);
     }
-    
+
+    /**
+     * JSONを生成します
+     * 
+     * @param array|string $array   JSONにしたい文字列
+     * @param array|string $array   JSONを返す
+     */ 
     function createJson($array){
         return json_encode($array);
     }
@@ -680,7 +733,17 @@ class db
     protected $password;
     protected $db;
     protected $port;
-    
+
+
+    /**
+     * DB接続のデフォルトの値を設定し，接続します
+     * 
+     * @param string $host          ホスト名
+     * @param string $username      ユーザ名
+     * @param string $password      パスワード
+     * @param string $db            データベース名
+     * @param string $port          ポート番号
+     */ 
     function __construct($host = null, $username = null, $password = null,
                          $db = null, $port = null)
     {
@@ -721,7 +784,11 @@ class db
         
         $this -> connect();
     }
-    
+
+
+    /**
+     * DBとの接続を確立します
+     */
     function connect()
     {
         $this -> _mysqli = new mysqli($this -> host, $this -> username, $this -> password,
@@ -736,7 +803,16 @@ class db
         $this -> _mysqli -> set_charset('utf-8');
         return true;
     }
-    
+
+
+    /**
+     * DBとの接続を確立します
+     * 
+     * @param string $type          INSERT， SELECT， DELETE， UPDATEのいずれか
+     * @param string $table         テーブル名
+     * @param string $array         値
+     * @param string $query         SQL文を返します
+     */ 
     function buildQuery($type, $table, $array)
     {
         $query = '';
@@ -789,7 +865,15 @@ class db
         }
         return $query;
     }
-    
+
+
+    /**
+     * クエリを実行します
+     * 
+     * @param  string $query          クエリ
+     * @param  bool   $is_secure      正当性をチェックします
+     * @return string $rest
+     */ 
     function goQuery($query, $is_secure = false)
     {
         if(!$is_secure)

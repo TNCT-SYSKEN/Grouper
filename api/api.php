@@ -1,17 +1,18 @@
 <?php
-/** GrouperメインAPI(?)
+/** 
+ * GrouperメインAPI(?)
  * 
  * GrouperのAPI
  * 
  * PHP version 4 and 5
  * 
  * @package org.sysken.grouper.api
- * @copyright &copy; 2014 SYSKEN, Ryosuke Hagihara(raryosu@sysken.org)
+ * @copyright &copy; 2014 SYSKEN, Ryosuke Hagihara
  * @create 2014/07/31
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5 / MySQL5+
- * @version 0.1.20140731
- * @ts 4  // tsってなに？
+ * @version 0.1.20140804
+ * @ts 4
  * @link http://grouper.sysken.org/
  */
  
@@ -22,14 +23,14 @@
 if($debug)
 {
     error_reporting(-1);
-    ini_set('display_errors', 'On'); //php.ini書き換えたらhttpd再起動必要なのでは？
+    ini_set('display_errors', true);
 }else{
     error_reporting(0);
-    ini_set('display_errors', 'Off');
+    ini_set('display_errors', false);
 }
 
 // function.phpをinclude
-if(!include('/home/raryosu/function.php')) // 絶対パスで指定(パッケージ名?)
+if(!include('/var/www/api/function.php')) // 絶対パスで指定(パッケージ名?)
 {
     echo 'Internal Server Error';
     exit();
@@ -37,7 +38,7 @@ if(!include('/home/raryosu/function.php')) // 絶対パスで指定(パッケー
 
 // 初期化(インスタンスを作るんじゃぁ＾～)
 $main = new main();
-$api = new api(localhost, raryosu, pass, grouper);
+$api = new api(localhost, root, stopstop00, Grouper);
 
 // $_GET, $_POSTの処理 
 foreach($_GET as $key => $value)
