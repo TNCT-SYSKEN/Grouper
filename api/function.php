@@ -11,7 +11,7 @@
  * @create 2014/07/27
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP 5.5 / MySQL 5+
- * @verison 0.1.20140804
+ * @verison 0.1.20140731
  * @ts 4
  * @link http://grouper.sysken.org/
  */
@@ -109,7 +109,7 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error');
+                self::error('other','Vald Error tel');
                 break;
                 
             case 'tel1':
@@ -117,17 +117,9 @@ class main //extends mysqli
                 {
                     return true;
                 }
-                self::error('other','Vald Error');
+                self::error('other','Vald Error tel');
                 break;
             
-            case 'aleat_choice':
-                if(is_numeric($value))
-                {
-                    return true;
-                }
-                self::error('other','Vald Error');
-                break;
-                
             case 'alarm_time':
             case 'group_time':
             case 'talk_time':
@@ -147,23 +139,23 @@ class main //extends mysqli
                         $day<1 || $day>31 || $hour<0 || $hour>23 ||
                         $minute<0 || minute>59 || $second<0 || $second>0)
                     {
-                        self::error('other','Vald Error');
+                        self::error('other','Vald Error time');
                         break;
                     }
                     
                     if(($month==4 || $month==6 || $month==9 || $month==11)
                         && $day>30)
                     {
-                        self::error('other','Vald Error');
+                        self::error('other','Vald Error time');
                         break;
                     }
                     
                     if($month==2 && $year%4==1 && $day>28)
                     {
-                        self::error('other','Vald Error');
+                        self::error('other','Vald Error time');
                         break;
                     }else if($month==2 && $year%4==0 && $day>29){
-                        self::error('other','Vald Error');
+                        self::error('other','Vald Error time');
                         break;
                     }
                     
@@ -173,27 +165,31 @@ class main //extends mysqli
             case 'is_tel_pub':
             case 'is_repeat':
             case 'is_group_delete':
+	    case 'debug':
                 if(is_bool($value))
                 {
                     return true;
+		    break;			
                 }
-                self::error('other','Vald Error');
-            break;
+                self::error('other','Vald Error bool');
+                break;
                 
             case 'alert_choise':
                 if($value=='1' || $value=='0')
                 {
                     return true;
+		    break;
                 }
-                self::error('other','Vald Error');
+                self::error('other','Vald Error alert_choice');
                 break;
             
             default:
                 if(is_string($value))
                 {
                     return true;
+		    break;
                 }
-                self::error('other','Vald Error validation');
+                self::error('other','Vald Error string');
                 break;
         }
     }
@@ -278,7 +274,7 @@ class main //extends mysqli
     {
         ob_end_flush();
         self::setHeader("Content-Type: application/json; charset=utf-8");
-        $json = api::createJson(array('status' => '-1', 'message' => $msg));
+        $json = api::createJson(array('status' => '-1', 'message' => $msg ));
         
         switch($type)
         {
@@ -308,14 +304,14 @@ class main //extends mysqli
                 break;
 
             case 'other':
-                self::setHeader("x-status-code: 500-4");
-                $json = api::createJson(array('status' => '500', 'message' => $msg ));
+                self::setHeader("x-status-code: 400-2");
+                $json = api::createJson(array('status' => '400', 'message' => $msg ));
                 break;
 
         }
         
         self::setHeader("x-sid: " . time());
-        echo $json;
+        echo $json; // 関数外で吐くようにした方がいいのか・・・？
         exit();
     }
 }
@@ -893,3 +889,4 @@ class db
 }
     
 ?>
+

@@ -38,24 +38,28 @@ if(!include('/var/www/api/function.php')) // 絶対パスで指定(パッケー�
 
 // 初期化(インスタンスを作るんじゃぁ＾～)
 $main = new main();
-$api = new api(localhost, root, stopstop00, Grouper);
+$api = new api(localhost, connection, grouper_server_tsuyama, Grouper);
 
 // $_GET, $_POSTの処理 
 foreach($_GET as $key => $value)
 {
     $_GET[$key] = $main -> secure($value);
+
     if(!($main -> validation($key, $_GET[$key])))
     {
         exit();     //ここの処理不安
     }
 }
+
 foreach($_POST as $key => $value)
 {
     $_POST = $main -> secure($value);
+/*
     if(!($main -> validation($key, $_POST[$key])))
     {
         exit();     //ここの処理不安
     }
+*/
 }
 
 // 実際に動かす部分(modeでswitch)
@@ -162,4 +166,5 @@ switch($_GET[$mode])
         echo $main -> error('query', 'query error');
 }
 ?>
+
 
