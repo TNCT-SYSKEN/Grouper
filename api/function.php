@@ -1,892 +1,604 @@
 <?php
 /**
- * Grouperコア コンポーネントクラス
- * 
- * Grouperの、主な処理を行うメインコンポーネント
- * 
- * PHP versions 4 and 5
- * 
- * @package org.sysken.grouper.core
- * @copyright &copy; 2014 SYSKEN, Ryosuke Hagihara
- * @create 2014/07/27
- * @auther Ryosuke Hagihara<raryosu@sysken.org>
- * @since PHP 5.5 / MySQL 5+
- * @verison 0.1.20140731
- * @ts 4
- * @link http://grouper.sysken.org/
+ * Grouper ファンクション
+ *
+ * @copyright &copy; 2014 Ryosuke Hagihara
+ * @create    2014.08.05
+ * @auther    Ryosuke Hagihara<raryosu@sysken.org>
+ * @since     PHP5.5+ / MySQL 5.3+
+ * @version   0.2.20140803
+ * @link      http://grouper.sysken.org/
  */
 
-/** Debug Flag **/
-$debug = false;
+// ファイルが直接読み込まれた場合は終了
+if(basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) exit();
 
-/** Charm **/
-if($debug)
+/**
+ * 共通クラス
+ *
+ * すべての処理で共通して利用する関数をまとめたクラスです。
+ *
+ * @copyright &copy;2014 Ryosuke Hagihara
+ * @version 0.2.20140805
+ */
+class common
 {
-    error_reporting(-1);
-    ini_set('display_errors', true);
-}else{
-    error_reporting(0);
-    ini_set('display_errors', false);
+  /**
+   * バイナリセーフでない値をバリデーションします(日本語あやうい)
+   *
+   * @param string $t 信頼に値しない情報
+   * @return string   エスケープ結果
+   */
+  function security($t)
+  {
+    return str_replace('\0', '', 
+                       str_replace(array('\\', '\0', '\n', '\r', '\xla', "'", '"'),
+                                   array('\\\\', '\\0', '\\n', '\\r', '\\xla', "\\'", '\\"'),
+                                   htmlspecoalchars(mb_convert_encoding($t, 'UTF-8', 'UTF-8,SJIS,EUC-JP'))
+                                   )
+                       );
+  }
+
+  /**
+   * レスポンスヘッダを設定します
+   *
+   * @param string $header    ヘッダ文字列
+   * @return bool             実行結果
+   */
+  function setHeader($header)
+  {
+    header($header);
+    return true;
+  }
+
+  /**
+   * データ送信準備
+   *
+   * @param array $content 連想配列
+   * @param array $header  ヘッダ内容
+   * @return string        出力できる文字列
+   */
+  function outgoing($content, $header = '')
+  {
+    // ヘッダの設定
+    if(is_array($header))
+    {
+      foreach ($header as $value)
+      {
+        self::setHeader($value);
+      }
+    }
+    self::setHeader("Content-Type: application/json; charset=utf-8");
+
+    // メインコンテンツ
+    $content = api::createJson($content);
+    return $content;
+  }
+
+  /**
+   * エラー時に実行する関数
+   * エラー用コード生成を行います
+   *
+   * @param string $type エラーの発生箇所[db, api, session, internal, query, login, other]
+   * @param strinr $msg  エラーの詳細
+   * @return  null
+   */
+  function error($type, $msg)
+  {
+    ob_end_flush();
+    self::setHeader('Content-Type: application/json; charset=utf-8');
+
+    $json = api::createJson(array('status'=>'500', 'contents'=>array('code'=>'-１', 'msg'=>'未知のエラーが発生しました')));
+
+    switch($type)
+    {
+      case 'db':
+        self::setHeader('x-status-code: 500-1');
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
+        break;
+
+      case 'api':
+        self::setHeader('x-status-code: 500-2');
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
+        break;
+
+      case 'session':
+        self::setHeader('x-status-code: 500-3');
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
+        break;
+
+      case 'internal':
+        self::setHeader('x-status-code: 500-4');
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
+        break;
+
+      case 'login':
+        self::setHeader('x-status-code: 401');
+        $json = api::createJson(array('status'=>'ERR', contents=>(array('code'=>'401', 'msg'=>$msg))));
+        break;
+
+      case 'query':
+        self::setHeader('x-status-code:400-1');
+        $json = api::createJson(array('status'=>'ERR', contents=>(array('code'=>'400', 'msg'=>$msg))));
+        break;
+    }
+    self::setHeader("x-sid: " . time());
+    echo $json;
+    exit();
+  }
 }
 
 /**
- * メイン処理クラス
+ * Grouper API処理クラス
  *
- * APIのコア機能を提供します。
+ * APIに関するクラスです
  *
- * @auther Ryosuke Hagihara<raryosu@sysken.org>
- * @since PHP5.5+ / MySQL 5+
- * @version 0.1
+ * @copyright &copy; 2014 Ryosuke Hagihara
+ * @version 0.2.20140803
  */
-class main //extends mysqli 
+class api
 {
-    /**
-     * 公開用jsonを生成します
-     *
-     * @param string $row rowを渡します
-     * @return string json_encodeされた結果を戻します
-     */
-    function publishJson($row)
+  /**
+   * MySQLハンドラの保持
+   * 
+   * @var resourse MySQLインスタンス
+   */
+  protected $_mysqli;
+
+  /**
+   * APIグローバルパラメータ
+   *
+   * @var array パラメータ
+   */
+  protected $_PARAM;
+
+  /**
+   * コンストラクト
+   *
+   * APIクラスが初期化された時に実行されます。
+   *
+   * @param string $host      MySQL接続先
+   * @param string $username  MySQLユーザ
+   * @param string $password  MySQLユーザのパスワード
+   * @param string $db        DB名
+   * @param int    $port      MySQLポート
+   */
+  function __construct($host = null, $username = null, $password = null,
+                       $db = null, $port = null)
+  {
+    $this -> _mysqli = new db($host, $username, $password, $db);
+  }
+
+  /**
+   * 渡された配列データからAPIレスポンス用のJSONを生成します
+   *
+   * @param  array $array 連想配列
+   * @return string       生成されたJSONデータ
+   */
+  function createJson($array)
+  {
+    return json_encode($array);
+  }
+
+  /**
+   * パラメータのアサイン
+   *
+   * @param string $name 変数名
+   * @param string $mode バリデーションモード
+   * @param string $text アサインしたいテキスト
+   * @return bool
+   */
+  function paramAssign($name, $mode, $text)
+  {
+    $options = explode(',', $mode);
+    if(!self::validation($text, $options))
     {
-        header('Content-type: application/json');
-        return json_encode($row);
+      common::error('query', 'query error (format)');
     }
-    /**
-     * MySQLに接続します
-     *
-     * @param  string $server   MySQL hostname
-     * @param  string $user     MySQL Username
-     * @param  string $password MySQL dbpassword
-     * @param  string $dbName   MySQL Database
-     * @return string           ErrorMsg
-     */
-    function connectSql($server, $user, $dbpassword, $dbName)
+    /*
+    if(array_search('password', $options))
     {
-        $mysqli = mysqli::__construct($server, $user, $dbpassword, $dbName);
-        if(!$connection)
+      $text = password_hash($text, PASSWORD_BCRYPT, array('cost'=>12));
+    }
+    */
+   
+   $this -> _PARAM[$name] = $text;
+   return true;
+  }
+
+  /**
+   * バリデーション
+   *
+   * @param string $text テキスト
+   * @param array  $mode バリデーションモード
+   * @return bool
+   */
+  function validation($text, $mode)
+  {
+    if(!is_array($mode))
+    {
+      return false;
+    }
+
+    foreach ($mode as $value)
+    {
+      if(is_numeric($value))
+      {
+        if(!(mb_strlen($text) <= $value))
         {
-            if($debug)
+          return false;
+        }
+      }
+      switch(mb_strtolower($value))
+      {
+        case 'not_null':
+          if(empty($text) && $text != '0')
+          {
+            return false;
+          }
+          break;
+
+        case 'date':
+          $date_format = '%\d{4,4}/\d{2,2}/\d{2,2}\s\d{2,2}:\d{2,2}:\d{2,2}%';
+          if(preg_match($date_format, $value))
+          {
+            $date    = preg_replace(array('/', '\s', ':'),'',$date);
+            $date_n  = int($date);
+            $year    = int($date_n/pow(10, 10));
+            $month   = int($date_n/pow(10, 8) % 100);
+            $day     = int($date_n/pow(10, 6) % 100);
+            $hour    = int($date_n/pow(10, 4) % 100);
+            $minute  = int($date_n/pow(10, 2) % 100);
+            $second  = int($date_n % 100);
+            if($year<2014 || $year>2030 || $month<1 || $month>12 || $day<1 || 
+               $day>31 || $hour<0 || $hour>23 || $minute<0 || minute>59 || 
+               $second<0 || $second>0)
             {
-                return "Couldn't connect to SQL" . $mysqli->errno;
-            }else{
-                return false;
+              return false;
             }
-        }
 
+            if(($month==4 || $month==6 || $month==9 || $month==11) && $day>30)
+            {
+              return false;
+            }
+
+            if($month==2 && $year%4==1 && $day>28)
+            {
+              return false;
+            }else if($month==2 && $year%4==0 && $day>29){
+              return false;
+            }
+            break;
+          }
+        
+        case 'hex':
+          if(!ctype_xdigit($text) && !empty($text))
+          {
+             return false;
+          }
+          break;
+
+        case 'int':
+          if(!is_numeric($text) && !empty($text))
+          {
+            return false;
+          }
+          break;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * ログイン状態を返す
+   *
+   * @param string $sessionID セッションID
+   * @param bool   $update    セッション更新フラグ
+   * @return  bool            ログイン状態
+   */
+  function is_login($sessionID, $update=true)
+  {
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array('sessionID'=>$sessionID));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(count($query_rest) == 1)
+    {
+      return ture;
+    }elseif(count($query_rest)==0){
+      return false;
+    }
+    common::error('session', 'Conflict');
+  }
+
+  /**
+   * ユーザ登録
+   *
+   * @param  string $username   ユーザ表示名
+   * @param  string $deviceID   androidID
+   * @param  string $tel1       電話番号上３桁
+   * @param  string $tel2       電話番号中4桁
+   * @param  string $tel3       電話番号下4桁
+   * @param  string $is_tel_pub 電話番号公開フラグ
+   * @return bool               結果を返す
+   */
+  function regist($username, $deviceID, $tel1, $tel2, $tel3, $is_tel_pub=0)
+  {
+    self::paramAssign('username', '64,NOT_NULL,text', $username);
+    self::paramAssign('deviceID', '64,NOT_NULL,text', $deviceID);
+    self::paramAssign('tel1', '3,int', $tel1);
+    self::paramAssign('tel2', '4,int', $tel2);
+    self::paramAssign('tel3', '4,int', $tel3);
+    self::paramAssign('is_tel_pub', '4,int', $is_tel_pub);
+
+    $userID = self::createRandHex('6');
+    $password = self::createRandHex('8');
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'User',
+                                            array('userID' => $this -> _PARAM['userID'],
+                                                  'password' => $this -> _PARAM['password'],
+                                                  'tel1' => $this -> _PARAM['tel1'],
+                                                  'tel2' => $this -> _PARAM['tel2'],
+                                                  'tel3' => $this -> _PARAM['tel3'],
+                                                  'is_tel_pub' => $this -> _PARAM['is_tel_pub']
+                                                  )
+                                            );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
+                                                                    'userID'=>$this->_PARAM['userID'],
+                                                                    'password'=>$this->_PARAM['$password']
+                                                                    )
+                                  )
+                           );
+  }
+
+  /**
+   * グループ作成します
+   *
+   * @param string $group_name グループ名
+   * @param string $group_desc グループ詳細
+   * @param string $sessionID  セッションID
+   * @return bool|array        
+   */
+  function create($group_name, $group_desc, $sessionID)
+  {
+    self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
+    self::paramAssign('name', '32,NOT_NULL,text',$group_name);
+    self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
+
+    // ログイン状態の確認
+    if(!self::is_login($this->_PARAM['sessionID']))
+    {
+      common::error('login', 'not login');
     }
 
-    /**
-     * パラメータの処理
-     *
-     * @param  array|string         URLの末尾のパラメータ
-     * @return array|string $rest   処理後のパラメータ
-     */
-    function paramAssign($array)
+    // グループ追加
+    $query = $this -> mysqli -> buildQuery('INSERT', 'Group', array('name'=>$this->_PARAM['name'],
+                                                                    'description'=>$this->_PARAM['group_desc']
+                                                                    )
+                                          );
+    $query_rest = $this->_mysqli->goQuery($query,true);
+    if(!$query_rest)
     {
-        foreach($array as $key => $value)
-        {
-            htmlentities(preg_replace(array("\n", "\0"), "", $value));
-            self::validation($value, $key);
-            $rest[$key] = $value;
-        }
+      common::error('query', 'missing');
+    }
+    $id = $this -> _mysqli -> getID();
+    self::paramAssign('groupID', '7,NOT_NULL,int', $groupID);
+
+    // sessionIDからユーザを割り出す(もしかしたら関数にした方がいいかも)
+    $userID = self::getUser(, $this -> _PARAM['sessionID'], 'array', true);
+    self::paramAssign('userID', "255, NOT_NULL, text", $userID);
+    if(empty($this -> _PARAM['userID']))
+    {
+      common::error('Internal', 'ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    }
+
+    // 招待IDの取得
+    $inviteID = self::addInvitation($this->_PARAM['groupID'], $this->_PARAM['sessionID']);
+
+    // グループへのユーザ追加
+    self::addGroupUser($this->_PARAM['groupID'], $this->_PARAM['userID'], '1011');
+
+    // 結果を返す
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  function addGroupUser($groupID, $userID, $permission)
+  {
+    // あとで考える
+    return false;
+  }
+
+  /**
+   * 招待コードの生成及び登録
+   *
+   * @param string $groupID   グループID
+   * @param string $sessionID セッションID
+   * @return string           招待コード
+   */
+  function addInvitation($groupID, $session)
+  {
+    $hex = self::createRandHex('6');
+    self::paramAssign('invitation', '6,NOT_NULL,hex', $hex);
+    self::paramAssign('groupID', '32,NOT_NULL,text', $groupID);
+
+    // 作り方悩んでる
+    
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'invitation', array(
+                                                                          'groupID' => $this -> _PARAM['groupID'],
+                                                                          'invitation' => $this -> _PARAM['invitation']
+                                                                          )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return $this -> _PARAM['invitation'];
+  }
+
+  /**
+   * ユーザ情報の取得
+   *
+   * @param string $userID        ユーザID
+   * @param string $sessionID     セッションID
+   * @param string $fmt           フォーマット
+   * @param bool $is_sessionSerch ユーザIDを割り出すならtrue
+   * @return bool|array           連想配列
+   */
+  function getUser($userID = NULL, $sessionID, $fmt = 'json', $is_sessionSerch = False)
+  {
+    if($is_sessionSerch  === true)
+    {
+      self::paramAssign('session', '64,NOT_NULL,hex', $sessionID);
+      if(!$self::is_login($this -> _PARAM['sessionID']))
+      {
+        common::error('login', 'not login');
+      }
+
+      $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array(
+                                                                         'sessionID'=>$this->_PARAM['sessionID'],
+                                                                         'logout'=>'0')
+                                             );
+      $query_rest = $this -> _mysqli -> goQuery($query, true);
+      if(empty($query_rest))
+      {
+        common::error('query', 'ログインしなおしてください');
+      }
+      self::paramAssign('userID', '64,NOT_NULL,hex', $query_rest['username']);
+      return $this -> _PARAM['userID'];
+    }else{
+      self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
+      self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+
+      if(!self::is_login($this->_PARAM['sessionID']))
+      {
+        common::error('login', 'not login');
+      }
+      $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
+                                                                      'userID'=>$this->_PARAM['userID'],
+                                                                      'is_delete'=>'0'
+                                                                      )
+                                             );
+      $query_rest = $this -> _mysqli -> goQuery($query, true);
+      if(empty($query_rest))
+      {
+        common::error('query', 'not found');
+      }
+      foreach($query_rest as $key => $value)
+      {
+        $rest[$key] = $value;
+      }
+      $rest = $rest[0];
+      unset($rest['password']);
+      unset($rest['delete']);
+      unset($rest['deviceID']);
+
+      if($rest['is_tel_pub'] == 0)
+      {
+        unset($rest[tel1]);
+        unset($rest[tel2]);
+        unset($rest[tel3]);
+      }
+      if($fmt == 'row')
+      {
         return $rest;
+      }
+      switch($fmt)
+      {
+        case 'json':
+          return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+
+        case 'array':
+        default:
+          return $rest;
+      }
     }
+  }
+
+  /**
+   * ログインします
+   *
+   * @param string $userID   ユーザID
+   * @param string $password パスワード
+   * @param string $deviceID デバイスID
+   * @return array|bool      連想配列
+   */
+  function login($userID, $password, $deviceID)
+  {
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('password', '64,NOT_NULL,text', $password);
+    self::paramAssign('deviceID', '16,NOT_NULL,hex', $deviceID);
+
+    // ユーザが存在しないかチェック～
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=>$this->_PARAM['userID'],
+                                                                    'delete'=>'0')
+                                            );
+    $query_rest = $this -> _mysqli -> goQuery($query, true)[0];
+    if(!$query_rest)
+    {
+      common::error('login', 'IDかパスワードが間違っています');
+    }
+    // password verify
     
-    /**
-     * Validationを行います
-     *
-     * @param  string $type     タイプ
-     * @param  string $value    値
-     * @return bool
-     */
-    function validation($type = 'none', $value)
+    // 既存のログインセッションを無効化する
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array(
+                                                                       'userID'=>$this->_PARAM['userID'],
+                                                                       'logout'=>'0')
+                                            );
+    $query_rest = $this -> _mysqli -> goQuery($query, true)[0];
+    if(!empty($query_rest))
     {
-        switch($type)
-        {
-            case 'tel2':
-            case 'tel3':
-                if(is_numeric($value) && strlen($value)==4)
-                {
-                    return true;
-                }
-                self::error('other','Vald Error tel');
-                break;
-                
-            case 'tel1':
-                if(is_numeric($value) && strlen($value)==3)
-                {
-                    return true;
-                }
-                self::error('other','Vald Error tel');
-                break;
-            
-            case 'alarm_time':
-            case 'group_time':
-            case 'talk_time':
-                $date_format = '%\d{4,4}/\d{2,2}/\d{2,2}\s\d{2,2}:\d{2,2}:\d{2,2}%';
-                if(preg_match($date_format, $value))
-                {
-                    $date    = preg_replace(array('/', '\s', ':'),'',$date);
-                    $date_n  = int($date);
-                    $year    = int($date_n/pow(10, 10));
-                    $month   = int($date_n/pow(10, 8) % 100);
-                    $day     = int($date_n/pow(10, 6) % 100);
-                    $hour    = int($date_n/pow(10, 4) % 100);
-                    $minute  = int($date_n/pow(10, 2) % 100);
-                    $second  = int($date_n % 100);
-                    
-                    if($year<2014 || $year>2030 || $month<1 || $month>12 ||
-                        $day<1 || $day>31 || $hour<0 || $hour>23 ||
-                        $minute<0 || minute>59 || $second<0 || $second>0)
-                    {
-                        self::error('other','Vald Error time');
-                        break;
-                    }
-                    
-                    if(($month==4 || $month==6 || $month==9 || $month==11)
-                        && $day>30)
-                    {
-                        self::error('other','Vald Error time');
-                        break;
-                    }
-                    
-                    if($month==2 && $year%4==1 && $day>28)
-                    {
-                        self::error('other','Vald Error time');
-                        break;
-                    }else if($month==2 && $year%4==0 && $day>29){
-                        self::error('other','Vald Error time');
-                        break;
-                    }
-                    
-                    return true;
-                }
-            
-            case 'is_tel_pub':
-            case 'is_repeat':
-            case 'is_group_delete':
-	    case 'debug':
-                if(is_bool($value))
-                {
-                    return true;
-		    break;			
-                }
-                self::error('other','Vald Error bool');
-                break;
-                
-            case 'alert_choise':
-                if($value=='1' || $value=='0')
-                {
-                    return true;
-		    break;
-                }
-                self::error('other','Vald Error alert_choice');
-                break;
-            
-            default:
-                if(is_string($value))
-                {
-                    return true;
-		    break;
-                }
-                self::error('other','Vald Error string');
-                break;
-        }
-    }
-    
-    /**
-     * Security and sanitize
-     * @auther Ryosuke Hagihara<raryosu@sysken.org>
-     *
-     * @param array|string $content User Content
-     * @return array                sanitize content
-     */
-    function secure($content)
-    {
-        //Init
-        $result = '';
-        
-        //Process
-        if(is_array($content))
-        {
-            foreach($content as $key => $value)
-            {
-                $result[$key] = str_replace("\0", '', str_replace(
-                    array("\\", "\0", "\n", "\r", "\xla", "'", '"'),
-                        array("\\\\", "\\0", "\\n", "\\r", "\\xla", "\'", '\"'),
-                            htmlspecialchars(mb_convert_encoding($value, 'UTF-8', 'UTF-8,SJIS,EUC-JP')
-                        )
-                    )
-                );
-            }
-        }else{
-            $result[0] = str_replace("\0", '', str_replace(
-                array("\\", "\0", "\n", "\r", "\xla", "'", '"'),
-                    array("\\\\", "\\0", "\\n", "\\r", "\\xla", "\'", '\"'),
-                        htmlspecialchars(mb_convert_encoding($content, 'UTF-8', 'UTF-8,SJIS,EUC-JP')
-                    )
-                )
-            );
-        }
-        return $result;
+      $query = $this -> _mysqli -> buildQuery('UPDATE', 'session', array('sessionID'=>$query_rest['id'],
+                                                                         'logout'=>'0',
+                                                                         array('logout'=>'1')
+                                                                        )
+                                              );
+      $query_rest = $this -> _mysqli -> goQuery($query, true);
     }
 
-    /**
-     * JSON出力用にヘッダーセット
-     *
-     * @param  string $header   取得
-     * @return bool
-     */
-    function setHeader($header) {
-        header($header);
-        return true;
-    }
-
-    /**
-     * JSON出力用JSONを生成
-     *
-     * @param  string $content  コンテンツ
-     * @param  string $header   ヘッダ
-     * @return string $content  JSONを返す
-     */
-    function outgoing($content, $header = '')
+    // 新しいセッションの生成
+    $hex = self::createRandHex('64');
+    self::paramAssign('session', '64,NOT_NULL,hex', $hex);
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'session', array(
+                                                                       'userID' => $this -> _PARAM['userID'],
+                                                                       'sessionID' => $this -> _PARAM['sessionID']
+                                                                      )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if($query_rest === true)
     {
-        if(is_array($header))
-        {
-            foreach($header as $value)
-            {
-                self::setHeader($value);
-            }
-        }
-        self::serHeader("Content-Type: application/json; charset=utf-8");
-        
-        $content = api::createJson($content);
-        return $content;
+      return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200'
+                                                                      'sessionID'=>$this->_PARAM['sessionID'])
+                                    )
+                              );
     }
-    
-    /**
-     * エラーを出力
-     *
-     * @param  string $type     エラー発生場所
-     * @param  string $msg      エラーメッセージ
-     */
-    function error($type, $msg) 
-    {
-        ob_end_flush();
-        self::setHeader("Content-Type: application/json; charset=utf-8");
-        $json = api::createJson(array('status' => '-1', 'message' => $msg ));
-        
-        switch($type)
-        {
-            case 'db':
-                self::setHeader("x-status-code: 500-1");
-                $json = api::createJson(array('status' => '500', 'message' => $msg ));
-                break;
-                
-            case 'api':
-                self::setHeader("x-status-code: 500-2");
-                $json = api::createJson(array('status' => '500', 'message' => $msg ));
-                break;
-                
-            case 'session':
-                self::setHeader("x-status-code: 500-3");
-                $json = api::createJson(array('status' => '500', 'message' => $msg ));
-                break;
-                
-            case 'login':
-                self::setHeader("x-status-code: 401");
-                $json = api::createJson(array('status' => '401', 'message' => $msg ));
-                break;
-                
-            case 'query':
-                self::setHeader("x-status-code: 400-1");
-                $json = api::createJson(array('status' => '400', 'message' => $msg ));
-                break;
+    return true;
+  }
 
-            case 'other':
-                self::setHeader("x-status-code: 400-2");
-                $json = api::createJson(array('status' => '400', 'message' => $msg ));
-                break;
+  /**
+   * ランダムな16進数の値を生成します
+   *
+   * @param int $int 生成する桁数
+   * @return string  ランダムな文字列
+   */
+  function createRandHex($int)
+  {
+    self::paramAssign('int', '3,NOT_NULL,int', $int);
+    $bytes = openssl_random_pseudo_bytes($this -> _PARAM['int']);
 
-        }
-        
-        self::setHeader("x-sid: " . time());
-        echo $json; // 関数外で吐くようにした方がいいのか・・・？
-        exit();
-    }
+    $hex = bin2hex($bytes);
+    return $hex;
+  }
 }
 
 /**
- * API
+ * Grouper DBアクセスクラス
  *
- * APIの処理を行います!!
- * 
- * @auther Ryosuke Hagihara<raryosu@sysken.org>
- * @since PHP5.5+
- * @version 0.1
+ * DBにアクセスします
+ *
+ * @copyright &copy; 2014 Ryosuke Hagihara
+ * @version 0.2.20140803
  */
-class api //extends mysqli
-{
-    protected $_mysqli;
-    public $count;
-
-    /**
-     * DBとの接続を確立します
-     * 
-     * @param string $host          ホスト名
-     * @param string $username      ユーザ名
-     * @param string $password      パスワード
-     * @param string $db            データベース名
-     * @param string $port          ポート番号
-     */
-    function __construct($host, $username, $password, $db, $port)
-    {
-        $this->_mysqli = new db($host, $username, $password, $db);
-    }
-
-    /**
-     * JSONを生成します
-     * 
-     * @param array|string $array   JSONにしたい文字列
-     * @param array|string $array   JSONを返す
-     */ 
-    function createJson($array){
-        return json_encode($array);
-    }
-    
-    /**
-     * ユーザ登録します
-     * 
-     * @param string $userID        User ID
-     * @param string $password      User password
-     * @param string $deviceID      User Android ID
-     * @param int $tel1             User phone number XXX-yyyy-zzzz
-     * @param int $tel2             User phone number xxx-YYYY-zzzz
-     * @param int $tel3             User phone number xxx-yyyy-ZZZZ
-     * @param boolean $is_tel_pub   電話番号を公開するか
-     * @param string $username      Screen name
-     * @return array|string         JSON返す
-     */ 
-    function regist($userID, $password, $deviceID, $tel1, $tel2, $tel3, $is_tel_pub, $username)
-    {
-        $query = $this -> _mysqli -> BuildQuery('INSERT', 'User', array(
-                                                                         'userID'=>$userID,
-                                                                         'password'=>$password,
-                                                                         'deviceID'=>$deviceID,
-                                                                         'tel1'=>$tel1,
-                                                                         'tel2'=>$tel2,
-                                                                         'tel3'=>$tel3,
-                                                                         'is_tel_pub'=>$is_tel_pub,
-                                                                         'username'=>$username)
-                                                        );
-        $query_rest = $this -> _mysqli -> goQuery(array($query, true));
-        if(!$query_rest)
-        {
-            main::error('regist', 'regist error'); // error->exit()してくれるからbreak不要
-        }
-        return createJson(array('status'=>'200'));
-    }
-    
-    /**
-     * ログインを行います
-     * 
-     * @param string $userID    User ID
-     * @param string $password  User password
-     * @param string $deviceID  User Android ID
-     * @return array|string     JSON返す
-     * 
-     */
-    function login($userID, $password, $deviceID)
-    {
-        $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
-                                                                        'userID'=>$userID,
-                                                                        'password'=>$password,
-                                                                        'deviceID'=>$deviceID)
-                                                 );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('login', 'not login');
-        }
-        return createJson(array('status'=>'200'));
-    }
-     
-    /**
-     * グループを作成します
-     * 
-     * @param string $sessionID         セッションIDです
-     * @param string $group_name        グループ名です
-     * @param string $group_desc        グループ詳細
-     * @param string $userID            作成者
-     * @param timestamp $create_time    作成日時
-     * @return array|string             JSON返す
-     * 
-     * @todo sessionIDからuserID取得
-     */ 
-    function create($sessionID, $group_name, $group_desc, $create_time)
-    {
-        $userid = ''; // sessionIDから取得
-        $query = $this -> _mysqli -> BuildQuery('INSERT', 'User', array(
-                                                                         'group_name'=>$group_name,
-                                                                         'group_description'=>$group_desc,
-                                                                         'create_user'=>$userID,
-                                                                         'create_time'=>$create_time,
-                                                                         'last_update'=>$create_time
-                                                                         )
-                                                        );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('create', 'create error');
-        }
-        return createJson(array('status'=>'200'));
-    }
-     
-     /**
-     * 招待IDを追加します
-     * 
-     * @param string $sessionID         セッションIDです
-     * @param string $groupID           グループIDです
-     * @return array|string             JSON返す
-     */ 
-    function invite($sessionID, $groupID)
-    {
-        $inviteID = ''; // 頑張って生成します
-        $query = $this -> _mysqli -> BuildQuery('INSERT', 'User', array(
-                                                                        'groupID'=>$groupID,
-                                                                        'sessionID'=>$sessionID
-                                                                        )
-                                                );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)  // inviteID重複を想定
-        {
-            invite($sessionID, $groupID);
-            $count++;
-        }
-        if($count >= 3) // 3回エラーが起きたらエラー返す
-        {
-            main::error('inviteID', 'create inviteID error');
-        }
-        return createJson(array('status'=>'200'));
-    }
-     
-    /**
-    * グループにユーザを追加します
-    * 
-    * @param string $sessionID         セッションIDです
-    * @param string $inviteID          招待IDです
-    * @return array|string             JSON返す
-    * 
-    * @todo sessionIDからgroupID取得
-    * @todo sessionIDからuserID取得
-    */      
-    function addUser($sessionID, $inviteID)
-    {
-        $groupID = ''; //sessionIDから取得
-        $userID = ''; //sessionIDから取得
-        $query = $this -> _mysqli -> buildQuery('INSERT', 'Relational', array(
-                                                                               'groupID'=>$groupID,
-                                                                               'userID'=>$userID
-                                                                               )
-                                                );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('addUser', 'add user error');
-        }
-        return createJson(array('status'=>'200'));
-    }
-     
-    /**
-    * トーク用API
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string groupID           グループIDです
-    * @param timestamp talk_time      発言した時刻です
-    * @param string talk              発言内容です
-    * @param float geo_x, geo_y       GPS座標です
-    * @param binary media             画像情報です
-    * @return array|string             JSON返す
-    * 
-    * @todo sessionIDからUserID取得
-    */
-    function talk($sessionID, $groupID, $talk_time, $talk=null, $geo_x=null, $geo_y=null, $media=null)
-    {
-        $userID = ''; //sessionIDから取得
-        
-        //sessionIDからuserIDを取得したい
-        $query = $this -> _mysqli -> buildQuery('INSERT', 'Chat', array(
-                                                                       'groupID'=>$groupID,
-                                                                       'userID'=>$userID,
-                                                                       'talk'=>$talk,
-                                                                       'geo_x'=>$geo_x,
-                                                                       'geo_y'=>$geo_y,
-                                                                       'media'=>$media
-                                                                        )
-                                                );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('talk', 'talk error');
-        }
-        return createJson(array('status'=>'200'));
-    }
-      
-    /**
-    * あらーむせっていします
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string groupID           グループIDです
-    * @param timestamp time_alarm     アラーム時刻です
-    * @param boolean is_repeat        リピートするかどうか
-    * @param int time_repeat          リピートの時刻の相対時刻 min
-    * @param string alert_desc        アラートの表示内容
-    * @param string alert_opt1        アラート選択肢1
-    * @param string alerm_opt2        アラート選択肢2
-    * @return array|string             JSON返す
-    * 
-    * @todo sessionIDからuserID
-    */
-    function alarm($sessionID, $groupID, $time_alarm, $is_repeat=false, $time_repeat=null,
-                    $alert_desc, $alert_opt1, $alert_opt2)
-    { 
-        $userID = ''; // sessionIDから生成
-        $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm', array(
-                                                                        'alarm_time'=>$time_alarm,
-                                                                        'groupID'=>$groupID,
-                                                                        'is_repeat'=>$is_repeat,
-                                                                        'time_repeat'=>$time_repeat,
-                                                                        'alert_text'=>$alert_desc,
-                                                                        'alert_opt1'=>$alert_opt1,
-                                                                        'alert_opt2'=>$alert_opt2
-                                                                        )
-                                                );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('alarm', 'alarm setting error');
-        }
-        return createJson(array('status'=>'200', 'time' => "'" . $time_alarm . "'"));
-    }
-     
-    /**
-    * アラートに対する応答です
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string alarmID           アラームID
-    * @param string alert_choise      選択した番号
-    * @return array|string            JSON返す
-    * 
-    * @todo sessionID から userID 取得
-    * @todo alarmID から groupID 取得
-    */
-    function alertchoice($sessionID, $groupID, $alarmID, $alert_choice)
-    {
-        //あと・・・
-    }
-      
-    /**
-    * トーク管理用
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string talkID            トークID
-    * @param string talk_del          削除するかどうか
-    * @return array|string            JSON返す
-    * 
-    * @todo talkID から groupID 取得 ->必要？
-    */
-    function settingTalk($sessionID, $talkID, $talk_del)
-    {
-        $groupID = ''; // talkIDから取得
-        if($talk_del==true)
-        {
-                $query = $this -> _mysqli -> buildQuery('DELETE', 'Chat', array('ID'=>$talkID));
-                $query_rest = $this -> _mysqli -> goQuery($query, true); 
-                if(!$query_rest)
-                {
-                    main::error('talk', 'talk deleat error');
-                }
-                return createJson(array('status'=>'200'));
-        }
-        return main::error('talk', 'param syntax error');
-    }
-     
-    /**
-    * ユーザ情報書き換え
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string out_groupID       退会するグループ
-    * @param string is_tel_pub        電話番号を公開するか否か
-    * @param string username          新しいスクリーンネーム
-    * @return array|string            JSON返す
-    */
-    function settingUser($sessionID, $out_groupID='', $is_tel_pub=false, $username='')
-    {
-        $array[groupID] = $out_groupID;
-        $array[is_tel_pub] = $is_tel_pub;
-        $array[username] = $username;
-        foreach($array as $key => $value)
-        {
-            if(empty("$value"))
-            {
-                unset($array[$key]);
-            }
-        }
-        if(!empty($username))
-        {
-            $query_username = $this -> _mysqli -> buildQuery('UPDATE', 'User', array('username'=>$username));
-            $query_username_rest = $this -> _mysqli -> goQuery($query, true);
-            if(!$query_username_rest)
-            {
-                main::error('Update username', 'update error');
-            }
-        }
-        
-        unset($array[username]);
-        
-        $query = $this -> _mysqli -> buildQuery('DELETE', 'User', $array);
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('Update user', 'update error');
-        }
-        
-        return createJson(array('status'=>'200'));
-        break;
-    }
-      
-    /**
-    * ユーザ情報取得
-    * 
-    * @param string sessionID         セッションIDです
-    * @return array|string            JSON返す
-    * 
-    * @todo sessinIDからuserID取得
-    */
-    function getUser($sessionID)
-    {
-        $userID = ''; // sessinID から取得
-        $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array());
-    } //646と同じ
-      
-    /**
-    * グループ管理
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string group_name        グループ名
-    * @param string group_desc        グループ詳細
-    * @param boolean is_group_del      グループ削除
-    * @return array|string            JSON返す
-    */
-    function settingGroup($sessionID, $group_name='', $group_desc='', $is_group_del=false)
-    {
-        $array[group_name] = $group_name;
-        $array[group_desc] = $group_desc;
-        $array[is_group_del] = $is_group_del;
-        foreach($array as $key => $value)
-        {
-            if(empty("$value"))
-            {
-                unset($array[$key]);
-            }
-        }
-        if($is_group_del == false)
-        {
-            unset($array[is_group_del]);
-        } /*{{{* 構文解析エラー : 期待していない } *}}}*/
-        $query = $this -> _mysqli -> buildQuery('UPDATE', 'Group', $array);
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(!$query_rest)
-        {
-            main::error('Update group', 'update error');
-        }
-        
-        return createJson(array('status'=>'200'));
-        break;
-    }
-    
-    /**
-    * グループ情報取得
-    * 
-    * @param string sessionID         セッションIDです
-    * @param string groupID           グループID
-    * @return array|string            JSON返す
-    */
-    function getGroup($sessionID, $groupID)
-    {
-        $query = $this -> _mysql ->buildQuery('SELECT', 'group', array(
-                                                                        ));
-        // getUserもだけどパラメータなにを渡したらいいかわからないarray
-    }
-}
-
-class db
-{
-    protected $_mysqli;
-    protected $_query;
-    protected $host;
-    protected $username;
-    protected $password;
-    protected $db;
-    protected $port;
-
-
-    /**
-     * DB接続のデフォルトの値を設定し，接続します
-     * 
-     * @param string $host          ホスト名
-     * @param string $username      ユーザ名
-     * @param string $password      パスワード
-     * @param string $db            データベース名
-     * @param string $port          ポート番号
-     */ 
-    function __construct($host = null, $username = null, $password = null,
-                         $db = null, $port = null)
-    {
-        if($host == null)
-        {
-            $this -> host = ini_get('mysqli.default_host');
-        }else{
-            $this -> host = $host;
-        }
-        
-        if($username == null)
-        {
-            $this -> username = ini_get('mysqli.default_username');
-        }else{
-            $this -> username = $username;
-        }
-        
-        if($password == null)
-        {
-            $this -> password = ini_get('mysqli.default_password');
-        }else{
-            $this -> password = $password;
-        }
-        
-        if($db == null)
-        {
-            $this -> db = '';
-        }else{
-            $this -> db = $db;
-        }
-        
-        if($port == null)
-        {
-            $this -> port = ini_get('mysqli.default_port');
-        }else{
-            $this -> port = $port;
-        }
-        
-        $this -> connect();
-    }
-
-
-    /**
-     * DBとの接続を確立します
-     */
-    function connect()
-    {
-        $this -> _mysqli = new mysqli($this -> host, $this -> username, $this -> password,
-                                      $this -> db, $this -> port);
-        
-        if($this -> _mysqli -> connect_error)
-        {
-            main::error('db', "Couldn't connect to DB");
-            return false;
-        }
-        
-        $this -> _mysqli -> set_charset('utf-8');
-        return true;
-    }
-
-
-    /**
-     * DBとの接続を確立します
-     * 
-     * @param string $type          INSERT， SELECT， DELETE， UPDATEのいずれか
-     * @param string $table         テーブル名
-     * @param string $array         値
-     * @param string $query         SQL文を返します
-     */ 
-    function buildQuery($type, $table, $array)
-    {
-        $query = '';
-        switch($type)
-        {
-            case 'INSERT':
-                $query .= "INSERT INTO `{$table}`  (`" . implode(array_keys($array), '`, `') . '` ) VALUE ( ';
-              //$query .= "INSERT INFO `{$table}`  (`" . implode(array_keys($array)), '`, `' . '` ) VALUE ( '; 
-              //$query .= "INSERT INTO `{$table}` ( `" . implode(array_keys($array), '`, `') . '` ) VALUE ( ';
-
-                foreach ($array as $key => $value)
-                {
-                    $query .= "'{$value}',";
-                }
-                $query = substr($query, 0, -1); 
-                $query .= ' )';
-                
-                break;
-                
-            case 'SELECT':
-                $query .= "SELECT * FROM `{$table}` WHERE ";
-                foreach($array as $key => $value)
-                {
-                    $query .= "`{$key}` = '{$value}' AND";
-                }
-                $query = substr($query, 0, -4);
-                
-                break;
-                
-            case 'DELETE':
-                $query .= "DELETE FROM `{$table}` WHERE ";
-                foreach($array as $key => $value)
-                {
-                    $query .= "`{$key}` = `{$value}`";
-                } 
-                
-                return $query;
-                
-                break;
-                
-            case 'UPDATE':
-                $query .= "UPDATE `{$table}` SET ";
-                foreach($array as $key => $value)
-                {
-                    $query .= "`{$key}` = `{$value}`,";
-                }
-                $query = substr($query, 0, -1);
-                return $query;
-                break;
-        }
-        return $query;
-    }
-
-
-    /**
-     * クエリを実行します
-     * 
-     * @param  string $query          クエリ
-     * @param  bool   $is_secure      正当性をチェックします
-     * @return string $rest
-     */ 
-    function goQuery($query, $is_secure = false)
-    {
-        if(!$is_secure)
-        {
-            main::error('db', 'Emergency STOP : Security');
-        }
-        $rest = $this -> _mysqli -> query($query);
-        if($rest === false)
-        {
-            return false;
-        }elseif($rest === true){
-            return true;
-        }
-        
-        return $rest->fetch_all(MYSQLI_ASSOC);
-    }
-}
-    
-?>
-
