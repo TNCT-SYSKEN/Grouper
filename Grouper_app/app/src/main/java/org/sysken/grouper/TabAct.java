@@ -4,6 +4,7 @@ package org.sysken.grouper;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,20 +26,30 @@ public class TabAct extends Activity {
                 .setText("ページ1")
                 .setTabListener(
                         new TabListener<HomeFragment>(
-                        this,"tag1",HomeFragment.class)));
+                                this, "tag1", HomeFragment.class)
+                ));
+
         actionBar.addTab(actionBar.newTab()
-            .setText("ページ2")
-            .setTabListener(new TabListener<GroupFragment>(
-                  this,"tag2", GroupFragment.class)));
+                .setText("ページ2")
+                .setTabListener(
+                        new TabListener<GroupFragment>(
+                                this, "tag2", GroupFragment.class)
+                ));
+        actionBar.addTab(actionBar.newTab()
+                .setText("ページ3")
+                .setTabListener(
+                        new TabListener<Setting>(
+                                this, "tag3", Setting.class)
+                ));
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.main,menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
-    public class TabListener<T extends Fragment> implements ActionBar.TabListener{
+    public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         private Fragment mFragment;
         private final Activity mActivity;
         private final String mTag;
@@ -50,11 +61,6 @@ public class TabAct extends Activity {
             mClass = clz;
         }
 
-        //@brief タブが選択されたときの処理
-
-        @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        }
 
         @Override
         public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -62,19 +68,23 @@ public class TabAct extends Activity {
             if (mFragment == null) {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName());
                 ft.add(android.R.id.content, mFragment, mTag);
-            }else{
+            } else {
                 ft.attach(mFragment);
             }
         }
 
-        //@brief タブの選択が解除されたときの処理
         @Override
         public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
             if (mFragment != null) {
-                ft.attach(mFragment);
+                FragmentManager fm = mActivity.getFragmentManager();
+                fm.beginTransaction().detach(mFragment).commit();
             }
         }
-    }
 
+        @Override
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        }
+    }
 }
+
 
