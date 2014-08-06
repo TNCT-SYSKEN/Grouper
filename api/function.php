@@ -6,7 +6,7 @@
  * @create    2014.08.05
  * @auther    Ryosuke Hagihara<raryosu@sysken.org>
  * @since     PHP5.5+ / MySQL 5.3+
- * @version   0.2.20140803
+ * @version   0.2.20140806
  * @link      http://grouper.sysken.org/
  */
 
@@ -34,7 +34,7 @@ class common
     return str_replace('\0', '', 
                        str_replace(array('\\', '\0', '\n', '\r', '\xla', "'", '"'),
                                    array('\\\\', '\\0', '\\n', '\\r', '\\xla', "\\'", '\\"'),
-                                   htmlspecoalchars(mb_convert_encoding($t, 'UTF-8', 'UTF-8,SJIS,EUC-JP'))
+                                   htmlspecialchars(mb_convert_encoding($t, 'UTF-8', 'UTF-8,SJIS,EUC-JP'))
                                    )
                        );
   }
@@ -85,41 +85,40 @@ class common
    */
   function error($type, $msg)
   {
-    ob_end_flush();
-    self::setHeader('Content-Type: application/json; charset=utf-8');
-
+//    ob_end_flush();
+//    self::setHeader("Content-Type: application/json; charset=utf-8");
     $json = api::createJson(array('status'=>'500', 'contents'=>array('code'=>'-１', 'msg'=>'未知のエラーが発生しました')));
 
     switch($type)
     {
       case 'db':
-        self::setHeader('x-status-code: 500-1');
+        self::setHeader("x-status-code: 500-1");
         $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
         break;
 
       case 'api':
-        self::setHeader('x-status-code: 500-2');
+        self::setHeader("x-status-code: 500-2");
         $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
         break;
 
       case 'session':
-        self::setHeader('x-status-code: 500-3');
+        self::setHeader("x-status-code: 500-3");
         $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
         break;
 
       case 'internal':
-        self::setHeader('x-status-code: 500-4');
+        self::setHeader("x-status-code: 500-4");
         $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'500', 'msg'=>$msg))));
         break;
 
       case 'login':
-        self::setHeader('x-status-code: 401');
-        $json = api::createJson(array('status'=>'ERR', contents=>(array('code'=>'401', 'msg'=>$msg))));
+        self::setHeader("x-status-code: 401");
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'401', 'msg'=>$msg))));
         break;
 
       case 'query':
-        self::setHeader('x-status-code:400-1');
-        $json = api::createJson(array('status'=>'ERR', contents=>(array('code'=>'400', 'msg'=>$msg))));
+        self::setHeader("x-status-code:400-1");
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'400', 'msg'=>$msg))));
         break;
     }
     self::setHeader("x-sid: " . time());
@@ -299,6 +298,7 @@ class api
   function is_login($sessionID, $update=true)
   {
     $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array('sessionID'=>$sessionID));
+
     $query_rest = $this -> _mysqli -> goQuery($query, true);
     if(count($query_rest) == 1)
     {
@@ -331,14 +331,16 @@ class api
 
     $userID = self::createRandHex('6');
     $password = self::createRandHex('8');
-
+    $sessionID = self::createRandHex('32');
     $query = $this -> _mysqli -> buildQuery('INSERT', 'User',
-                                            array('userID' => $this -> _PARAM['userID'],
-                                                  'password' => $this -> _PARAM['password'],
+                                            array('userID' => $userID,
+                                                  'password' => $password,
+                                                  'username' => $this -> _PARAM['username'],
                                                   'tel1' => $this -> _PARAM['tel1'],
                                                   'tel2' => $this -> _PARAM['tel2'],
                                                   'tel3' => $this -> _PARAM['tel3'],
-                                                  'is_tel_pub' => $this -> _PARAM['is_tel_pub']
+                                                  'is_tel_pub' => $this -> _PARAM['is_tel_pub'],
+                                                  'sessionID' => $sessionID
                                                   )
                                             );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -347,8 +349,8 @@ class api
       common::error('query', 'missing');
     }
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
-                                                                    'userID'=>$this->_PARAM['userID'],
-                                                                    'password'=>$this->_PARAM['$password']
+                                                                    'userID'=>$userID,
+                                                                    'password'=>$password
                                                                     )
                                   )
                            );
@@ -418,7 +420,7 @@ class api
    * @param string $sessionID セッションID
    * @return string           招待コード
    */
-  function addInvitation($groupID, $session)
+  function addInvitation($groupID, $sessionID)
   {
     $hex = self::createRandHex('6');
     self::paramAssign('invitation', '6,NOT_NULL,hex', $hex);
@@ -523,20 +525,19 @@ class api
    *
    * @param string $userID   ユーザID
    * @param string $password パスワード
-   * @param string $deviceID デバイスID
    * @return array|bool      連想配列
    */
-  function login($userID, $password, $deviceID)
+  function login($userID, $password)
   {
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('password', '64,NOT_NULL,text', $password);
-    self::paramAssign('deviceID', '16,NOT_NULL,hex', $deviceID);
 
     // ユーザが存在しないかチェック～
     $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=>$this->_PARAM['userID'],
-                                                                    'delete'=>'0')
+                                                                    'password'=>$this->_PARAM['password'],
+                                                                    'is_delete'=>'0')
                                             );
-    $query_rest = $this -> _mysqli -> goQuery($query, true)[0];
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
     if(!$query_rest)
     {
       common::error('login', 'IDかパスワードが間違っています');
@@ -546,36 +547,38 @@ class api
     // 既存のログインセッションを無効化する
     $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array(
                                                                        'userID'=>$this->_PARAM['userID'],
-                                                                       'logout'=>'0')
+                                                                       'is_logout'=>'0')
                                             );
-    $query_rest = $this -> _mysqli -> goQuery($query, true)[0];
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
     if(!empty($query_rest))
     {
       $query = $this -> _mysqli -> buildQuery('UPDATE', 'session', array('sessionID'=>$query_rest['id'],
-                                                                         'logout'=>'0',
-                                                                         array('logout'=>'1')
+                                                                         'is_logout'=>'0',
+                                                                         array('is_logout'=>'1')
                                                                         )
                                               );
       $query_rest = $this -> _mysqli -> goQuery($query, true);
     }
 
     // 新しいセッションの生成
-    $hex = self::createRandHex('64');
-    self::paramAssign('session', '64,NOT_NULL,hex', $hex);
+    $sessionID = self::createRandHex('32');
+//    self::paramAssign('session', '32,NOT_NULL,hex', $sessionID);
     $query = $this -> _mysqli -> buildQuery('INSERT', 'session', array(
                                                                        'userID' => $this -> _PARAM['userID'],
-                                                                       'sessionID' => $this -> _PARAM['sessionID']
+                                                                       'sessionID' => $sessionID
                                                                       )
                                            );
+    echo $query;
     $query_rest = $this -> _mysqli -> goQuery($query, true);
     if($query_rest === true)
     {
       return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
-                                                                      'sessionID'=>$this->_PARAM['sessionID'])
+                                                                      'sessionID'=>$sessionID
+                                                                      )
                                     )
                               );
     }
-    return true;
+//    return true;
   }
 
   /**
@@ -637,7 +640,7 @@ class db
   {
     if($host === NULL)
     {
-      $this -> host = localhost
+      $this -> host = 'localhost';
                       //ini_get('mysqli.default_host');
     }else{
       $this -> host = $host;
@@ -645,7 +648,7 @@ class db
 
     if($username === NULL)
     {
-      $this -> username = connection
+      $this -> username = 'connection';
                           //ini_get('m.default_user');
     }else{
       $this -> username = $username;
@@ -653,7 +656,7 @@ class db
 
     if($password === NULL)
     {
-      $this -> password = 'grouper_server_tsuyama'
+      $this -> password = 'grouper_server_tsuyama';
                           //ini_get('mysqli.default_pw');
     }else{
       $this -> password = $password;
@@ -722,20 +725,20 @@ class db
     switch (mb_strtolower($type))
     {
       case 'insert':
-        $query .= "INSERT INTO `{$table}` ( `" . implode(array_keys($search), '`, `') . '` ) VALUE (';
+        $query .= "INSERT INTO Grouper.{$table} ( " . implode(array_keys($search), ', ') . ' ) VALUE ( ';
         foreach ($search as $key => $value)
         {
-          $query .= self::security($value) . ",";
+          $query .= "'" . self::security($value) . "',";
         }
         $query = substr($query, 0, -1);
         $query .= ' )';
         break;
       
       case 'select':
-        $query .= "SELECT * FROM `{$table}` WHERE";
+        $query .= "SELECT * FROM {$table} WHERE ";
         foreach($search as $key => $value)
         {
-          $query .= "`{$key}` = '" . self::security($value) . "' AND " ;
+          $query .= "{$key} = '" . self::security($value) . "' AND " ;
         }
         $query = substr($query, 0, -5);
         break;
@@ -753,7 +756,7 @@ class db
         break;
     }
 
-      return $query;
+    return $query;
   }
 
   /**
