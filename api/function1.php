@@ -6,7 +6,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140809
+ * @version 0.2.20140807
  * @link http://grouper.sysken.org/
  */
 
@@ -294,7 +294,6 @@ class api
    * @param bool   $update    セッション更新フラグ
    * @return  bool            ログイン状態
    */
-  /*
   function is_login($sessionID, $update=true)
   {
     $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array('sessionID'=>$sessionID));
@@ -308,7 +307,6 @@ class api
     }
     common::error('session', 'Conflict');
   }
-  */
 
   /**
    * ユーザ登録
@@ -336,7 +334,7 @@ class api
     $query = $this -> _mysqli -> buildQuery('INSERT', 'User',
                                             array('userID' => $userID,
                                                   'password' => $password,
-                                                  'user_name' => $this -> _PARAM['username'],
+                                                  'username' => $this -> _PARAM['username'],
                                                   'tel1' => $this -> _PARAM['tel1'],
                                                   'tel2' => $this -> _PARAM['tel2'],
                                                   'tel3' => $this -> _PARAM['tel3'],
@@ -365,27 +363,23 @@ class api
    * @param string $sessionID  セッションID
    * @return bool|array
    */
-  function create($group_name, $group_desc, $sessionID, $userID)
+  function create($group_name, $group_desc, $sessionID)
   {
     self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
-    self::paramAssign('group_name', '32,NOT_NULL,text',$group_name);
+    self::paramAssign('name', '32,NOT_NULL,text',$group_name);
     self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
-    self::paramAssign('userID', '64,NOT_NULL,hex', $userID);
 
     // ログイン状態の確認
-    /*
     if(!self::is_login($this->_PARAM['sessionID']))
     {
       common::error('login', 'not login');
     }
-    */
+
     $groupID = self::createRandHex(10);
 
     // グループ追加
-    $query = $this -> _mysqli -> buildQuery('INSERT', 'Group', array('groupID'=>$groupID,
-                                                                    'group_name'=>$this->_PARAM['group_name'],
-                                                                    'group_desc'=>$this->_PARAM['group_desc'],
-                                                                    'createUser'=>$this->_PARAM['userID']
+    $query = $this -> mysqli -> buildQuery('INSERT', 'Group', array('name'=>$this->_PARAM['name'],
+                                                                    'description'=>$this->_PARAM['group_desc']
                                                                     )
                                           );
     $query_rest = $this->_mysqli->goQuery($query,true);
@@ -393,10 +387,25 @@ class api
     {
       common::error('query', 'missing');
     }
-    // $id = $this -> _mysqli -> getID();
+    $id = $this -> _mysqli -> getID();
+    self::paramAssign('groupID', '7,NOT_NULL,int', $groupID);
+
+    // sessionIDからユーザを割り出す(もしかしたら関数にした方がいいかも)
+    $userID = self::getUser('', $this -> _PARAM['sessionID'], 'array', true);
+    self::paramAssign('userID', "255, NOT_NULL, text", $userID);
+    if(empty($this -> _PARAM['userID']))
+    {
+      common::error('Internal', 'ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    }
+
+    // 招待IDの取得
+    $inviteID = self::addInvitation($this->_PARAM['groupID'], $this->_PARAM['sessionID']);
+
+    // グループへのユーザ追加
+    self::addGroupUser($this->_PARAM['groupID'], $this->_PARAM['userID'], '1011');
 
     // 結果を返す
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'groupID'=>$groupID)));
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
   }
 
   function addGroupUser($groupID, $userID, $permission)
@@ -473,6 +482,7 @@ class api
       }
       $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
                                                                       'userID'=>$this->_PARAM['userID'],
+                                                                      'is_delete'=>'0'
                                                                       )
                                              );
       $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -526,7 +536,7 @@ class api
     // ユーザが存在しないかチェック～
     $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=>$this->_PARAM['userID'],
                                                                     'password'=>$this->_PARAM['password'],
-                                                                    )
+                                                                    'is_delete'=>'0')
                                             );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
     if(!$query_rest)
@@ -534,6 +544,22 @@ class api
       common::error('login', 'IDかパスワードが間違っています');
     }
     // password verify
+    
+    // 既存のログインセッションを無効化する
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array(
+                                                                       'userID'=>$this->_PARAM['userID'],
+                                                                       'is_logout'=>'0')
+                                            );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!empty($query_rest))
+    {
+      $query = $this -> _mysqli -> buildQuery('UPDATE', 'session', array('sessionID'=>$query_rest['id'],
+                                                                         'is_logout'=>'0',
+                                                                         array('is_logout'=>'1')
+                                                                        )
+                                              );
+      $query_rest = $this -> _mysqli -> goQuery($query, true);
+    }
 
     // 新しいセッションの生成
     $sessionID = self::createRandHex('32');
@@ -543,6 +569,7 @@ class api
                                                                        'sessionID' => $sessionID
                                                                       )
                                            );
+    echo $query;
     $query_rest = $this -> _mysqli -> goQuery($query, true);
     if($query_rest === true)
     {
@@ -591,7 +618,7 @@ class db
    */
   protected $_query;
 
-  /**
+  /** 
    * MySQL接続先ホスト名・ユーザ名・パスワード・db・ポート
    */
   protected $host;
@@ -638,7 +665,7 @@ class db
 
     if($db === NULL)
     {
-      $this -> db = 'Grouper_new';
+      $this -> db = 'Grouper';
     }else{
       $this -> db = $db;
     }
@@ -662,7 +689,7 @@ class db
   {
     $this -> _mysqli = new mysqli ($this -> host, $this -> username, $this -> password,
                                    $this -> db, $this ->port);
-
+    
     if($this -> _mysqli -> connect_error)
     {
       common::error('db', 'Error connecting to DB');
@@ -699,7 +726,7 @@ class db
     switch (mb_strtolower($type))
     {
       case 'insert':
-        $query .= "INSERT INTO Grouper_new.{$table} ( " . implode(array_keys($search), ', ') . ' ) VALUE ( ';
+        $query .= "INSERT INTO Grouper.{$table} ( " . implode(array_keys($search), ', ') . ' ) VALUE ( ';
         foreach ($search as $key => $value)
         {
           $query .= "'" . self::security($value) . "',";
@@ -707,9 +734,9 @@ class db
         $query = substr($query, 0, -1);
         $query .= ' )';
         break;
-
+      
       case 'select':
-        $query .= "SELECT * FROM Grouper_new.{$table} WHERE ";
+        $query .= "SELECT * FROM {$table} WHERE ";
         foreach($search as $key => $value)
         {
           $query .= "{$key} = '" . self::security($value) . "' AND " ;
@@ -718,7 +745,7 @@ class db
         break;
 
       case 'update':
-        $query .= "UPDATE `Grouper_new.{$table}` SET ";
+        $query .= "UPDATE `{$table}` SET ";
         foreach($update as $key => $value)
         {
           $query .= "`{$key}` = '" . self::security($value) . "' AND ";
