@@ -30,5 +30,4 @@
 
 ##その他
 * アプリのパッケージ名 : 暫定的に **org.sysken.grouper**
-* サーバはserver.raryosu.infoです。
-  * DB設計についてはDropboxにあげているER図が最新です
+* APIの仕様については別にまとめているので確認して下さい。

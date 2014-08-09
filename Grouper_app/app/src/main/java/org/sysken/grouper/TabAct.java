@@ -6,12 +6,19 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 
 
 public class TabAct extends Activity {
-
+    public static final String PREFERENCES_FILE_NAME = "preference";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,25 +30,27 @@ public class TabAct extends Activity {
 
         actionBar.addTab(actionBar
                 .newTab()
-                .setText("ページ1")
+                .setText("@string/home")
                 .setTabListener(
                         new TabListener<HomeFragment>(
                                 this, "tag1", HomeFragment.class)
                 ));
 
         actionBar.addTab(actionBar.newTab()
-                .setText("ページ2")
+                .setText("@string/group")
                 .setTabListener(
                         new TabListener<GroupFragment>(
                                 this, "tag2", GroupFragment.class)
                 ));
         actionBar.addTab(actionBar.newTab()
-                .setText("ページ3")
+                .setText("@string/setting")
                 .setTabListener(
                         new TabListener<Setting>(
                                 this, "tag3", Setting.class)
                 ));
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
