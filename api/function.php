@@ -6,7 +6,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140809
+ * @version 0.2.20140810
  * @link http://grouper.sysken.org/
  */
 
@@ -294,7 +294,6 @@ class api
    * @param bool   $update    セッション更新フラグ
    * @return  bool            ログイン状態
    */
-  /*
   function is_login($sessionID, $update=true)
   {
     $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array('sessionID'=>$sessionID));
@@ -302,13 +301,12 @@ class api
     $query_rest = $this -> _mysqli -> goQuery($query, true);
     if(count($query_rest) == 1)
     {
-      return ture;
+      return true;
     }elseif(count($query_rest)==0){
       return false;
     }
     common::error('session', 'Conflict');
   }
-  */
 
   /**
    * ユーザ登録
@@ -399,10 +397,29 @@ class api
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'groupID'=>$groupID)));
   }
 
-  function addGroupUser($groupID, $userID, $permission)
+  /**
+   * グループにユーザを追加します
+   *
+   * @param string $groupID    グループID
+   * @param string $userID     ユーザID
+   * @param string $sessionID  セッションID
+   * @return bool|array
+   */
+  function addGroupUser($groupID, $userID, $sessionID)
   {
-    // あとで考える
-    return false;
+    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('userID', '32,NOT_NULL,text',$userID);
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'relational', array(
+                                                                          'userID' => $this -> _PARAM['userID'],
+                                                                          'groupID' => $this -> _PARAM['groupID']
+                                                                          )
+                                           );
+    $query_rest = $this->_mysqli->goQuery($query,true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
   }
 
   /**
@@ -485,16 +502,15 @@ class api
         $rest[$key] = $value;
       }
       $rest = $rest[0];
+      unset($rest['user_SQE']);
       unset($rest['password']);
       unset($rest['delete']);
       unset($rest['deviceID']);
-
-      if($rest['is_tel_pub'] == 0)
-      {
-        unset($rest[tel1]);
-        unset($rest[tel2]);
-        unset($rest[tel3]);
-      }
+      unset($rest['is_tel_pub']);
+      unset($rest['tel1']);
+      unset($rest['tel2']);
+      unset($rest['tel3']);
+      unset($rest['sessionID']);
       if($fmt == 'row')
       {
         return $rest;
@@ -511,6 +527,57 @@ class api
     }
   }
 
+  /**
+   * グループ情報の取得
+   *
+   * @param string $groupID        ユーザID
+   * @param string $query_mode 実行モード[user(グループに属すユーザ情報の取得), group(グループ名, グループ作成者のIDを取得)]
+   * @return bool|array           連想配列
+   */
+  function getGroup($groupID, $query_mode)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('query_mode', '64,NOT_NULL,string', $query_mode);
+
+    //モードスイッチによる切り替え(検索するDBの切り替え)
+    switch($this->_PARAM['query_mode'])
+    {
+      case 'user':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'relational', array('groupID'=>$this->_PARAM['groupID']));
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          return common::error('query', 'missing');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['relation_SQE']);
+        unset($rest['groupID']);
+      break;
+
+      case 'group':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'Group', array('groupID'=>$this->_PARAM['groupID']));
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          return common::error('query', 'missing');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['group_SQE']);
+        unset($rest['groupID']);
+        unset($rest['last_update']);
+        unset($rest['createTime']);
+      break;
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+  }
   /**
    * ログインします
    *
@@ -552,7 +619,7 @@ class api
                                     )
                               );
     }
-//    return true;
+  //  return true;
   }
 
   /**

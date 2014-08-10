@@ -28,19 +28,23 @@ switch($_GET['mode']) {
   break;
 
   case 'login':
-    echo $api->login($_GET['userID'], $_GET['password']);
+    $rest = $api->login($_GET['userID'], $_GET['password']);
+    echo $rest;
   break;
 
   case 'create':
-    echo $api->create($_GET['group_name'], $_GET['group_desc'], $_GET['sessionID'], $_GET['userID']);
+    $rest = $api->create($_GET['group_name'], $_GET['group_desc'], $_GET['sessionID'], $_GET['userID']);
+    echo $rest;
   break;
 
   case 'inviteID':
-    echo $api->addInvitation($_GET['groupID'], $_GET['sessionID']);
+    $rest = $api->addInvitation($_GET['groupID'], $_GET['sessionID']);
+    echo $rest;
   break;
 
   case 'addUser':
-    // 後で何とかします。ごめんなさい。許してください。なんでもし
+    $rest = $api->addGroupUser($_GET['groupID'], $_GET['userID'], $_GET['sessionID']);
+    echo $rest;
   break;
 
   case 'talk':
@@ -60,7 +64,8 @@ switch($_GET['mode']) {
   break;
 
   case 'getGroup':
-    // あｔ
+    $rest = $api->getGroup($_GET['groupID'], $_GET['query_mode']);
+    echo $rest;
   break;
 
   default:
