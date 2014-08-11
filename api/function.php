@@ -6,7 +6,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140810
+ * @version 0.2.20140811
  * @link http://grouper.sysken.org/
  */
 
@@ -120,10 +120,59 @@ class common
         self::setHeader("x-status-code:400-1");
         $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'400', 'msg'=>$msg))));
         break;
+
+      case 'push':
+        self::setHeader("x-status-code:500-5");
+        $json = api::createJson(array('status'=>'ERR', 'contents'=>(array('code'=>'400', 'msg'=>$msg))));
+        break;
     }
     self::setHeader("x-sid: " . time());
     echo $json;
     exit();
+  }
+
+  /**
+   * push通知を送信します
+   *
+   * @param array|string $regID レジストレーションキー
+   * @param strinr $msg         送信したいメッセージ
+   * @param string $senduser    送信者のID
+   * @return  bool              成功したかどうか
+   */
+  function sender($regID, $msg, $senduser)
+  {
+    $url = 'https://android.googleapis.com/gcm/send';
+    $header = array(
+                    'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
+                    'Authorization: key=AIzaSyDwMmyU5RHNn6NL8m_fGHvzaQaWB87HFFY'
+                   );
+
+    // クソ
+    for($i=0; !empty($regID); i++)
+    {
+      $postParam = array(
+                        'registration_id' => $regID[$i],
+                        'collapse_key' => 'update',
+                        'data.message' => $msg,
+                        );
+      $post = http_build_query($postParam, '&');
+
+      $curl = curl_init($url);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+      curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+      curl_setopt($curl, CURLOPT_POST, TRUE);
+      curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+      curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
+      curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+      $ret = curl_exec($curl);
+      if(!$ret)
+      {
+        self::error('push', 'push通知を送信できませんでした。');
+      }
+      unset($regID[$i])
+    }
+    return true;
   }
 }
 
@@ -317,9 +366,10 @@ class api
    * @param  string $tel2       電話番号中4桁
    * @param  string $tel3       電話番号下4桁
    * @param  string $is_tel_pub 電話番号公開フラグ
+   * @param  string  $regID     Google Cloud Messege レジストレーションキー
    * @return bool               結果を返す
    */
-  function regist($username, $deviceID, $tel1, $tel2, $tel3, $is_tel_pub=0)
+  function regist($username, $deviceID, $tel1, $tel2, $tel3, $is_tel_pub=0, $regID)
   {
     self::paramAssign('username', '64,NOT_NULL,text', $username);
     self::paramAssign('deviceID', '64,NOT_NULL,text', $deviceID);
@@ -327,6 +377,7 @@ class api
     self::paramAssign('tel2', '4,int', $tel2);
     self::paramAssign('tel3', '4,int', $tel3);
     self::paramAssign('is_tel_pub', '4,int', $is_tel_pub);
+    self::paramAssign('is_tel_pub', '100,text', $regID);
 
     $userID = self::createRandHex('6');
     $password = self::createRandHex('8');
@@ -339,7 +390,8 @@ class api
                                                   'tel2' => $this -> _PARAM['tel2'],
                                                   'tel3' => $this -> _PARAM['tel3'],
                                                   'is_tel_pub' => $this -> _PARAM['is_tel_pub'],
-                                                  'sessionID' => $sessionID
+                                                  'sessionID' => $sessionID,
+                                                  'regID' => $this -> _PARAM['regID']
                                                   )
                                             );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
