@@ -148,7 +148,7 @@ class common
                    );
     $msg = array('mode' => $mode, 'message' => $msg);
     // クソ
-    for($i=0; !empty($regID); i++)
+    for($i=0; !empty($regID); $i++)
     {
       $postParam = array(
                         'registration_id' => $regID[$i],
@@ -170,7 +170,7 @@ class common
       {
         self::error('push', 'push通知を送信できませんでした。');
       }
-      unset($regID[$i])
+      unset($regID[$i]);
     }
     return true;
   }
@@ -377,7 +377,7 @@ class api
     self::paramAssign('tel2', '4,int', $tel2);
     self::paramAssign('tel3', '4,int', $tel3);
     self::paramAssign('is_tel_pub', '4,int', $is_tel_pub);
-    self::paramAssign('is_tel_pub', '100,text', $regID);
+    self::paramAssign('regID', '1000,text', $regID);
 
     $userID = self::createRandHex('6');
     $password = self::createRandHex('8');
@@ -391,7 +391,8 @@ class api
                                                   'tel3' => $this -> _PARAM['tel3'],
                                                   'is_tel_pub' => $this -> _PARAM['is_tel_pub'],
                                                   'sessionID' => $sessionID,
-                                                  'regID' => $this -> _PARAM['regID']
+                                                  'regID' => $this -> _PARAM['regID'],
+                                                  'deviceID' => $this -> _PARAM['deviceID']
                                                   )
                                             );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -731,6 +732,64 @@ class api
   }
 
   /**
+   * アラームを設定します
+   *
+   * @param string $groupID   グループID
+   * @param string $userID    ユーザID
+   * @param setinr $sessionID セッションID
+   * @param string $talk      発言内容
+   * @param binary $media     画像のバイナリデータ
+   * @param float  $geo_x     GPSで取得した位置情報のx座標
+   * @param float  $geo_y     GPSで取得した位置情報のy座標
+   * @return array|bool 連想配列
+   */
+  /*
+  function alarm($groupID, $userID, $sessionID, $talk, $media, $geo_x, $geo_y)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('talk', '500,text', $talk);
+    self::paramAssign('media', '2500000000000000,binary', $media);
+    self::paramAssign('geo_x', '100,text', $geo_x);
+    self::paramAssign('geo_y', '100,text', $geo_y);
+
+    $talkID = self::createRandHex('15');
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'talk', array(
+                                                                       'groupID' => $this -> _PARAM['groupID'],
+                                                                       'userID' => $this -> _PARAM['userID'],
+                                                                       'talkID' => $talkID,
+                                                                       'talk' => $this -> _PARAM['talk'],
+                                                                       'media' => $this -> _PARAM['media'],
+                                                                       'geo_x' => $this -> _PARAM['geo_x'],
+                                                                       'geo_y' => $this -> _PARAM['geo_y']
+                                                                    )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    if(!($talk === null))
+    {
+      $msg = $talk;
+    } elseif (!($media === null)) {
+      $msg = $media;
+    } elseif(!($geo_x === null) && !($geo_y === null))
+    {
+      $msg = $geo_x . ',' . $geo_y;
+    }
+
+    // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
+    $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
+    $user = $this -> _mysqli -> goQuery($user, true, 'select');
+    $query_II_rest = common::sender($user['regID'], $msg, $userID);
+  }
+  */
+
+  /**
    * ランダムな16進数の値を生成します
    *
    * @param int $int 生成する桁数
@@ -921,14 +980,15 @@ class db
     {
       common::error('db', 'Emergency STOP');
     }
-    $rest = $this -> _mysqli -> query($query);
     switch ($mode)
     {
       case 'select':
+        $rest = $this -> _mysqli -> query($query);
         return $rest;
         break;
 
       default:
+        $rest = $this -> _mysqli -> query($query);
         if($rest === false)
         {
           return false;

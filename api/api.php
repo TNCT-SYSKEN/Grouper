@@ -18,8 +18,7 @@ foreach($_POST as $key => $value) { $_POST[$key] = $common->security($value); }
 // モードスイッチによって実行モードを変更する
 switch($_GET['mode']) {
   case 'regist':
-    $rest = $api->regist($_GET['username'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'],
-                         $_GET['is_tel_pub'], $_GET['regID']);
+    $rest = $api->regist($_GET['username'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'],$_GET['is_tel_pub'], $_GET['regID']);
     echo $rest;
   break;
 
