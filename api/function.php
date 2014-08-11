@@ -139,21 +139,21 @@ class common
    * @param string $senduser    送信者のID
    * @return  bool              成功したかどうか
    */
-  function sender($regID, $msg, $senduser)
+  function sender($regID, $msg, $senduser, $mode='talk')
   {
     $url = 'https://android.googleapis.com/gcm/send';
     $header = array(
                     'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
                     'Authorization: key=AIzaSyDwMmyU5RHNn6NL8m_fGHvzaQaWB87HFFY'
                    );
-
+    $msg = array('mode' => $mode, 'message' => $msg);
     // クソ
     for($i=0; !empty($regID); i++)
     {
       $postParam = array(
                         'registration_id' => $regID[$i],
                         'collapse_key' => 'update',
-                        'data.message' => $msg,
+                        'data.message' => $msg
                         );
       $post = http_build_query($postParam, '&');
 
@@ -675,6 +675,62 @@ class api
   }
 
   /**
+   * トークをDBに登録しプッシュ通知を行う準備をします
+   *
+   * @param string $groupID   グループID
+   * @param string $userID    ユーザID
+   * @param setinr $sessionID セッションID
+   * @param string $talk      発言内容
+   * @param binary $media     画像のバイナリデータ
+   * @param float  $geo_x     GPSで取得した位置情報のx座標
+   * @param float  $geo_y     GPSで取得した位置情報のy座標
+   * @return array|bool 連想配列
+   */
+  function talk($groupID, $userID, $sessionID, $talk = null, $media = null, $geo_x = null, $geo_y = null)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('talk', '500,text', $talk);
+    self::paramAssign('media', '2500000000000000,binary', $media);
+    self::paramAssign('geo_x', '100,text', $geo_x);
+    self::paramAssign('geo_y', '100,text', $geo_y);
+
+    $talkID = self::createRandHex('15');
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'talk', array(
+                                                                       'groupID' => $this -> _PARAM['groupID'],
+                                                                       'userID' => $this -> _PARAM['userID'],
+                                                                       'talkID' => $talkID,
+                                                                       'talk' => $this -> _PARAM['talk'],
+                                                                       'media' => $this -> _PARAM['media'],
+                                                                       'geo_x' => $this -> _PARAM['geo_x'],
+                                                                       'geo_y' => $this -> _PARAM['geo_y']
+                                                                    )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    if(!($talk === null))
+    {
+      $msg = $talk;
+    } elseif (!($media === null)) {
+      $msg = $media;
+    } elseif(!($geo_x === null) && !($geo_y === null))
+    {
+      $msg = $geo_x . ',' . $geo_y;
+    }
+
+    // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
+    $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
+    $user = $this -> _mysqli -> goQuery($user, true, 'select');
+    $query_II_rest = common::sender($user['regID'], $msg, $userID);
+  }
+
+  /**
    * ランダムな16進数の値を生成します
    *
    * @param int $int 生成する桁数
@@ -859,19 +915,27 @@ class db
    * @param bool $is_secure 安全かどうか
    * @return  bool          問い合わせ結果
    */
-  function goQuery($query, $is_secure = false)
+  function goQuery($query, $is_secure = false, $mode = null)
   {
     if(!$is_secure)
     {
       common::error('db', 'Emergency STOP');
     }
     $rest = $this -> _mysqli -> query($query);
-
-    if($rest === false)
+    switch ($mode)
     {
-      return false;
-    }elseif($rest === true){
-      return true;
+      case 'select':
+        return $rest;
+        break;
+
+      default:
+        if($rest === false)
+        {
+          return false;
+        }elseif($rest === true){
+          return true;
+        }
+        break;
     }
     return $rest -> fetch_all(MYSQLI_ASSOC);
   }

@@ -18,7 +18,8 @@ foreach($_POST as $key => $value) { $_POST[$key] = $common->security($value); }
 // モードスイッチによって実行モードを変更する
 switch($_GET['mode']) {
   case 'regist':
-    $rest = $api->regist($_GET['username'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'], $_GET['is_tel_pub'], $_GET['regID']);
+    $rest = $api->regist($_GET['username'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'],
+                         $_GET['is_tel_pub'], $_GET['regID']);
     echo $rest;
   break;
 
@@ -48,7 +49,13 @@ switch($_GET['mode']) {
   break;
 
   case 'talk':
-    // あとでお願いします
+    isset($talk) ? $_GET['talk'] : null;
+    isset($media) ? $_GET['media'] : null;
+    isset($geo_x) ? $_GET['geo_x'] : null;
+    isset($geo_y) ? $_GET['geo_y'] : null;
+    $rest = $api->talk($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $talk,
+                       $media, $geo_x, $geo_y);
+    echo $rest;
   break;
 
   case 'alarm':
