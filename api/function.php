@@ -6,7 +6,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140811
+ * @version 0.2.20140812
  * @link http://grouper.sysken.org/
  */
 
@@ -484,15 +484,13 @@ class api
    */
   function addInvitation($groupID, $sessionID)
   {
-    $hex = self::createRandHex('6');
-    self::paramAssign('invitation', '6,NOT_NULL,hex', $hex);
+    $hex = self::createRandHex('10');
+    self::paramAssign('invitation', '50,NOT_NULL,hex', $hex);
     self::paramAssign('groupID', '32,NOT_NULL,text', $groupID);
-
-    // 作り方悩んでる
 
     $query = $this -> _mysqli -> buildQuery('INSERT', 'invitation', array(
                                                                           'groupID' => $this -> _PARAM['groupID'],
-                                                                          'invitation' => $this -> _PARAM['invitation']
+                                                                          'invitation' => $hex
                                                                           )
                                            );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -500,7 +498,7 @@ class api
     {
       common::error('query', 'missing');
     }
-    return $this -> _PARAM['invitation'];
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'inviteID'=>$hex)));
   }
 
   /**
@@ -512,6 +510,7 @@ class api
    * @param bool $is_sessionSerch ユーザIDを割り出すならtrue
    * @return bool|array           連想配列
    */
+  /* 要調整
   function getUser($userID = NULL, $sessionID, $fmt = 'json', $is_sessionSerch = False)
   {
     if($is_sessionSerch  === true)
@@ -536,7 +535,6 @@ class api
     }else{
       self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
       self::paramAssign('userID', '64,NOT_NULL,text', $userID);
-
       if(!self::is_login($this->_PARAM['sessionID']))
       {
         common::error('login', 'not login');
@@ -579,6 +577,7 @@ class api
       }
     }
   }
+  */
 
   /**
    * グループ情報の取得
@@ -659,8 +658,8 @@ class api
     $sessionID = self::createRandHex('32');
 //    self::paramAssign('session', '32,NOT_NULL,hex', $sessionID);
     $query = $this -> _mysqli -> buildQuery('INSERT', 'session', array(
-                                                                       'userID' => $this -> _PARAM['userID'],
-                                                                       'sessionID' => $sessionID
+                                                                       'sessionID' => $sessionID,
+                                                                       'userID' => $this -> _PARAM['userID']
                                                                       )
                                            );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -728,7 +727,19 @@ class api
     // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
     $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
     $user = $this -> _mysqli -> goQuery($user, true, 'select');
+
+    // senderに送信リクエストを渡す
     $query_II_rest = common::sender($user['regID'], $msg, $userID);
+    if(!$query_II_rest)
+    {
+      common::error('query', 'missing gcm');
+    }
+
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
+                                                                    'talkID'=>$talkID
+                                                                    )
+                                  )
+                            );
   }
 
   /**

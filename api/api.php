@@ -48,26 +48,48 @@ switch($_GET['mode']) {
   break;
 
   case 'talk':
-    isset($talk) ? $_GET['talk'] : null;
-    isset($media) ? $_GET['media'] : null;
-    isset($geo_x) ? $_GET['geo_x'] : null;
-    isset($geo_y) ? $_GET['geo_y'] : null;
-    $rest = $api->talk($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $talk,
-                       $media, $geo_x, $geo_y);
+    isset($_GET['talk']) ? $_GET['talk'] : null;
+    isset($_GET['media']) ? $_GET['media'] : null;
+    isset($_GET['geo_x']) ? $_GET['geo_x'] : null;
+    isset($_GET['geo_y']) ? $_GET['geo_y'] : null;
+    $rest = $api->talk($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $talk, $media, $geo_x, $geo_y);
     echo $rest;
   break;
 
   case 'alarm':
-    // 後でします
+    $rest = $api->alarm($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['time_alarm'], $_GET['alart_desc'], $_GET['alert_opt1'], $_GET['alart_opt2']);
+    echo $rest;
   break;
 
-  case 'settingTalk':
-    // あｔ
+  case 'alartchoice':
+    $rest = $api->alartchoice($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alart_choice']);
+    echo $rest;
+
+  case 'delTalk':
+    $rest = $api->delTalk($_GET['userID'], $_GET['sessionID'], $_GET['talkID']);
+    echo $rest;
   break;
 
+/* 準備中
   case 'settingGroup':
-    // あ
+    isset($_GET['group_name']) ? $_GET['group_name'] : null;
+    isset($_GET['group_desc']) ? $_GET['group_desc'] : null;
+    isset($_GET['is_group_del']) ? $_GET['is_group_del'] : '0';
+    $rest = $api->settingGroup($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['group_name'], $_GET['group_desc'], $_GET['is_group_del']);
+    echo $rest;
   break;
+*/
+
+/* 準備中
+  case 'settingUser':
+    isset($_GET['group_name']) ? $_GET['group_name'] : null;
+    isset($_GET['group_desc']) ? $_GET['group_desc'] : null;
+    isset($_GET['is_group_del']) ? $_GET['is_group_del'] : '0';
+    $rest = $api->delTalk($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['group_name'], $_GET['group_desc'], $_GET['is_group_del']);
+    echo $rest;
+  break;
+*/
+
 
   case 'getGroup':
     $rest = $api->getGroup($_GET['groupID'], $_GET['query_mode']);
