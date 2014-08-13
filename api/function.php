@@ -6,7 +6,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara<raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140812
+ * @version 0.2.20140813
  * @link http://grouper.sysken.org/
  */
 
@@ -85,8 +85,6 @@ class common
    */
   function error($type, $msg)
   {
-//    ob_end_flush();
-//    self::setHeader("Content-Type: application/json; charset=utf-8");
     $json = api::createJson(array('status'=>'500', 'contents'=>array('code'=>'-１', 'msg'=>'未知のエラーが発生しました')));
 
     switch($type)
@@ -211,8 +209,7 @@ class api
    * @param string $db        DB名
    * @param int    $port      MySQLポート
    */
-  function __construct($host = null, $username = null, $password = null,
-                       $db = null, $port = null)
+  function __construct($host = null, $username = null, $password = null, $db = null, $port = null)
   {
     $this -> _mysqli = new db($host, $username, $password, $db);
   }
@@ -285,7 +282,7 @@ class api
           }
           break;
 
-        case 'date':
+        case 'timestamp':
           $date_format = '%\d{4,4}/\d{2,2}/\d{2,2}\s\d{2,2}:\d{2,2}:\d{2,2}%';
           if(preg_match($date_format, $value))
           {
@@ -506,78 +503,67 @@ class api
    *
    * @param string $userID        ユーザID
    * @param string $sessionID     セッションID
-   * @param string $fmt           フォーマット
-   * @param bool $is_sessionSerch ユーザIDを割り出すならtrue
+   * @param string $query_mode    モード[user, group]
    * @return bool|array           連想配列
    */
-  /* 要調整
-  function getUser($userID = NULL, $sessionID, $fmt = 'json', $is_sessionSerch = False)
+  function getUser($userID = NULL, $sessionID, $query_mode)
   {
-    if($is_sessionSerch  === true)
+    self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('query_mode', '64,NOT_NULL,text', $query_mode);
+
+    switch($query_mode)
     {
-      self::paramAssign('session', '64,NOT_NULL,hex', $sessionID);
-      if(!$self::is_login($this -> _PARAM['sessionID']))
-      {
-        common::error('login', 'not login');
-      }
+      case 'user':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
+                                                                        'userID'=>$this->_PARAM['userID'],
+                                                                        )
+                                               );
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          common::error('query', 'not found');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['user_SQE']);
+        unset($rest['password']);
+        unset($rest['delete']);
+        unset($rest['deviceID']);
+        unset($rest['is_tel_pub']);
+        unset($rest['tel1']);
+        unset($rest['tel2']);
+        unset($rest['tel3']);
+      break;
 
-      $query = $this -> _mysqli -> buildQuery('SELECT', 'session', array(
-                                                                         'sessionID'=>$this->_PARAM['sessionID'],
-                                                                         'logout'=>'0')
-                                             );
-      $query_rest = $this -> _mysqli -> goQuery($query, true);
-      if(empty($query_rest))
-      {
-        common::error('query', 'ログインしなおしてください');
-      }
-      self::paramAssign('userID', '64,NOT_NULL,hex', $query_rest['username']);
-      return $this -> _PARAM['userID'];
-    }else{
-      self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
-      self::paramAssign('userID', '64,NOT_NULL,text', $userID);
-      if(!self::is_login($this->_PARAM['sessionID']))
-      {
-        common::error('login', 'not login');
-      }
-      $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
-                                                                      'userID'=>$this->_PARAM['userID'],
-                                                                      )
-                                             );
-      $query_rest = $this -> _mysqli -> goQuery($query, true);
-      if(empty($query_rest))
-      {
-        common::error('query', 'not found');
-      }
-      foreach($query_rest as $key => $value)
-      {
-        $rest[$key] = $value;
-      }
-      $rest = $rest[0];
-      unset($rest['user_SQE']);
-      unset($rest['password']);
-      unset($rest['delete']);
-      unset($rest['deviceID']);
-      unset($rest['is_tel_pub']);
-      unset($rest['tel1']);
-      unset($rest['tel2']);
-      unset($rest['tel3']);
-      unset($rest['sessionID']);
-      if($fmt == 'row')
-      {
-        return $rest;
-      }
-      switch($fmt)
-      {
-        case 'json':
-          return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+      case 'group':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'Session', array(
+                                                                        'userID'=>$this->_PARAM['userID'],
+                                                                        )
+                                               );
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          common::error('query', 'not found');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['relational_SQE']);
+        unset($rest['userID']);
+      break;
 
-        case 'array':
-        default:
-          return $rest;
-      }
+      default:
+        common::error('query', 'format error');
     }
+
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
   }
-  */
 
   /**
    * グループ情報の取得
@@ -656,7 +642,6 @@ class api
 
     // 新しいセッションの生成
     $sessionID = self::createRandHex('32');
-//    self::paramAssign('session', '32,NOT_NULL,hex', $sessionID);
     $query = $this -> _mysqli -> buildQuery('INSERT', 'session', array(
                                                                        'sessionID' => $sessionID,
                                                                        'userID' => $this -> _PARAM['userID']
@@ -671,7 +656,6 @@ class api
                                     )
                               );
     }
-  //  return true;
   }
 
   /**
@@ -686,7 +670,7 @@ class api
    * @param float  $geo_y     GPSで取得した位置情報のy座標
    * @return array|bool 連想配列
    */
-  function talk($groupID, $userID, $sessionID, $talk = null, $media = null, $geo_x = null, $geo_y = null)
+  function talk($groupID, $userID, $sessionID, $talk, $media, $geo_x, $geo_y)
   {
     self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
@@ -745,36 +729,35 @@ class api
   /**
    * アラームを設定します
    *
-   * @param string $groupID   グループID
-   * @param string $userID    ユーザID
-   * @param setinr $sessionID セッションID
-   * @param string $talk      発言内容
-   * @param binary $media     画像のバイナリデータ
-   * @param float  $geo_x     GPSで取得した位置情報のx座標
-   * @param float  $geo_y     GPSで取得した位置情報のy座標
+   * @param string $groupID        グループID
+   * @param string $userID         ユーザID
+   * @param setinr $sessionID      セッションID
+   * @param timestamp $alarm_time  アラーム時刻
+   * @param string $alarm_desc     アラーム詳細
+   * @param float  $alert_opt1     アラート選択肢1
+   * @param float  $alert_opt2     アラート選択肢2
    * @return array|bool 連想配列
    */
-  /*
-  function alarm($groupID, $userID, $sessionID, $talk, $media, $geo_x, $geo_y)
+  function alarm($groupID, $userID, $sessionID, $alarm_time, $alert_desc, $alert_opt1, $alert_opt2)
   {
     self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
-    self::paramAssign('talk', '500,text', $talk);
-    self::paramAssign('media', '2500000000000000,binary', $media);
-    self::paramAssign('geo_x', '100,text', $geo_x);
-    self::paramAssign('geo_y', '100,text', $geo_y);
+    self::paramAssign('alarm_time', '500,NOT_NULL,timestamp', $alarm_time);
+    self::paramAssign('alert_desc', '500,text', $alert_desc);
+    self::paramAssign('alert_opt1', '100,text', $alert_opt1);
+    self::paramAssign('alert_opt2', '100,text', $alert_opt2);
 
-    $talkID = self::createRandHex('15');
+    $alarmID = self::createRandHex('15');
 
-    $query = $this -> _mysqli -> buildQuery('INSERT', 'talk', array(
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm', array(
                                                                        'groupID' => $this -> _PARAM['groupID'],
-                                                                       'userID' => $this -> _PARAM['userID'],
-                                                                       'talkID' => $talkID,
-                                                                       'talk' => $this -> _PARAM['talk'],
-                                                                       'media' => $this -> _PARAM['media'],
-                                                                       'geo_x' => $this -> _PARAM['geo_x'],
-                                                                       'geo_y' => $this -> _PARAM['geo_y']
+                                                                       'createUser' => $this -> _PARAM['userID'],
+                                                                       'alarmID' => $alarmID,
+                                                                       'alarm_time' => $this -> _PARAM['alarm_time'],
+                                                                       'alarm_desc' => $this -> _PARAM['alarm_desc'],
+                                                                       'alarm_opt1' => $this -> _PARAM['alarm_opt1'],
+                                                                       'alarm_opt2' => $this -> _PARAM['alarm_opt2']
                                                                     )
                                            );
     $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -782,23 +765,159 @@ class api
     {
       common::error('query', 'missing');
     }
-
-    if(!($talk === null))
-    {
-      $msg = $talk;
-    } elseif (!($media === null)) {
-      $msg = $media;
-    } elseif(!($geo_x === null) && !($geo_y === null))
-    {
-      $msg = $geo_x . ',' . $geo_y;
-    }
-
-    // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
-    $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
-    $user = $this -> _mysqli -> goQuery($user, true, 'select');
-    $query_II_rest = common::sender($user['regID'], $msg, $userID);
   }
-  */
+
+  /**
+   * グループの設定を行います
+   *
+   * @param string $groupID    グループID
+   * @param string $userID     ユーザID
+   * @param string $sessionID  セッションID
+   * @param string $group_name グループ名
+   * @param string $group_desc グループ詳細
+   * @param string $is_group_del グループ削除
+   * @return bool|array
+   */
+  function settingGroup($userID , $sessionID, $groupID, $group_name, $group_desc, $is_group_del)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('userID', '64,NOT_NULL,text',$userID);
+    self::paramAssign('sessionID', '200,NOT_NULL,hex', $sessionID);
+    self::paramAssign('group_name', '200,NOT_NULL,text', $group_name);
+    self::paramAssign('group_desc', '200,NOT_NULL,text', $group_desc);
+    self::paramAssign('is_group_del', '2, NOT_NULL,text', $is_group_del);
+    if($this -> _PARAM['is_group_del'] == 1)
+    {
+      $query_group     = $this -> _mysqli -> buildQuery('DELETE', 'Group', array('groupID' => $this -> _PARAM['groupID']));
+      $query_alarm     = $this -> _mysqli -> buildQuery('DELETE', 'Alarm', array('groupID' => $this -> _PARAM['groupID']));
+      $query_relational= $this -> _mysqli -> buildQuery('DELETE', 'relational', array('groupID' => $this -> _PARAM['groupID']));
+      $query_group_rest      = $this->_mysqli->goQuery($query_group,true);
+      $query_alarm_rest      = $this->_mysqli->goQuery($query_alarm,true);
+      $query_relational_rest = $this->_mysqli->goQuery($query_relational,true);
+      if(!$query_group_rest)
+      {
+        echo $query_group;
+        common::error('query', 'missing db:group');
+      }
+      if(!$query_alarm_rest)
+      {
+        echo $query_alarm;
+        common::error('query', 'missing db:alarm');
+      }
+      if(!$query_relational_rest)
+      {
+        echo $query_relational;
+        common::error('query', 'missing db:relational');
+      }
+    }else{
+      // Groupテーブルから該当のグループの列を引っこ抜く
+      $query = $this -> _mysqli -> buildQuery('SELECT', 'Group', array('groupID' => $this -> _PARAM['groupID']));
+      $query_rest = $this->_mysqli->goQuery($query,true);
+
+      if(!$query_rest)
+      {
+        common::error('query', 'missing');
+      }
+      foreach($query_rest as $key => $value)
+      {
+        $rest[$key] = $value;
+      }
+      $rest = $rest[0];
+
+      // Group名もしくはグループ詳細を変更しない場合は現状の名前を再度入れる
+      if($group_name === '0')
+      {
+        $group_name = $rest['group_name'];
+      }else{
+        $group_name = $this -> _PARAM['group_name'];
+      }
+      if($group_desc === '0')
+      {
+        $group_desc = $rest['group_desc'];
+      }else{
+        $group_desc = $this -> _PARAM['group_desc'];
+      }
+
+      $query = $this -> _mysqli -> buildQuery('Update', 'Group', array('group_name' => $group_name,'group_desc' => $group_desc),
+                                                                        array('groupID' => $this -> _PARAM['groupID']));
+      $query_rest = $this->_mysqli->goQuery($query,true);
+      if(!$query_rest)
+      {
+        common::error('query', 'missing');
+      }
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  /**
+   * ユーザの設定を行います
+   *
+   * @param string $userID      ユーザID
+   * @param string $sessionID   セッションID
+   * @param string $user_name   ユーザ名
+   * @param string $groupID     グループID
+   * @param string $is_user_del ユーザ削除
+   * @return bool|array
+   */
+  function settingUser($userID , $sessionID, $groupID, $user_name, $is_user_del)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('userID', '64,NOT_NULL,text',$userID);
+    self::paramAssign('sessionID', '200,NOT_NULL,hex', $sessionID);
+    self::paramAssign('user_name', '200,NOT_NULL,text', $user_name);
+    self::paramAssign('is_user_del', '2, NOT_NULL,text', $is_user_del);
+    if($this -> _PARAM['is_user_del'] === 1)
+    {
+      $query_user      = $this -> _mysqli -> buildQuery('DELETE', 'User', array('userID' => $this -> _PARAM['userID']));
+      $query_alarm     = $this -> _mysqli -> buildQuery('DELETE', 'Alarm', array('userID' => $this -> _PARAM['userID']));
+      $query_relational= $this -> _mysqli -> buildQuery('DELETE', 'relational', array('userID' => $this -> _PARAM['userID']));
+      $query_user_rest       = $this->_mysqli->goQuery($query_user,true);
+      $query_alarm_rest      = $this->_mysqli->goQuery($query_alarm,true);
+      $query_relational_rest = $this->_mysqli->goQuery($query_relational,true);
+      if(!$query_user_rest)
+      {
+        common::error('query', 'missing');
+      }
+      if(!$query_alarm_rest)
+      {
+        common::error('query', 'missing');
+      }
+      if(!$query_relational_rest)
+      {
+        common::error('query', 'missing');
+      }
+    }else{
+      // Userテーブルから該当のUserの列を引っこ抜く
+      $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID' => $this -> _PARAM['userID']));
+      $query_rest = $this->_mysqli->goQuery($query,true);
+
+      if(!$query_rest)
+      {
+        common::error('query', 'missing');
+      }
+      foreach($query_rest as $key => $value)
+      {
+        $rest[$key] = $value;
+      }
+      $rest = $rest[0];
+
+      // user名\を変更しない場合は現状の名前を再度入れる
+      if($user_name === '0')
+      {
+        $user_name = $rest['user_name'];
+      }else{
+        $user_name = $this -> _PARAM['user_name'];
+      }
+      $query = $this -> _mysqli -> buildQuery('UPDATE', 'User', array('user_name' => $user_name),
+                                              array('userID' => $this -> _PARAM['userID']));
+      $query_rest = $this->_mysqli->goQuery($query,true);
+      if(!$query_rest)
+      {
+        common::error('query', 'missing');
+      }
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
 
   /**
    * ランダムな16進数の値を生成します
@@ -854,8 +973,7 @@ class db
    * @param string [$db = null]       データベースホスト名
    * @param int    [$port = null]     ポート
    */
-  function __construct($host = null, $username = null, $password = null,
-                       $db = null, $port = null)
+  function __construct($host = null, $username = null, $password = null, $db = null, $port = null)
   {
     if($host === NULL)
     {
@@ -963,15 +1081,25 @@ class db
         break;
 
       case 'update':
-        $query .= "UPDATE `Grouper_new.{$table}` SET ";
+        $query .= "UPDATE `{$table}` SET ";
+        foreach($search as $key => $value)
+        {
+          $query .= "`{$key}` = '" . self::security($value) . "', ";
+        }
+        $query = substr($query, 0, -2);
+
         foreach($update as $key => $value)
         {
-          $query .= "`{$key}` = '" . self::security($value) . "' AND ";
+          $query .= "WHERE `{$key}` = '" . self::security($value) . "'";
         }
-        $query = substr($query, 0, -5);
         break;
 
       case 'delete':
+        $query .= "DELETE FROM `{$table}` WHERE";
+        foreach($search as $key => $value)
+        {
+          $query .= "`{$key}` = '" . self::security($value) . "'";
+        }
         break;
     }
 

@@ -1,5 +1,16 @@
 <?php
 /**
+ * Grouper API実行
+ *
+ * @copyright &copy; 2014 Ryosuke Hagihara
+ * @create 2014.08.05
+ * @auther Ryosuke Hagihara<raryosu@sysken.org>
+ * @since PHP5.5+ / MySQL 5.3+
+ * @version 0.2.20140813
+ * @link http://grouper.sysken.org/
+ */
+
+/**
  * アプリケーションとの通信を行います
  */
 // ファンクションファイルを読み込む(失敗為たら取り合えず終了)
@@ -48,16 +59,12 @@ switch($_GET['mode']) {
   break;
 
   case 'talk':
-    isset($_GET['talk']) ? $_GET['talk'] : null;
-    isset($_GET['media']) ? $_GET['media'] : null;
-    isset($_GET['geo_x']) ? $_GET['geo_x'] : null;
-    isset($_GET['geo_y']) ? $_GET['geo_y'] : null;
-    $rest = $api->talk($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $talk, $media, $geo_x, $geo_y);
+    $rest = $api->talk($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['talk'], $_GET['media'], $_GET['geo_x'], $_GET['geo_y']);
     echo $rest;
   break;
 
   case 'alarm':
-    $rest = $api->alarm($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['time_alarm'], $_GET['alart_desc'], $_GET['alert_opt1'], $_GET['alart_opt2']);
+    $rest = $api->alarm($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alarm_time'], $_GET['alart_desc'], $_GET['alert_opt1'], $_GET['alart_opt2']);
     echo $rest;
   break;
 
@@ -70,26 +77,19 @@ switch($_GET['mode']) {
     echo $rest;
   break;
 
-/* 準備中
   case 'settingGroup':
-    isset($_GET['group_name']) ? $_GET['group_name'] : null;
-    isset($_GET['group_desc']) ? $_GET['group_desc'] : null;
-    isset($_GET['is_group_del']) ? $_GET['is_group_del'] : '0';
     $rest = $api->settingGroup($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['group_name'], $_GET['group_desc'], $_GET['is_group_del']);
     echo $rest;
   break;
-*/
 
-/* 準備中
   case 'settingUser':
-    isset($_GET['group_name']) ? $_GET['group_name'] : null;
-    isset($_GET['group_desc']) ? $_GET['group_desc'] : null;
-    isset($_GET['is_group_del']) ? $_GET['is_group_del'] : '0';
-    $rest = $api->delTalk($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['group_name'], $_GET['group_desc'], $_GET['is_group_del']);
+    $rest = $api->settingUser($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['user_name'], $_GET['is_user_del']);
     echo $rest;
   break;
-*/
 
+//調整中
+  case 'delTalk':
+  break;
 
   case 'getGroup':
     $rest = $api->getGroup($_GET['groupID'], $_GET['query_mode']);
