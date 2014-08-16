@@ -2,11 +2,13 @@
 /**
  * Grouper ファンクション
  *
+ * Grouperの各種機能を提供します。(2014.08.16更新)
+ *
  * @copyright &copy; 2014 Ryosuke Hagihara
- * @create 2014.08.05
- * @auther Ryosuke Hagihara<raryosu@sysken.org>
+ * @create 2014/08/05
+ * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140813
+ * @version 0.3.1
  * @link http://grouper.sysken.org/
  */
 
@@ -18,8 +20,8 @@ if(basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) exit();
  *
  * すべての処理で共通して利用する関数をまとめたクラスです。
  *
- * @copyright &copy;2014 Ryosuke Hagihara
- * @version 0.2.20140805
+ * @copyright &copy;2014 Ryosuke Hagihara <raryosu@sysken.org>
+ * @version 0.30
  */
 class common
 {
@@ -86,7 +88,6 @@ class common
   function error($type, $msg)
   {
     $json = api::createJson(array('status'=>'500', 'contents'=>array('code'=>'-１', 'msg'=>'未知のエラーが発生しました')));
-
     switch($type)
     {
       case 'db':
@@ -179,8 +180,8 @@ class common
  *
  * APIに関するクラスです
  *
- * @copyright &copy; 2014 Ryosuke Hagihara
- * @version 0.2.20140803
+ * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
+ * @version 0.30
  */
 class api
 {
@@ -355,7 +356,7 @@ class api
   }
 
   /**
-   * ユーザ登録
+   * 1. ユーザ登録
    *
    * @param  string $username   ユーザ表示名
    * @param  string $deviceID   androidID
@@ -406,218 +407,7 @@ class api
   }
 
   /**
-   * グループ作成します
-   *
-   * @param string $group_name グループ名
-   * @param string $group_desc グループ詳細
-   * @param string $sessionID  セッションID
-   * @return bool|array
-   */
-  function create($group_name, $group_desc, $sessionID, $userID)
-  {
-    self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
-    self::paramAssign('group_name', '32,NOT_NULL,text',$group_name);
-    self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
-    self::paramAssign('userID', '64,NOT_NULL,hex', $userID);
-
-    // ログイン状態の確認
-    /*
-    if(!self::is_login($this->_PARAM['sessionID']))
-    {
-      common::error('login', 'not login');
-    }
-    */
-    $groupID = self::createRandHex(10);
-
-    // グループ追加
-    $query = $this -> _mysqli -> buildQuery('INSERT', 'Group', array('groupID'=>$groupID,
-                                                                    'group_name'=>$this->_PARAM['group_name'],
-                                                                    'group_desc'=>$this->_PARAM['group_desc'],
-                                                                    'createUser'=>$this->_PARAM['userID']
-                                                                    )
-                                          );
-    $query_rest = $this->_mysqli->goQuery($query,true);
-    if(!$query_rest)
-    {
-      common::error('query', 'missing');
-    }
-    // $id = $this -> _mysqli -> getID();
-
-    // 結果を返す
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'groupID'=>$groupID)));
-  }
-
-  /**
-   * グループにユーザを追加します
-   *
-   * @param string $groupID    グループID
-   * @param string $userID     ユーザID
-   * @param string $sessionID  セッションID
-   * @return bool|array
-   */
-  function addGroupUser($groupID, $userID, $sessionID)
-  {
-    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
-    self::paramAssign('userID', '32,NOT_NULL,text',$userID);
-    $query = $this -> _mysqli -> buildQuery('INSERT', 'relational', array(
-                                                                          'userID' => $this -> _PARAM['userID'],
-                                                                          'groupID' => $this -> _PARAM['groupID']
-                                                                          )
-                                           );
-    $query_rest = $this->_mysqli->goQuery($query,true);
-    if(!$query_rest)
-    {
-      common::error('query', 'missing');
-    }
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
-  }
-
-  /**
-   * 招待コードの生成及び登録
-   *
-   * @param string $groupID   グループID
-   * @param string $sessionID セッションID
-   * @return string           招待コード
-   */
-  function addInvitation($groupID, $sessionID)
-  {
-    $hex = self::createRandHex('10');
-    self::paramAssign('invitation', '50,NOT_NULL,hex', $hex);
-    self::paramAssign('groupID', '32,NOT_NULL,text', $groupID);
-
-    $query = $this -> _mysqli -> buildQuery('INSERT', 'invitation', array(
-                                                                          'groupID' => $this -> _PARAM['groupID'],
-                                                                          'invitation' => $hex
-                                                                          )
-                                           );
-    $query_rest = $this -> _mysqli -> goQuery($query, true);
-    if(!$query_rest)
-    {
-      common::error('query', 'missing');
-    }
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'inviteID'=>$hex)));
-  }
-
-  /**
-   * ユーザ情報の取得
-   *
-   * @param string $userID        ユーザID
-   * @param string $sessionID     セッションID
-   * @param string $query_mode    モード[user, group]
-   * @return bool|array           連想配列
-   */
-  function getUser($userID = NULL, $sessionID, $query_mode)
-  {
-    self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
-    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
-    self::paramAssign('query_mode', '64,NOT_NULL,text', $query_mode);
-
-    switch($query_mode)
-    {
-      case 'user':
-        $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
-                                                                        'userID'=>$this->_PARAM['userID'],
-                                                                        )
-                                               );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(empty($query_rest))
-        {
-          common::error('query', 'not found');
-        }
-        foreach($query_rest as $key => $value)
-        {
-          $rest[$key] = $value;
-        }
-        $rest = $rest[0];
-        unset($rest['user_SQE']);
-        unset($rest['password']);
-        unset($rest['delete']);
-        unset($rest['deviceID']);
-        unset($rest['is_tel_pub']);
-        unset($rest['tel1']);
-        unset($rest['tel2']);
-        unset($rest['tel3']);
-      break;
-
-      case 'group':
-        $query = $this -> _mysqli -> buildQuery('SELECT', 'Session', array(
-                                                                        'userID'=>$this->_PARAM['userID'],
-                                                                        )
-                                               );
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(empty($query_rest))
-        {
-          common::error('query', 'not found');
-        }
-        foreach($query_rest as $key => $value)
-        {
-          $rest[$key] = $value;
-        }
-        $rest = $rest[0];
-        unset($rest['relational_SQE']);
-        unset($rest['userID']);
-      break;
-
-      default:
-        common::error('query', 'format error');
-    }
-
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
-  }
-
-  /**
-   * グループ情報の取得
-   *
-   * @param string $groupID        ユーザID
-   * @param string $query_mode 実行モード[user(グループに属すユーザ情報の取得), group(グループ名, グループ作成者のIDを取得)]
-   * @return bool|array           連想配列
-   */
-  function getGroup($groupID, $query_mode)
-  {
-    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
-    self::paramAssign('query_mode', '64,NOT_NULL,string', $query_mode);
-
-    //モードスイッチによる切り替え(検索するDBの切り替え)
-    switch($this->_PARAM['query_mode'])
-    {
-      case 'user':
-        $query = $this -> _mysqli -> buildQuery('SELECT', 'relational', array('groupID'=>$this->_PARAM['groupID']));
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(empty($query_rest))
-        {
-          return common::error('query', 'missing');
-        }
-        foreach($query_rest as $key => $value)
-        {
-          $rest[$key] = $value;
-        }
-        $rest = $rest[0];
-        unset($rest['relation_SQE']);
-        unset($rest['groupID']);
-      break;
-
-      case 'group':
-        $query = $this -> _mysqli -> buildQuery('SELECT', 'Group', array('groupID'=>$this->_PARAM['groupID']));
-        $query_rest = $this -> _mysqli -> goQuery($query, true);
-        if(empty($query_rest))
-        {
-          return common::error('query', 'missing');
-        }
-        foreach($query_rest as $key => $value)
-        {
-          $rest[$key] = $value;
-        }
-        $rest = $rest[0];
-        unset($rest['group_SQE']);
-        unset($rest['groupID']);
-        unset($rest['last_update']);
-        unset($rest['createTime']);
-      break;
-    }
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
-  }
-  /**
-   * ログインします
+   * 2. ログイン
    *
    * @param string $userID   ユーザID
    * @param string $password パスワード
@@ -659,7 +449,100 @@ class api
   }
 
   /**
-   * トークをDBに登録しプッシュ通知を行う準備をします
+   * 3. グループ作成
+   *
+   * @param string $group_name グループ名
+   * @param string $group_desc グループ詳細
+   * @param string $sessionID  セッションID
+   * @return bool|array
+   */
+  function create($group_name, $group_desc, $sessionID, $userID)
+  {
+    self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
+    self::paramAssign('group_name', '32,NOT_NULL,text',$group_name);
+    self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
+    self::paramAssign('userID', '64,NOT_NULL,hex', $userID);
+
+    // ログイン状態の確認
+    /*
+    if(!self::is_login($this->_PARAM['sessionID']))
+    {
+      common::error('login', 'not login');
+    }
+    */
+    $groupID = self::createRandHex(10);
+
+    // グループ追加
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'Group', array('groupID'=>$groupID,
+                                                                    'group_name'=>$this->_PARAM['group_name'],
+                                                                    'group_desc'=>$this->_PARAM['group_desc'],
+                                                                    'createUser'=>$this->_PARAM['userID']
+                                                                    )
+                                          );
+    $query_rest = $this->_mysqli->goQuery($query,true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    // $id = $this -> _mysqli -> getID();
+
+    // 結果を返す
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'groupID'=>$groupID)));
+  }
+
+  /**
+   * 4. 招待コードの生成及び登録
+   *
+   * @param string $groupID   グループID
+   * @param string $sessionID セッションID
+   * @return string           招待コード
+   */
+  function addInvitation($groupID, $sessionID)
+  {
+    $hex = self::createRandHex('10');
+    self::paramAssign('invitation', '50,NOT_NULL,hex', $hex);
+    self::paramAssign('groupID', '32,NOT_NULL,text', $groupID);
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'invitation', array(
+                                                                          'groupID' => $this -> _PARAM['groupID'],
+                                                                          'invitation' => $hex
+                                                                          )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'inviteID'=>$hex)));
+  }
+
+  /**
+   * 5. グループにユーザを追加
+   *
+   * @param string $groupID    グループID
+   * @param string $userID     ユーザID
+   * @param string $sessionID  セッションID
+   * @return bool|array
+   */
+  function addGroupUser($groupID, $userID, $sessionID)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('userID', '32,NOT_NULL,text',$userID);
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'relational', array(
+                                                                          'userID' => $this -> _PARAM['userID'],
+                                                                          'groupID' => $this -> _PARAM['groupID']
+                                                                          )
+                                           );
+    $query_rest = $this->_mysqli->goQuery($query,true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  /**
+   * 6. トークをDBに登録しプッシュ通知を行う準備をします
    *
    * @param string $groupID   グループID
    * @param string $userID    ユーザID
@@ -727,7 +610,7 @@ class api
   }
 
   /**
-   * アラームを設定します
+   * 7. アラームを設定
    *
    * @param string $groupID        グループID
    * @param string $userID         ユーザID
@@ -765,10 +648,68 @@ class api
     {
       common::error('query', 'missing');
     }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
+                                                                    'alarmID'=>$alarmID
+                                                                    )
+                                  )
+                            );
   }
 
   /**
-   * グループの設定を行います
+   * 8. アラームへの応答
+   *
+   * @param string $groupID      グループID
+   * @param string $userID       ユーザID
+   * @param string $sessionID    セッションID
+   * @param int    $alart_choice アラート選択肢
+   * @return array|bool 連想配列
+   */
+  function alartchoice($alarmID, $userID, $sessionID, $alart_choice)
+  {
+    self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('alart_choice', '100,NOT_NULL,text', $alart_choice);
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm_choice', array(
+                                                                       'alarmID' => $this -> _PARAM['alarmID'],
+                                                                       'userID' => $this -> _PARAM['userID'],
+                                                                       'choice' => $this -> _PARAM['alart_choice']
+                                                                    )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  /**
+   * 9. トークの削除
+   *
+   * @param string $userID    ユーザID
+   * @param string $sessionID セッションID
+   * @param string $talkID    トークID
+   * @return array|bool 連想配列
+   */
+  function delTalk($userID, $sessionID, $talkID)
+  {
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('talkID', '100,NOT_NULL,text', $talkID);
+
+    $query = $this -> _mysqli -> buildQuery('DELETE', 'Talk', array('talkID' => $this -> _PARAM['talkID']));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  /**
+   * 10. グループの設定
    *
    * @param string $groupID    グループID
    * @param string $userID     ユーザID
@@ -850,7 +791,7 @@ class api
   }
 
   /**
-   * ユーザの設定を行います
+   * 11. ユーザの設定
    *
    * @param string $userID      ユーザID
    * @param string $sessionID   セッションID
@@ -901,7 +842,7 @@ class api
       }
       $rest = $rest[0];
 
-      // user名\を変更しない場合は現状の名前を再度入れる
+      // user名を変更しない場合は現状の名前を再度入れる
       if($user_name === '0')
       {
         $user_name = $rest['user_name'];
@@ -917,6 +858,125 @@ class api
       }
     }
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  /**
+   * 12. ユーザ情報の取得
+   *
+   * @param string $userID        ユーザID
+   * @param string $sessionID     セッションID
+   * @param string $query_mode    モード[user, group]
+   * @return bool|array           連想配列
+   */
+  function getUser($userID = NULL, $sessionID, $query_mode)
+  {
+    self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('query_mode', '64,NOT_NULL,text', $query_mode);
+
+    switch($query_mode)
+    {
+      case 'user':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'User', array(
+                                                                        'userID'=>$this->_PARAM['userID'],
+                                                                        )
+                                               );
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          common::error('query', 'not found');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['ID']);
+        unset($rest['password']);
+        unset($rest['delete']);
+        unset($rest['deviceID']);
+        unset($rest['is_tel_pub']);
+        unset($rest['tel1']);
+        unset($rest['tel2']);
+        unset($rest['tel3']);
+      break;
+
+      case 'group':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'Session', array(
+                                                                        'userID'=>$this->_PARAM['userID'],
+                                                                        )
+                                               );
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          common::error('query', 'not found');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['ID']);
+        unset($rest['userID']);
+      break;
+
+      default:
+        common::error('query', 'format error');
+    }
+
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+  }
+
+  /**
+   * 13. グループ情報の取得
+   *
+   * @param string $groupID        ユーザID
+   * @param string $query_mode 実行モード[user(グループに属すユーザ情報の取得), group(グループ名, グループ作成者のIDを取得)]
+   * @return bool|array           連想配列
+   */
+  function getGroup($groupID, $query_mode)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('query_mode', '64,NOT_NULL,string', $query_mode);
+
+    //モードスイッチによる切り替え(検索するDBの切り替え)
+    switch($this->_PARAM['query_mode'])
+    {
+      case 'user':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'relational', array('groupID'=>$this->_PARAM['groupID']));
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          return common::error('query', 'missing');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['ID']);
+        unset($rest['groupID']);
+      break;
+
+      case 'group':
+        $query = $this -> _mysqli -> buildQuery('SELECT', 'Group', array('groupID'=>$this->_PARAM['groupID']));
+        $query_rest = $this -> _mysqli -> goQuery($query, true);
+        if(empty($query_rest))
+        {
+          return common::error('query', 'missing');
+        }
+        foreach($query_rest as $key => $value)
+        {
+          $rest[$key] = $value;
+        }
+        $rest = $rest[0];
+        unset($rest['ID']);
+        unset($rest['groupID']);
+        unset($rest['last_update']);
+        unset($rest['createTime']);
+      break;
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
   }
 
   /**
@@ -940,8 +1000,8 @@ class api
  *
  * DBにアクセスします
  *
- * @copyright &copy; 2014 Ryosuke Hagihara
- * @version 0.2.20140803
+ * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
+ * @version 0.30
  */
 class db
 {
@@ -1053,8 +1113,6 @@ class db
    * @param string $table 問い合わせたいテーブル
    * @param array $array  アサインしたいデータ配列
    * @return string       生成したクエリ
-   *
-   * @todo deleteのところ
    */
   function buildQuery($type, $table, $search, $update = null)
   {

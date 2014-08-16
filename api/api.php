@@ -2,11 +2,13 @@
 /**
  * Grouper API実行
  *
+ * 実行用ファイルです(2014.08.16更新)
+ *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create 2014.08.05
- * @auther Ryosuke Hagihara<raryosu@sysken.org>
+ * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.2.20140813
+ * @version 0.3.1
  * @link http://grouper.sysken.org/
  */
 
@@ -28,69 +30,79 @@ foreach($_POST as $key => $value) { $_POST[$key] = $common->security($value); }
 
 // モードスイッチによって実行モードを変更する
 switch($_GET['mode']) {
+  // 1. ユーザ登録
   case 'regist':
     $rest = $api->regist($_GET['username'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'],$_GET['is_tel_pub'], $_GET['regID']);
     echo $rest;
   break;
 
-  case 'getUser':
-    $rest = $api->getUser($_GET['userID'], $_GET['sessionID']);
-    echo $rest;
-  break;
-
+  // 2. ログイン
   case 'login':
     $rest = $api->login($_GET['userID'], $_GET['password']);
     echo $rest;
   break;
 
+  // 3. グループ作成
   case 'create':
     $rest = $api->create($_GET['group_name'], $_GET['group_desc'], $_GET['sessionID'], $_GET['userID']);
     echo $rest;
   break;
 
+  // 4. 招待コードの生成及び登録
   case 'inviteID':
     $rest = $api->addInvitation($_GET['groupID'], $_GET['sessionID']);
     echo $rest;
   break;
 
+  // 5. グループにユーザを追加
   case 'addUser':
     $rest = $api->addGroupUser($_GET['groupID'], $_GET['userID'], $_GET['sessionID']);
     echo $rest;
   break;
 
+  // 6. トークをDBに登録しプッシュ通知を行う準備をします
   case 'talk':
     $rest = $api->talk($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['talk'], $_GET['media'], $_GET['geo_x'], $_GET['geo_y']);
     echo $rest;
   break;
 
+  // 7. アラームを設定
   case 'alarm':
     $rest = $api->alarm($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alarm_time'], $_GET['alart_desc'], $_GET['alert_opt1'], $_GET['alart_opt2']);
     echo $rest;
   break;
 
+  // 8. アラームへの応答
   case 'alartchoice':
-    $rest = $api->alartchoice($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alart_choice']);
+    $rest = $api->alartchoice($_GET['alarmID'], $_GET['userID'], $_GET['sessionID'], $_GET['alart_choice']);
     echo $rest;
+  break;
 
+  // 9. トークの削除
   case 'delTalk':
     $rest = $api->delTalk($_GET['userID'], $_GET['sessionID'], $_GET['talkID']);
     echo $rest;
   break;
 
+  // 10. グループの設定
   case 'settingGroup':
     $rest = $api->settingGroup($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['group_name'], $_GET['group_desc'], $_GET['is_group_del']);
     echo $rest;
   break;
 
+  // 11. ユーザの設定
   case 'settingUser':
     $rest = $api->settingUser($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['user_name'], $_GET['is_user_del']);
     echo $rest;
   break;
 
-//調整中
-  case 'delTalk':
+  // 12. ユーザ情報の取得
+  case 'getUser':
+    $rest = $api->getUser($_GET['userID'], $_GET['sessionID']);
+    echo $rest;
   break;
 
+  // 13. グループ情報の取得
   case 'getGroup':
     $rest = $api->getGroup($_GET['groupID'], $_GET['query_mode']);
     echo $rest;
@@ -98,5 +110,6 @@ switch($_GET['mode']) {
 
   default:
     echo $common->error('query','モードが間違っています');
+  break;
 
 }
