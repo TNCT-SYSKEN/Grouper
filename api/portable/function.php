@@ -1,14 +1,14 @@
 <?php
 /**
- * Grouper ファンクション
+ * Grouper 移動式サーバファンクション
  *
- * Grouperの各種機能を提供します。(2014.08.16更新)
+ * Grouperの各種機能を提供します。(2014.08.17更新)
  *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create 2014/08/05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.1
+ * @version 0.3.2
  * @link http://grouper.sysken.org/
  */
 
@@ -454,14 +454,24 @@ class api
    * @param string $group_name グループ名
    * @param string $group_desc グループ詳細
    * @param string $sessionID  セッションID
+   * @param string $query_mode モード[normal/disaster]
    * @return bool|array
    */
-  function create($group_name, $group_desc, $sessionID, $userID)
+  function create($group_name, $group_desc, $sessionID, $userID, $query_mode)
   {
     self::paramAssign('sessionID', '64,NOT_NULL,hex', $sessionID);
     self::paramAssign('group_name', '32,NOT_NULL,text',$group_name);
     self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
     self::paramAssign('userID', '64,NOT_NULL,hex', $userID);
+
+    if($query_mode == 'normal')
+    {
+      $mode = 0;
+    }elseif ($query_mode == 'disaster'){
+      $mode = 1;
+    }else{
+      common::error('query', 'query error (format)');
+    }
 
     // ログイン状態の確認
     /*
@@ -476,7 +486,8 @@ class api
     $query = $this -> _mysqli -> buildQuery('INSERT', 'Group', array('groupID'=>$groupID,
                                                                     'group_name'=>$this->_PARAM['group_name'],
                                                                     'group_desc'=>$this->_PARAM['group_desc'],
-                                                                    'createUser'=>$this->_PARAM['userID']
+                                                                    'createUser'=>$this->_PARAM['userID'],
+                                                                    'mode'=>$mode
                                                                     )
                                           );
     $query_rest = $this->_mysqli->goQuery($query,true);
@@ -594,6 +605,7 @@ class api
     // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
     $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
     $user = $this -> _mysqli -> goQuery($user, true, 'select');
+    $user = $user[0];
 
     // senderに送信リクエストを渡す
     $query_II_rest = common::sender($user['regID'], $msg, $userID);
@@ -611,6 +623,7 @@ class api
 
   /**
    * 7. アラームを設定
+   * 15. スケジュール機能
    *
    * @param string $groupID        グループID
    * @param string $userID         ユーザID
@@ -977,6 +990,100 @@ class api
       break;
     }
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+  }
+
+  /**
+   * 14. 掲示板機能
+   *
+   * @param string $groupID グループID
+   * @param string $userID ユーザID
+   * @param string $contents コンテンツ(HTML形式)
+   * @return bool 実行結果
+   *
+   * @todo regID出すの関数化する？
+   */
+  function board($groupID, $userID, $contents)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('contents', '600,NOT_NULL,text', $contents);
+
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'Group', array('groupID'=>$this->_PARAM['groupID']));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(empty($query_rest))
+    {
+      return common::error('query', 'missing');
+    }
+    foreach($query_rest as $key => $value)
+    {
+      $rest[$key] = $value;
+    }
+    $rest = $rest[0];
+    if($rest['mode'] == 0)
+    {
+      return common::error('query', 'error(format)');
+    }
+
+    $boardID = self::createRandHex('12');
+    $query_second = $this -> _mysqli -> buildQuery('INSERT', 'board', array(
+                                                                    'groupID'=>$this->_PARAM['groupID'],
+                                                                    'userID'=>$this->_PARAM['userID'],
+                                                                    'boardID'=>$boardID,
+                                                                    'contents'=>$this->_PARAM['contents']
+                                                                    )
+                                            );
+    $query_second_rest = $this -> _mysqli -> goQuery($query_second, true);
+    if(empty($query_second_rest))
+    {
+      return common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'boardID'=>$boardID)));
+  }
+
+  /**
+   * 15. 掲示板同期
+   *
+   * @param string $groupID グループID
+   * @return bool|array 実行結果
+   */
+  function fetchBoard($groupID)
+  {
+    self::paramAssign('groupID', '600,NOT_NULL,text', $groupID);
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'board', array(
+                                                                   'groupID'=>$this->_PARAM['groupID'],
+                                                                    )
+                                            );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(empty($query_rest))
+    {
+      common::error('query', 'not found');
+    }
+    foreach($query_rest as $key => $value)
+    {
+      $rest[$key] = $value;
+    }
+    $rest = $rest[0];
+    unset($rest['ID']);
+    unset($rest['userID']);
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+  }
+
+  /**
+   * 16. 掲示板削除
+   *
+   * @param string $boardID 掲示板ID
+   * @return bool 実行結果
+   */
+  function delBoard($boardID)
+  {
+    self::paramAssign('boardID', '600,NOT_NULL,text', $boardID);
+    $query = $this -> _mysqli -> buildQuery('DELETE', 'board', array('boardID' => $this -> _PARAM['boardID']));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      return common::error('query', 'missing');
+    }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
   }
 
   /**
