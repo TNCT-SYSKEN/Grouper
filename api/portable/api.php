@@ -17,7 +17,7 @@
  */
 // ファンクションファイルを読み込む(失敗為たら取り合えず終了)
 // ちゃんと失敗したときの処理考えて無い
-if(!include '/var/www/html/api/beta/index.php'){
+if(!include '/var/www/api/beta/index.php'){
   exit();
 }
 
