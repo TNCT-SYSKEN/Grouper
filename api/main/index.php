@@ -31,4 +31,14 @@ if($debug)
 $common = new common();
 $api = new api($_CONF['db_host'], $_CONF['db_user'], $_CONF['db_pass'], $_CONF['db_table']);
 
-?>
+/**
+ * オートロード機構
+ *
+ * 読み込まれていないクラスファイルがあれば必要に応じ動的にロードします
+ *
+ * @param string $class_type クラスファイルのタイプ
+ * @return bool
+ */
+function __autoload($class_type) {
+  return include 'classes/org.sysken.grouper.' . $class_type . '.class.php';
+}
