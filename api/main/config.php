@@ -8,7 +8,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.1
+ * @version 0.3.3
  * @link http://grouper.sysken.org/
  */
 

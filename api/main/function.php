@@ -8,12 +8,15 @@
  * @create 2014/08/05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.2
+ * @version 0.3.3
  * @link http://grouper.sysken.org/
  */
 
 // ファイルが直接読み込まれた場合は終了
-if(basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) exit();
+if(basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__))
+{
+  exit();
+}
 
 /**
  * 共通クラス

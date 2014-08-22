@@ -8,11 +8,11 @@
  * @create    2014.08.05
  * @auther    Ryosuke Hagihara<raryosu@sysken.org>
  * @since     PHP5.5+ / MySQL 5.3+
- * @version   0.2.20140803
+ * @version   0.3.3
  * @link      http://grouper.sysken.org/
  */
 // function.phpを読み込めなかったら・・・
-if(!include 'config.php')
+if(!include_once '/var/www/html/api/beta/config.php')
 {
   exit();
 }
@@ -36,9 +36,10 @@ $api = new api($_CONF['db_host'], $_CONF['db_user'], $_CONF['db_pass'], $_CONF['
  *
  * 読み込まれていないクラスファイルがあれば必要に応じ動的にロードします
  *
- * @param string $class_type クラスファイルのタイプ
+ * @param string $class クラスファイルのタイプ
  * @return bool
  */
-function __autoload($class_type) {
-  return include 'classes/org.sysken.grouper.' . $class_type . '.class.php';
-}
+spl_autoload_register(function ($class)
+{
+  include '/var/www/html/api/beta/classes/' . $class . '.class.php';
+});

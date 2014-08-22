@@ -8,7 +8,7 @@
  * @create 2014.08.05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.2
+ * @version 0.3.3
  * @link http://grouper.sysken.org/
  */
 
@@ -17,7 +17,7 @@
  */
 // ファンクションファイルを読み込む(失敗為たら取り合えず終了)
 // ちゃんと失敗したときの処理考えて無い
-if(!include '/var/www/html/api/beta/index.php'){
+if(!include_once '/var/www/html/api/beta/index.php'){
   exit();
 }
 
