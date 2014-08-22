@@ -1,0 +1,117 @@
+html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	padding: 10px 0;
+}
+
+h1, h2, h3 {
+	margin: 10px auto;
+	padding: 0;
+	text-align: center;
+}
+
+h3 {
+	margin: 0;
+}
+
+.center {
+  text-align: center;
+}
+
+table tr td a {
+  display:block;
+  height:100%;
+  width:100%;
+}
+td {
+  background-color: #ccff84;
+}
+.pink {
+  background-color: #ffdfea;
+}
+
+#blackout {
+	display: none;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+#loading {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 60px;
+	height: 60px;
+	padding: 10px;
+	margin: -30px 0 0 -30px;
+	border-radius: 10px;
+	background: #FFF;
+}
+
+#ou {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 120px;
+	height: 60px;
+	padding: 5px;
+	font-size: .7em;
+	margin: -30px 0 0 -60px;
+	background: #FFF;
+}
+
+#alice {
+	margin: 10px;
+	font-weight: bold;
+	color: #880000;
+	display: none;
+}
+
+.line_status {
+	margin: 0;
+	margin-top: -10px;
+	padding: 10px;
+	color: #FFF;
+	background: #1771CA;
+}
+.from_h, .to_h {
+	padding: 5px;
+}
+.from_h {
+	background: #CCFF84;
+}
+.to_h {
+	background: #F9D2B7;
+}
+.from_h h4, .to_h h4, .line_status h4 {
+	margin: 0;
+	padding: 0;
+}
+
+
+form {
+	margin: 0px;
+	padding: 0;
+}
+
+#id_num_v {
+	font-size: 1.2em;
+	background: #47a447;
+	padding: .3em;
+	color: #FFF;
+}
+
+
+.yellow {
+  background-color: #ffff33;
+}
+.red {
+  background-color: #f2444d;
+}

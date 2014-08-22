@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="dist/js/device.js"></script>
+    <title>Buspo for android</title>
+    <link rel="stylesheet" href="dist/css/bootstrap.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h3>ID検索</h3>
+    <div class="center">
+      <form method="get" action="/push/" id="id_search">
+      <div class="input-group">
+          <input type="text" class="form-control" placeholder="ID入力" name="id_num" id="id_num">
+          <a class="glyphicon glyphicon-search input-group-addon" id="submit"></a>
+      </div>
+      </form>
+
+      <div id="alice">IDには5桁の数字を入力</div>
+
+    </div>
+    <script src="dist/js/jquery.js"></script>
+    <script src="dist/js/id_adder.js"></script>
+    <script src="dist/js/bootstrap.js"></script>
+  </body>
+</html>

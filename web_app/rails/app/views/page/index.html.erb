@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="/dist/js/device.js"></script>
+    <title>Buspo for android</title>
+    <link rel="stylesheet" href="/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <h3>登録確認</h3>
+    <div class="center">
+      利用するBuspo ID<br>
+      <div id="id_num_v">00001</div>
+      <label for="checkboxx" style="font-size:.7em;">位置情報の利用を許可する<input type="checkbox" id="checkboxx"></label>
+      <br><br>
+      <%= link_to "登録する", "/masita.html", remote: true, method: :post, class: "btn btn-primary" %>
+      <a href="index.html" class="btn btn-xs btn-danger" style="margin: 2em 0 0 7em">Homeへ</a>
+
+    </div>
+    <script src="/dist/js/jquery.js"></script>
+    <script src="/dist/js/id_adder.js"></script>
+    <script src="/dist/js/bootstrap.js"></script>
+  </body>
+</html>

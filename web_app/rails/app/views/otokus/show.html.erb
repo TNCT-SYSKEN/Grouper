@@ -1,0 +1,92 @@
+<% content_for :map do %>
+  <!-- for Google Map -->
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+  #map_canvas { height: 100% }
+  </style>
+  <script type="text/javascript"
+  src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAgztveMHnLKQmBYyl0yaG0w-0JWnDjnDo&sensor=false">
+  </script>
+  <script type="text/javascript">
+  function initialize() {
+    var myLatlng = new google.maps.LatLng(<%= @otoku.y %>, <%= @otoku.x %>);
+    var mapOptions = {
+      center: myLatlng,
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+
+    };
+    var map = new google.maps.Map(document.getElementById("map_canvas"),
+      mapOptions);
+    var marker = new google.maps.Marker({
+      position: myLatlng,
+      map: map,
+      title: "<%= @otoku.place %>"
+    });
+  }
+  </script>
+<% end %>
+
+<% content_for :count do %>
+  <script language="JavaScript">
+    <!--
+    var cnt1 = 31;
+    var cnt2 = 2;
+    var cnt3 = 5;
+    var flg = true;
+
+    function f_click1(){
+    if(flg){
+    cnt1++;
+    document.getElementById('c1').innerHTML=cnt1;
+    flg = false;
+    }
+    }
+    function f_click2(){
+    if(flg){
+    cnt2++;
+    document.getElementById('c2').innerHTML=cnt2;
+    flg = false;
+    }
+    }
+    function f_click3(){
+    if(flg){
+    cnt3++;
+    document.getElementById('c3').innerHTML=cnt3;
+    flg = false;
+    }
+    }
+    //-->
+  </script>
+<% end %>
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>場所:</b>
+  <%= @otoku.place %>
+</p>
+
+<p>
+  <b>内容:</b>
+  <%= @otoku.name %>
+</p>
+
+<p>
+  <%= @otoku.period.strftime("%Y %m/%d %H:%M") %>
+  <b>まで</b>
+</p>
+
+<b>Map:</b>
+<body onload="initialize()" class="center">
+  <div id="map_canvas" style="width:320; height:200px; text-align: center"></div>
+</body>
+
+<span class="btn btn-default" onClick="f_click1()"><span id="c1">31</span><br><%= image_tag 'Great.png', size: "32x32" %></span>
+<span class="btn btn-default" onClick="f_click2()"><span id="c2">2</span><br><%= image_tag 'good.png', size: "32x32" %></span>
+<span class="btn btn-default" onClick="f_click3()"><span id="c3">5</span><br><%= image_tag 'bad.png', size: "32x32" %></span>
+
+<br><br>
+<%= link_to '戻る', otokus_path %>

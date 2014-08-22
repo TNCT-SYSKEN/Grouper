@@ -1,0 +1,28 @@
+<h1>お得情報</h1>
+
+<table>
+  <tr>
+    <th>場所</th>
+    <th>内容</th>
+    <th>期間</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @otokus.each do |otoku| %>
+  <tr>
+    <td><%= otoku.place %></td>
+    <td><%= otoku.name %></td>
+    <td><%= otoku.period %></td>
+    <td><%= link_to 'Show', otoku %></td>
+    <td><%= link_to 'Edit', edit_otoku_path(otoku) %></td>
+    <td><%= link_to 'Destroy', otoku, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+           
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to '投稿する', new_otoku_path %>

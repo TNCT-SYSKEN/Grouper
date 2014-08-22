@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <%= yield :map %>
+    <%= yield :count %>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="/dist/js/device.js"></script>
+    <title>Buspo for android</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/dist/css/bootstrap.css">
+  </head>
+  <body>
+    <div class="center">
+
+      <%= yield %>
+
+    </div>
+    <script src="/../dist/js/jquery.js"></script>
+    <script src="/dist/js/bootstrap.js"></script>
+  </body>
+</html>

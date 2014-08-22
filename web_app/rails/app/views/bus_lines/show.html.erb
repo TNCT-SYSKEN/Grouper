@@ -1,0 +1,37 @@
+<p>
+  <b>路線:</b>
+  <%= @bus_line.title %>線
+</p>
+
+<p>
+  <b>説明:</b>
+  <%= @bus_line.description %>
+</p>
+
+<p>
+  <b>状態:</b>
+  <% if @bus_line.status == 0 %>
+    通常運行(code: <%= @bus_line.status %>)
+  <% end %>
+  <% if @bus_line.status == 1 %>
+    運行遅延(code: <%= @bus_line.status %>)
+  <% end %>
+  <% if @bus_line.status == 2 %>
+    運行中止(code: <%= @bus_line.status %>)
+  <% end %>
+</p>
+<br>
+
+<b><%= link_to "バス停一覧", bus_line_stops_path(@bus_line) %></b><br>
+<% if @stops.empty? %>
+  <p>バス停を追加してください</p>
+<% end %>
+<% @stops.each do |stop| %>
+  <%= link_to stop.title, bus_line_stop_path(stop.bus_line_id, stop) %><br>
+<% end %>
+<br>
+<%= link_to 'New bus stop', new_bus_line_stop_path(@bus_line) %> </br>
+<br>
+
+<%= link_to 'Edit', edit_bus_line_path(@bus_line) %> |
+<%= link_to 'Back', bus_lines_path %>

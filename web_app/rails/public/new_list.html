@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="dist/js/device.js"></script>
+    <title>Buspo for android</title>
+    <link rel="stylesheet" href="dist/css/bootstrap.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h2>新規選択</h2>
+    <div class="center">
+      <form method="get" action="confirm.html" id="new_list">
+      出発地:<br>
+      <input  type="text" class="form-control" placeholder="建物名,地名" id="from_input" name="from"><br>
+      <span class="btn btn-success" id="location">現在地から</span>
+
+      <br><br>
+      到着地:<br>
+      <input  type="text" class="form-control" placeholder="建物名,地名" id="to_input" name="to"><br>
+      <br>
+      
+      出発地 <span id="from"></span><br>
+      <span class="glyphicon glyphicon-arrow-down"></span><br>
+      目的地 <span id="to"></span><br>
+      <br>
+      <br>
+
+      <a class="btn btn-danger" id="a_submit">バス停の検索</a>
+      </form>
+
+    </div>
+    <div id="blackout">
+      <div id="loading"><img src="./img/loading.gif" width="40" height="40" alt="loading"></div>
+    </div>
+    <script src="dist/js/jquery.js"></script>
+    <script src="dist/js/new_list.js"></script>
+    <script src="dist/js/bootstrap.js"></script>
+  </body>
+</html>
