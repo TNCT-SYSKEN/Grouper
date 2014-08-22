@@ -12,7 +12,7 @@
  * @link      http://grouper.sysken.org/
  */
 // function.phpを読み込めなかったら・・・
-if(!include 'function.php' || !include 'config.php')
+if(!include 'config.php')
 {
   exit();
 }

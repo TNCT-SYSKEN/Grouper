@@ -2,13 +2,13 @@
 /**
  * index.php
  *
- * 移動式サーバ用index.phpです(2014.08.17更新)
+ * index.phpです()
  *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create    2014.08.05
  * @auther    Ryosuke Hagihara<raryosu@sysken.org>
  * @since     PHP5.5+ / MySQL 5.3+
- * @version   0.3.1
+ * @version   0.2.20140803
  * @link      http://grouper.sysken.org/
  */
 // function.phpを読み込めなかったら・・・
@@ -30,5 +30,17 @@ if($debug)
 // インスタンスの生成じゃぁ＾～
 $common = new common();
 $api = new api($_CONF['db_host'], $_CONF['db_user'], $_CONF['db_pass'], $_CONF['db_table']);
+
+/**
+ * オートロード機構
+ *
+ * 読み込まれていないクラスファイルがあれば必要に応じ動的にロードします
+ *
+ * @param string $class_type クラスファイルのタイプ
+ * @return bool
+ */
+function __autoload($class_type) {
+  return include 'class/org.sysken.grouper.' . $class_type . '.class.php';
+}
 
 ?>
