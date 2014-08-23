@@ -5,7 +5,7 @@
  * すべての処理で共通して利用する関数をまとめたクラスです。
  *
  * @copyright &copy;2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.3.3
+ * @version 0.3.4
  */
 class common
 {

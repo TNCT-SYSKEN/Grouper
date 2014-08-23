@@ -2,13 +2,13 @@
 /**
  * Grouper API実行
  *
- * 実行用ファイルです(2014.08.17更新)
+ * 実行用ファイルです(2014.08.23更新)
  *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create 2014.08.05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.3
+ * @version 0.3.4
  * @link http://grouper.sysken.org/
  */
 
@@ -78,31 +78,37 @@ switch($_GET['mode']) {
     echo $rest;
   break;
 
-  // 9. トークの削除
+  // 9. アラームへの応答確認
+  case 'alartchoice':
+    $rest = $api->alartchoice($_GET['alarmID'], $_GET['groupID'], $_GET['sessionID']);
+    echo $rest;
+  break;
+
+  // 10. トークの削除
   case 'delTalk':
     $rest = $api->delTalk($_GET['userID'], $_GET['sessionID'], $_GET['talkID']);
     echo $rest;
   break;
 
-  // 10. グループの設定
+  // 11. グループの設定
   case 'settingGroup':
     $rest = $api->settingGroup($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['group_name'], $_GET['group_desc'], $_GET['is_group_del']);
     echo $rest;
   break;
 
-  // 11. ユーザの設定
+  // 12. ユーザの設定
   case 'settingUser':
     $rest = $api->settingUser($_GET['userID'], $_GET['sessionID'], $_GET['groupID'], $_GET['user_name'], $_GET['is_user_del']);
     echo $rest;
   break;
 
-  // 12. ユーザ情報の取得
+  // 13. ユーザ情報の取得
   case 'getUser':
     $rest = $api->getUser($_GET['userID'], $_GET['sessionID']);
     echo $rest;
   break;
 
-  // 13. グループ情報の取得
+  // 14. グループ情報の取得
   case 'getGroup':
     $rest = $api->getGroup($_GET['groupID'], $_GET['query_mode']);
     echo $rest;
@@ -111,29 +117,29 @@ switch($_GET['mode']) {
   /**
    * 以後災害時用機能(Group mode = 'disaster'(1)の場合のみ利用可能=>func.phpで定義)
    *
-   * 14-16. 掲示板関連
-   * 17. スケジュール機能
+   * 15-17. 掲示板関連
+   * 18. スケジュール機能
    */
 
-  // 14. 掲示板機能
+  // 15. 掲示板機能
   case 'board':
     $rest = $api->board($_GET['groupID'], $_GET['userID'], $_GET['contents']);
     echo $rest;
   break;
 
-  // 15. 掲示板同期
+  // 16. 掲示板同期
   case 'fetch_board':
     $rest = $api->fetchBoard($_GET['groupID']);
     echo $rest;
   break;
 
-  // 16. 掲示板削除
+  // 17. 掲示板削除
   case 'del_board':
     $rest = $api->delBoard($_GET['boardID']);
     echo $rest;
   break;
 
-  // 17. スケジュール機能 -> 実は中身がアラーム機能と同等なため再利用(分類分けのためあえて別記)
+  // 18. スケジュール機能 -> 実は中身がアラーム機能と同等なため再利用(分類分けのためあえて別記)
   case 'schedule':
     $rest = $api->alarm($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alarm_time'], $_GET['alart_desc'], $_GET['alert_opt1'], $_GET['alart_opt2']);
     echo $rest;

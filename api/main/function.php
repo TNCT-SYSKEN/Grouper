@@ -2,13 +2,13 @@
 /**
  * Grouper ファンクション
  *
- * Grouperの各種機能を提供します。(2014.08.17更新)
+ * Grouperの各種機能を提供します。(2014.08.23更新)
  *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create 2014/08/05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.3
+ * @version 0.3.4
  * @link http://grouper.sysken.org/
  */
 
@@ -24,7 +24,7 @@ if(basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__))
  * すべての処理で共通して利用する関数をまとめたクラスです。
  *
  * @copyright &copy;2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.30
+ * @version 0.3.4
  */
 class common
 {
@@ -184,7 +184,7 @@ class common
  * APIに関するクラスです
  *
  * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.30
+ * @version 0.3.4
  */
 class api
 {
@@ -626,7 +626,7 @@ class api
 
   /**
    * 7. アラームを設定
-   * 15. スケジュール機能
+   * 18. スケジュール機能
    *
    * @param string $groupID        グループID
    * @param string $userID         ユーザID
@@ -677,14 +677,16 @@ class api
    * @param string $groupID      グループID
    * @param string $userID       ユーザID
    * @param string $sessionID    セッションID
+   * @param string $alarmID      アラームID
    * @param int    $alart_choice アラート選択肢
    * @return array|bool 連想配列
    */
-  function alartchoice($alarmID, $userID, $sessionID, $alart_choice)
+  function alartchoice($alarmID, $userID, $sessionID, $alarmID, $alart_choice)
   {
     self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('alarmID', '100,NOT_NULL,text', $alaemID)
     self::paramAssign('alart_choice', '100,NOT_NULL,text', $alart_choice);
 
     $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm_choice', array(
@@ -702,7 +704,40 @@ class api
   }
 
   /**
-   * 9. トークの削除
+   * 9. アラームへの応答確認
+   *
+   * @param string $groupID      グループID
+   * @param string $alarmID       ユーザID
+   * @param string $sessionID    セッションID
+   * @return array|bool 連想配列
+   */
+  function alartcheck($groupID, $alarmID, $sessionID)
+  {
+    self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
+    self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'Alarm_choice', array(
+                                                                       'alarmID' => $this -> _PARAM['alarmID'],
+                                                                    )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+    foreach($query_rest as $key => $value)
+    {
+      $rest[$key] = $value;
+    }
+    $rest = $rest[0];
+    unset($rest['ID']);
+    unset($rest['alarmID'])
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+  }
+
+  /**
+   * 10. トークの削除
    *
    * @param string $userID    ユーザID
    * @param string $sessionID セッションID
@@ -725,7 +760,7 @@ class api
   }
 
   /**
-   * 10. グループの設定
+   * 11. グループの設定
    *
    * @param string $groupID    グループID
    * @param string $userID     ユーザID
@@ -807,7 +842,7 @@ class api
   }
 
   /**
-   * 11. ユーザの設定
+   * 12. ユーザの設定
    *
    * @param string $userID      ユーザID
    * @param string $sessionID   セッションID
@@ -877,7 +912,7 @@ class api
   }
 
   /**
-   * 12. ユーザ情報の取得
+   * 13. ユーザ情報の取得
    *
    * @param string $userID        ユーザID
    * @param string $sessionID     セッションID
@@ -944,7 +979,7 @@ class api
   }
 
   /**
-   * 13. グループ情報の取得
+   * 14. グループ情報の取得
    *
    * @param string $groupID        ユーザID
    * @param string $query_mode 実行モード[user(グループに属すユーザ情報の取得), group(グループ名, グループ作成者のIDを取得)]
@@ -996,7 +1031,7 @@ class api
   }
 
   /**
-   * 14. 掲示板機能
+   * 15. 掲示板機能
    *
    * @param string $groupID グループID
    * @param string $userID ユーザID
@@ -1044,7 +1079,7 @@ class api
   }
 
   /**
-   * 15. 掲示板同期
+   * 16. 掲示板同期
    *
    * @param string $groupID グループID
    * @return bool|array 実行結果
@@ -1072,7 +1107,7 @@ class api
   }
 
   /**
-   * 16. 掲示板削除
+   * 17. 掲示板削除
    *
    * @param string $boardID 掲示板ID
    * @return bool 実行結果
@@ -1105,13 +1140,14 @@ class api
   }
 }
 
+
 /**
  * Grouper DBアクセスクラス
  *
  * DBにアクセスします
  *
  * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.30
+ * @version 0.3.4
  */
 class db
 {
