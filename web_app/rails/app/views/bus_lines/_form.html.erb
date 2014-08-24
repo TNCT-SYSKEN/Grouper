@@ -1,0 +1,31 @@
+<%= form_for(@bus_line) do |f| %>
+  <% if @bus_line.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@bus_line.errors.count, "error") %> prohibited this bus_line from being saved:</h2>
+
+      <ul>
+      <% @bus_line.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_area :description %>
+  </div>
+  <div class="field">
+    <%= f.label :status %><br />
+    通常運行<%= f.radio_button :status, 0 %><br />
+    運行遅延<%= f.radio_button :status, 1 %><br />
+    運行中止<%= f.radio_button :status, 2 %><br />
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

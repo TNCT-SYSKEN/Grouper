@@ -79,6 +79,10 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+<<<<<<< HEAD
+=======
+    <orderEntry type="library" exported="" name="butterknife-5.1.2" level="project" />
+>>>>>>> 7ee5cb7fd25f1cc8e8f4014913f2e8392119b980
     <orderEntry type="module" module-name="AndroidBootstrap" exported="" />
   </component>
 </module>

@@ -1,0 +1,27 @@
+<h1>Listing bus_lines</h1>
+
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Status</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @bus_lines.each do |bus_line| %>
+  <tr>
+    <td><%= bus_line.title %></td>
+    <td><%= bus_line.description %></td>
+    <td><%= bus_line.status %></td>
+    <td><%= link_to 'Show', bus_line %></td>
+    <td><%= link_to 'Edit', edit_bus_line_path(bus_line) %></td>
+    <td><%= link_to 'Destroy', bus_line, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br>
+
+<%= link_to 'New Bus line', new_bus_line_path %>

@@ -1,0 +1,68 @@
+<% content_for :map do %>
+  <!-- for Google Map -->
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0; padding: 0 }
+  #map_canvas { height: 100% }
+  </style>
+  <script type="text/javascript"
+  src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAgztveMHnLKQmBYyl0yaG0w-0JWnDjnDo&sensor=false">
+  </script>
+  <script type="text/javascript">
+  function initialize() {
+    var myLatlng = new google.maps.LatLng(<%= @stop.y %>, <%= @stop.x %>);
+    var mapOptions = {
+      center: myLatlng,
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+
+    };
+    var map = new google.maps.Map(document.getElementById("map_canvas"),
+      mapOptions);
+    var marker = new google.maps.Marker({
+      position: myLatlng,
+      map: map,
+      title: "<%= @stop.title %>"
+    });
+  }
+  </script>
+<% end %>
+
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Title:</b>
+  <%= @stop.title %>
+</p>
+
+<p>
+  <b>X:</b>
+  <%= @stop.x %>
+</p>
+
+<p>
+  <b>Y:</b>
+  <%= @stop.y %>
+</p>
+
+<p>
+  <b>Line:</b>
+  <%= @stop.bus_line_id %>
+</p>
+
+<p>
+  <b>Times:</b><br>
+  <%= sanitize(@stop.times) %>
+</p>
+
+<p>
+<b>Map:</b>
+<body onload="initialize()">
+  <div id="map_canvas" style="width:500px; height:300px"></div>
+</body>
+</p>
+
+
+<%= link_to 'Edit', edit_bus_line_stop_path(@stop.bus_line_id, @stop) %> |
+<%= link_to 'Back', bus_line_stops_path(@stop.bus_line_id) %>

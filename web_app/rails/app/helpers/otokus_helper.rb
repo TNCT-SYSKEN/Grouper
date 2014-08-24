@@ -1,0 +1,2 @@
+module OtokusHelper
+end
