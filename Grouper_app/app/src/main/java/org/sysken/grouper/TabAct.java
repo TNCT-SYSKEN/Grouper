@@ -30,20 +30,20 @@ public class TabAct extends Activity {
 
         actionBar.addTab(actionBar
                 .newTab()
-                .setText("@string/home")
+                .setText(R.string.home)
                 .setTabListener(
                         new TabListener<HomeFragment>(
                                 this, "tag1", HomeFragment.class)
                 ));
 
         actionBar.addTab(actionBar.newTab()
-                .setText("@string/group")
+                .setText(R.string.group)
                 .setTabListener(
                         new TabListener<GroupFragment>(
                                 this, "tag2", GroupFragment.class)
                 ));
         actionBar.addTab(actionBar.newTab()
-                .setText("@string/setting")
+                .setText(R.string.settings)
                 .setTabListener(
                         new TabListener<Setting>(
                                 this, "tag3", Setting.class)

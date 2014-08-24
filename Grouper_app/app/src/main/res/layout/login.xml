@@ -8,17 +8,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
         <TextView
-            android:text="@string/welcome"
-            android:textSize="24sp"
-            android:paddingTop="30dp"
-            android:paddingBottom="30dp"
-            android:paddingLeft="70dp"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:text="@string/welcome"
+            android:textSize="24dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="8dp"
             />
 
      </LinearLayout>
@@ -31,7 +30,8 @@
         <TextView
             android:text="@string/user_name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"/>
 
         <EditText
             android:layout_width="0dp"
@@ -45,18 +45,12 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp">
+        android:padding="16dp">
 
-        <TextView
+        <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/number_check"
-            android:id="@+id/textView" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ok"
             android:id="@+id/number_check" />
 
     </LinearLayout>
@@ -71,6 +65,7 @@
             android:layout_height="wrap_content"
             android:text="@string/login"
             android:layout_weight="1"
+            android:layout_marginTop="8dp"
             android:id="@+id/button_login" />
 
     </LinearLayout>

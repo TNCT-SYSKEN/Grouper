@@ -8,10 +8,9 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginAct"
             android:label="@string/app_name"
-            android:noHistory="true"
-            android:launchMode="singleTask">
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,12 +21,16 @@
             android:name=".TabAct"
             android:label="@string/app_name">
         </activity>
+<<<<<<< HEAD
+        <uses-permission android:name="android.permission.INTERNET" />>
+=======
         <activity
             android:name=".LoginAct"
             android:noHistory="true"
             android:label="@string/app_name">
         </activity>
         <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+>>>>>>> 7ee5cb7fd25f1cc8e8f4014913f2e8392119b980
         </application>
 
 </manifest>
