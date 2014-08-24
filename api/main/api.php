@@ -32,7 +32,7 @@ foreach($_POST as $key => $value) { $_POST[$key] = $common->security($value); }
 switch($_GET['mode']) {
   // 1. ユーザ登録
   case 'regist':
-    $rest = $api->regist($_GET['username'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'],$_GET['is_tel_pub'], $_GET['regID']);
+    $rest = $api->regist($_GET['user_name'], $_GET['deviceID'], $_GET['tel1'], $_GET['tel2'], $_GET['tel3'],$_GET['is_tel_pub'], $_GET['regID']);
     echo $rest;
   break;
 
@@ -56,7 +56,7 @@ switch($_GET['mode']) {
 
   // 5. グループにユーザを追加
   case 'addUser':
-    $rest = $api->addGroupUser($_GET['groupID'], $_GET['userID'], $_GET['sessionID']);
+    $rest = $api->addGroupUser($_GET['inviteID'], $_GET['userID'], $_GET['sessionID']);
     echo $rest;
   break;
 
@@ -123,25 +123,25 @@ switch($_GET['mode']) {
 
   // 15. 掲示板機能
   case 'board':
-    $rest = $api->board($_GET['groupID'], $_GET['userID'], $_GET['contents']);
+    $rest = $api->board($_GET['sessionID'],$_GET['groupID'], $_GET['userID'], $_GET['contents']);
     echo $rest;
   break;
 
   // 16. 掲示板同期
   case 'fetch_board':
-    $rest = $api->fetchBoard($_GET['groupID']);
+    $rest = $api->fetchBoard($_GET['sessionID'],$_GET['groupID']);
     echo $rest;
   break;
 
   // 17. 掲示板削除
   case 'del_board':
-    $rest = $api->delBoard($_GET['boardID']);
+    $rest = $api->delBoard($_GET['sessionID'],$_GET['boardID']);
     echo $rest;
   break;
 
-  // 18. スケジュール機能 -> 実は中身がアラーム機能と同等なため再利用(分類分けのためあえて別記)
+  // 18. スケジュール機能
   case 'schedule':
-    $rest = $api->alarm($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alarm_time'], $_GET['alart_desc'], $_GET['alert_opt1'], $_GET['alart_opt2']);
+    $rest = $api->schedule($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alarm_time'], $_GET['alart_desc']);
     echo $rest;
   break;
 
