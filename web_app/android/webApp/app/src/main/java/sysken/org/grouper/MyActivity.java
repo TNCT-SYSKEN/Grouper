@@ -13,10 +13,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.google.android.gcm.GCMRegistrar;
 
-
-public class MainActivity extends Activity {
+public class MyActivity extends Activity {
 
     Globals globals;
     private static final String TAG = "GCMSampleActivity";
@@ -27,7 +25,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toast.makeText(this, "テスト", Toast.LENGTH_LONG).show();
-        globals = (Globals) this.getApplication();
+        globals = (Globals)this.getApplication();
         globals.GlobalsAllinit();
 
         globals.web = (WebView)findViewById(R.id.webview);
@@ -36,22 +34,7 @@ public class MainActivity extends Activity {
         globals.web.setWebViewClient(new WebViewClient());
 
         globals.web.loadUrl(globals.url_string);
-        // �f�o�C�X�E�}�j�t�F�X�g�̊m�F
-        /*
-        GCMRegistrar.checkDevice(getApplicationContext());
-        GCMRegistrar.checkManifest(getApplicationContext());
-        */
-        // �o�^�ς��ǂ����𔻕�
-        /*
-        String regId = GCMRegistrar.getRegistrationId(getApplicationContext());
-        if (TextUtils.isEmpty(regId)) {
-            // ���o�^
-            GCMRegistrar.register(getApplicationContext(), "971963527791");
-        } else {
-            // �o�^��
-            Log.i(TAG, "�o�^�ς�");
-        }
-        */
+
     }
 
     @Override
@@ -64,7 +47,7 @@ public class MainActivity extends Activity {
         switch(item.getItemId()){
             case R.id.action_settings:
 
-                Intent intent = new Intent(this, SettingActivity.class);
+                Intent intent = new Intent(this, sysken.org.grouper.SettingActivity.class);
                 startActivity(intent);
 
                 return true;
@@ -78,10 +61,10 @@ public class MainActivity extends Activity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            if(globals.web.canGoBack()) { //�O�̃y�[�W�w
+            if(globals.web.canGoBack()) {
                 globals.web.goBack();
-            } else { //�@�߂�Ȃ�������I��
-                MainActivity.this.finish();
+            } else {
+                MyActivity.this.finish();
             }
             return true;
         }
@@ -90,8 +73,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        /** GCM��M���b�Z�[�W�̕\�� **/
-        // GCM���b�Z�[�W�̎擾
+
         Intent intent = this.getIntent();
 
         if (intent != null){

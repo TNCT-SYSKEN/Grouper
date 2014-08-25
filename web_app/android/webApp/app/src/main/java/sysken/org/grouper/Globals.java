@@ -10,6 +10,6 @@ public class Globals extends Application {
     String url_string;
     WebView web;
     public void GlobalsAllinit() {
-        url_string = "http://buspo.herokuapp.com/";
+        url_string = "http://grouper.sysken.org/beta/";
     }
 }
