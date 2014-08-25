@@ -2,13 +2,13 @@
 /**
  * Grouper API実行
  *
- * 実行用ファイルです(2014.08.23更新)
+ * 実行用ファイルです(2014.08.25更新)
  *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create 2014.08.05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.4
+ * @version 0.3.5
  * @link http://grouper.sysken.org/
  */
 
@@ -44,7 +44,7 @@ switch($_GET['mode']) {
 
   // 3. グループ作成
   case 'create':
-    $rest = $api->create($_GET['group_name'], $_GET['group_desc'], $_GET['sessionID'], $_GET['userID'], $_GET['mode']);
+    $rest = $api->create($_GET['group_name'], $_GET['group_desc'], $_GET['sessionID'], $_GET['userID'], $_GET['query_mode']);
     echo $rest;
   break;
 
@@ -74,13 +74,13 @@ switch($_GET['mode']) {
 
   // 8. アラームへの応答
   case 'alartchoice':
-    $rest = $api->alartchoice($_GET['alarmID'], $_GET['userID'], $_GET['sessionID'], $_GET['alart_choice']);
+    $rest = $api->alartchoice($_GET['userID'], $_GET['sessionID'], $_GET['alarmID'], $_GET['alart_choice']);
     echo $rest;
   break;
 
   // 9. アラームへの応答確認
-  case 'alartchoice':
-    $rest = $api->alartchoice($_GET['alarmID'], $_GET['groupID'], $_GET['sessionID']);
+  case 'alartcheck':
+    $rest = $api->alartcheck($_GET['alarmID'], $_GET['groupID'], $_GET['sessionID']);
     echo $rest;
   break;
 
@@ -118,7 +118,7 @@ switch($_GET['mode']) {
    * 以後災害時用機能(Group mode = 'disaster'(1)の場合のみ利用可能=>func.phpで定義)
    *
    * 15-17. 掲示板関連
-   * 18. スケジュール機能
+   * 18-20. スケジュール機能
    */
 
   // 15. 掲示板機能
@@ -142,6 +142,18 @@ switch($_GET['mode']) {
   // 18. スケジュール機能
   case 'schedule':
     $rest = $api->schedule($_GET['groupID'], $_GET['userID'], $_GET['sessionID'], $_GET['alarm_time'], $_GET['alart_desc']);
+    echo $rest;
+  break;
+
+  // 19. スケジュール同期
+  case 'fetchSchedule':
+    $rest = $api->fetchSchedule($_GET['sessionID'], $_GET['alarmID']);
+    echo $rest;
+  break;
+
+  // 20. スケジュール変更・削除
+  case 'editSchedule':
+    $rest = $api->editSchedule($_GET['sessionID'], $_GET['alarmID'], $_GET['is_schedule_del'], $_GET['alarm_time'], $_GET['alarm_desc']);
     echo $rest;
   break;
 

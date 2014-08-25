@@ -2,13 +2,13 @@
 /**
  * Grouper ファンクション
  *
- * Grouperの各種機能を提供します。(2014.08.23更新)
+ * Grouperの各種機能を提供します。(2014.08.25更新)
  *
  * @copyright &copy; 2014 Ryosuke Hagihara
  * @create 2014/08/05
  * @auther Ryosuke Hagihara <raryosu@sysken.org>
  * @since PHP5.5+ / MySQL 5.3+
- * @version 0.3.4
+ * @version 0.3.5
  * @link http://grouper.sysken.org/
  */
 
@@ -24,7 +24,7 @@ if(basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__))
  * すべての処理で共通して利用する関数をまとめたクラスです。
  *
  * @copyright &copy;2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.3.4
+ * @version 0.3.5
  */
 class common
 {
@@ -184,7 +184,7 @@ class common
  * APIに関するクラスです
  *
  * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.3.4
+ * @version 0.3.5
  */
 class api
 {
@@ -466,11 +466,12 @@ class api
     self::paramAssign('group_name', '32,NOT_NULL,text',$group_name);
     self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
     self::paramAssign('userID', '64,NOT_NULL,hex', $userID);
+    self::paramAssign('query_mode', '64,NOT_NULL,hex', $query_mode);
 
-    if($query_mode == 'normal')
+    if($this -> _PARAM['query_mode'] == 'normal')
     {
       $mode = 0;
-    }elseif ($query_mode == 'disaster'){
+    }elseif ($this -> _PARAM['query_mode'] == 'disaster'){
       $mode = 1;
     }else{
       common::error('query', 'query error (format)');
@@ -533,15 +534,23 @@ class api
   /**
    * 5. グループにユーザを追加
    *
-   * @param string $groupID    グループID
+   * @param string $inviteID   グループ招待ID
    * @param string $userID     ユーザID
    * @param string $sessionID  セッションID
    * @return bool|array
    */
-  function addGroupUser($groupID, $userID, $sessionID)
+  function addGroupUser($inviteID, $userID, $sessionID)
   {
-    self::paramAssign('groupID', '64,NOT_NULL,hex', $groupID);
+    self::paramAssign('inviteID', '64,NOT_NULL,hex', $inviteID);
     self::paramAssign('userID', '32,NOT_NULL,text',$userID);
+    $query_g = $this -> _mysqli -> buildQuery('SELECT', 'invitation', array('invitation'=> $this -> _PARAM['inviteID']));
+    $query_g_rest = $this -> _mysqli -> goQuery($query_g, true);
+    if(!$query_g_rest)
+    {
+      common::error('query', 'missing');
+    }
+    $query_g_rest = $query_g_rest[0];
+    $groupID = $query_g_rest['inviteID'];
     $query = $this -> _mysqli -> buildQuery('INSERT', 'relational', array(
                                                                           'userID' => $this -> _PARAM['userID'],
                                                                           'groupID' => $this -> _PARAM['groupID']
@@ -605,16 +614,28 @@ class api
       $msg = $geo_x . ',' . $geo_y;
     }
 
-    // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
-    $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
-    $user = $this -> _mysqli -> goQuery($user, true, 'select');
-    $user = $user[0];
+    // グループのユーザID取得
+    $query_user = $this -> _mysqli -> buildQuery('SELECT', 'relational', array('groupID' => $this -> _PARAM['groupID']));
+    $query_user_rest = $this -> _mysqli -> goQuery($query, true);
+    $i = 0;
+    foreach ($query_user as $key => $value) {
+      $user = $query_user_rest[$i];
+      $i++;
+    }
 
-    // senderに送信リクエストを渡す
-    $query_II_rest = common::sender($user['regID'], $msg, $userID);
-    if(!$query_II_rest)
-    {
-      common::error('query', 'missing gcm');
+    // クソ
+    foreach ($user as $key => $value) {
+      // ユーザからregisterIDを絞り出す(正確には該当するユーザのユーザIDの列を連想配列で抜き出す)
+      $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
+      $user = $this -> _mysqli -> goQuery($user, true, 'select');
+      $user = $user[0];
+
+      // senderに送信リクエストを渡す
+      $query_II_rest = common::sender($user['regID'], $msg, $userID);
+      if(!$query_II_rest)
+      {
+        common::error('query', 'missing gcm');
+      }
     }
 
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
@@ -626,7 +647,6 @@ class api
 
   /**
    * 7. アラームを設定
-   * 18. スケジュール機能
    *
    * @param string $groupID        グループID
    * @param string $userID         ユーザID
@@ -664,6 +684,35 @@ class api
     {
       common::error('query', 'missing');
     }
+
+    $msg => array('alarmID'=>$alarmID, 'alarm_time'=> $this -> _PARAM['alarm_time'],
+                  'alarm_desc' => $this -> _PARAM['alarm_desc'], 'alarm_opt1' => $this -> _PARAM['alarm_opt1'],
+                  'alarm_opt2' => $this -> _PARAM['alarm_opt2'], 'groupID' => $this -> _PARAM['groupID']);
+
+    // グループのユーザID取得
+    $query_user = $this -> _mysqli -> buildQuery('SELECT', 'relational', array('groupID' => $this -> _PARAM['groupID']));
+    $query_user_rest = $this -> _mysqli -> goQuery($query, true);
+    $i = 0;
+    foreach ($query_user as $key => $value) {
+      $user = $query_user_rest[$i];
+      $i++;
+    }
+
+    $mode = 'alarm';
+    // クソ
+    foreach ($user as $key => $value) {
+      $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['grID']));
+      $user = $this -> _mysqli -> goQuery($user, true, 'select');
+      $user = $user[0];
+
+      // senderに送信リクエストを渡す
+      $query_II_rest = common::sender($user['regID'], $msg, $userID $mode);
+      if(!$query_II_rest)
+      {
+        common::error('query', 'missing gcm');
+      }
+    }
+
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
                                                                     'alarmID'=>$alarmID
                                                                     )
@@ -674,16 +723,14 @@ class api
   /**
    * 8. アラームへの応答
    *
-   * @param string $groupID      グループID
    * @param string $userID       ユーザID
    * @param string $sessionID    セッションID
    * @param string $alarmID      アラームID
    * @param int    $alart_choice アラート選択肢
    * @return array|bool 連想配列
    */
-  function alartchoice($alarmID, $userID, $sessionID, $alarmID, $alart_choice)
+  function alartchoice($userID, $sessionID, $alarmID, $alart_choice)
   {
-    self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
     self::paramAssign('alarmID', '100,NOT_NULL,text', $alaemID)
@@ -711,7 +758,7 @@ class api
    * @param string $sessionID    セッションID
    * @return array|bool 連想配列
    */
-  function alartcheck($groupID, $alarmID, $sessionID)
+  function alartcheck($alarmID, $groupID, $sessionID)
   {
     self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
     self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
@@ -732,8 +779,8 @@ class api
     }
     $rest = $rest[0];
     unset($rest['ID']);
-    unset($rest['alarmID'])
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+    unset($rest['alarmID']);
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'msg' => $rest)));
   }
 
   /**
@@ -1033,6 +1080,7 @@ class api
   /**
    * 15. 掲示板機能
    *
+   * @param string $sessionID セッションID
    * @param string $groupID グループID
    * @param string $userID ユーザID
    * @param string $contents コンテンツ(HTML形式)
@@ -1040,8 +1088,9 @@ class api
    *
    * @todo regID出すの関数化する？
    */
-  function board($groupID, $userID, $contents)
+  function board($sessionID, $groupID, $userID, $contents)
   {
+    self::paramAssign('sessionID', '64,NOT_NULL,text', $sessionID);
     self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('contents', '600,NOT_NULL,text', $contents);
@@ -1081,11 +1130,13 @@ class api
   /**
    * 16. 掲示板同期
    *
+   * @param string $sessionID セッションID
    * @param string $groupID グループID
    * @return bool|array 実行結果
    */
-  function fetchBoard($groupID)
+  function fetchBoard($sessionID, $groupID)
   {
+    self::paramAssign('sessionID', '64,NOT_NULL,text', $sessionID);
     self::paramAssign('groupID', '600,NOT_NULL,text', $groupID);
     $query = $this -> _mysqli -> buildQuery('SELECT', 'board', array(
                                                                    'groupID'=>$this->_PARAM['groupID'],
@@ -1103,17 +1154,19 @@ class api
     $rest = $rest[0];
     unset($rest['ID']);
     unset($rest['userID']);
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', $rest)));
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200', 'msg' => $rest)));
   }
 
   /**
    * 17. 掲示板削除
    *
+   * @param string $sessionID セッションID
    * @param string $boardID 掲示板ID
    * @return bool 実行結果
    */
-  function delBoard($boardID)
+  function delBoard($sessionID, $boardID)
   {
+    self::paramAssign('sessionID', '64,NOT_NULL,text', $sessionID);
     self::paramAssign('boardID', '600,NOT_NULL,text', $boardID);
     $query = $this -> _mysqli -> buildQuery('DELETE', 'board', array('boardID' => $this -> _PARAM['boardID']));
     $query_rest = $this -> _mysqli -> goQuery($query, true);
@@ -1121,6 +1174,140 @@ class api
     {
       return common::error('query', 'missing');
     }
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
+  }
+
+  /**
+   * 18. スケジュール機能
+   *
+   * @param string $groupID        グループID
+   * @param string $userID         ユーザID
+   * @param setinr $sessionID      セッションID
+   * @param timestamp $alarm_time  アラーム時刻
+   * @param string $alarm_desc     アラーム詳細
+   * @return array|bool 連想配列
+   */
+  function schedule($groupID, $userID, $sessionID, $alarm_time, $alert_desc)
+  {
+    self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('userID', '64,NOT_NULL,text', $userID);
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('alarm_time', '500,NOT_NULL,timestamp', $alarm_time);
+    self::paramAssign('alert_desc', '500,text', $alert_desc);
+
+    $alarmID = self::createRandHex('15');
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm', array(
+                                                                       'groupID' => $this -> _PARAM['groupID'],
+                                                                       'createUser' => $this -> _PARAM['userID'],
+                                                                       'alarmID' => $alarmID,
+                                                                       'alarm_time' => $this -> _PARAM['alarm_time'],
+                                                                       'alarm_desc' => $this -> _PARAM['alarm_desc'],
+                                                                    )
+                                           );
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200',
+                                                                    'alarmID'=>$alarmID
+                                                                    )
+                                  )
+                            );
+  }
+
+  /**
+   * 19. スケジュール同期
+   *
+   * @param string $sessionID セッションID
+   * @param string $groupID グループID
+   */
+  function fetchSchedule($sessionID, $alarmID)
+  {
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('alarmID', '64,NOT_NULL,text', $groupID);
+
+    $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm', array('groupID' => $this -> _PARAM['groupID']));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    foreach ($query_rest as $key => $value) {
+      $rest[$key] = $value;
+    }
+
+    foreach ($rest as $key => $value) {
+      unset($rest['alarm_opt1']);
+      unset($rest['alarm_opt2']);
+      unset($rest['groupID']);
+      unset($rest['alarmID']);
+    }
+
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200','msg'=>$rest)));
+  }
+
+  /**
+   * 20. スケジュール変更・削除
+   *
+   * @param string $sessionID セッションID
+   * @param string $alarmID アラームID
+   * @param string $is_schedule_del アラーム削除
+   * @param string $alarm_time アラーム時刻(変更の場合)
+   * @param string $alarm_desc アラーム詳細
+   */
+  function editSchedule($sessionID, $alarmID, $is_schedule_del, $alarm_time, $alarm_desc)
+  {
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('alarmID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('is_schedule_del', '100,NOT_NULL,text', $is_schedule_del);
+    self::paramAssign('alarm_time', '64,timestamp', $alarm_time);
+    self::paramAssign('alarm_desc', '64,text',$alert_desc);
+
+    if($this -> _PARAM['is_schedule_del'] == 1)
+    {
+      $query = $this -> _mysqli -> buildQuery('DELETE', 'Alarm', array('alarmID' => $this -> _PARAM['alarmID']));
+      $query_rest = $this -> _mysqli -> goQuery($query, true);
+      if(!$query_rest)
+      {
+        common::error('query', 'missing');
+      }
+    }
+
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'Alarm', array('alarmID' => $this -> _PARAM['alarmID']));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    foreach ($query_rest as $key => $value) {
+      $rest[$key] = $value;
+    }
+
+    $rest = $rest[0];
+
+    if($this -> _PARAM['alarm_time'] == 0)
+    {
+      $alarm_time = $rest['alarm_time'];
+    }
+    if($this -> _PARAM['alarm_desc'])
+    {
+      $alarm_desc = $rest['alarm_desc'];
+    }
+
+    $query_update = $this -> _mysqli -> buildQuery('UPDATE', 'Alarm', array('alarmID' => $this -> _PARAM['alarmID']),
+                                                   array('alarm_time'=> $this -> _PARAM['alarm_time'],
+                                                         'alarm_desc'=> $this -> _PARAM['alarm_desc'])
+                                                  );
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
     return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
   }
 
@@ -1147,7 +1334,7 @@ class api
  * DBにアクセスします
  *
  * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.3.4
+ * @version 0.3.5
  */
 class db
 {

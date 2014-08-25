@@ -5,7 +5,7 @@
  * DBにアクセスします
  *
  * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.3.4
+ * @version 0.3.5
  */
 class db
 {

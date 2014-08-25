@@ -5,7 +5,7 @@
  * APIに関するクラスです
  *
  * @copyright &copy; 2014 Ryosuke Hagihara <raryosu@sysken.org>
- * @version 0.3.4
+ * @version 0.3.5
  */
 class api
 {
@@ -287,11 +287,12 @@ class api
     self::paramAssign('group_name', '32,NOT_NULL,text',$group_name);
     self::paramAssign('group_desc', '140,NOT_NULL,text', $group_desc);
     self::paramAssign('userID', '64,NOT_NULL,hex', $userID);
+    self::paramAssign('query_mode', '64,NOT_NULL,hex', $query_mode);
 
-    if($query_mode == 'normal')
+    if($this -> _PARAM['query_mode'] == 'normal')
     {
       $mode = 0;
-    }elseif ($query_mode == 'disaster'){
+    }elseif ($this -> _PARAM['query_mode'] == 'disaster'){
       $mode = 1;
     }else{
       common::error('query', 'query error (format)');
@@ -543,16 +544,14 @@ class api
   /**
    * 8. アラームへの応答
    *
-   * @param string $groupID      グループID
    * @param string $userID       ユーザID
    * @param string $sessionID    セッションID
    * @param string $alarmID      アラームID
    * @param int    $alart_choice アラート選択肢
    * @return array|bool 連想配列
    */
-  function alartchoice($alarmID, $userID, $sessionID, $alarmID, $alart_choice)
+  function alartchoice($userID, $sessionID, $alarmID, $alart_choice)
   {
-    self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
     self::paramAssign('alarmID', '100,NOT_NULL,text', $alaemID)
@@ -580,7 +579,7 @@ class api
    * @param string $sessionID    セッションID
    * @return array|bool 連想配列
    */
-  function alartcheck($groupID, $alarmID, $sessionID)
+  function alartcheck($alarmID, $groupID, $sessionID)
   {
     self::paramAssign('alarmID', '64,NOT_NULL,text', $alarmID);
     self::paramAssign('groupID', '64,NOT_NULL,text', $groupID);
@@ -1069,7 +1068,68 @@ class api
       unset($rest['alarmID']);
     }
 
-    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200','msg'=>$rest));)
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200','msg'=>$rest)));
+  }
+
+  /**
+   * 20. スケジュール変更・削除
+   *
+   * @param string $sessionID セッションID
+   * @param string $alarmID アラームID
+   * @param string $is_schedule_del アラーム削除
+   * @param string $alarm_time アラーム時刻(変更の場合)
+   * @param string $alarm_desc アラーム詳細
+   */
+  function editSchedule($sessionID, $alarmID, $is_schedule_del, $alarm_time, $alarm_desc)
+  {
+    self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
+    self::paramAssign('alarmID', '64,NOT_NULL,text', $groupID);
+    self::paramAssign('is_schedule_del', '100,NOT_NULL,text', $is_schedule_del);
+    self::paramAssign('alarm_time', '64,timestamp', $alarm_time);
+    self::paramAssign('alarm_desc', '64,text',$alert_desc);
+
+    if($this -> _PARAM['is_schedule_del'] == 1)
+    {
+      $query = $this -> _mysqli -> buildQuery('DELETE', 'Alarm', array('alarmID' => $this -> _PARAM['alarmID']));
+      $query_rest = $this -> _mysqli -> goQuery($query, true);
+      if(!$query_rest)
+      {
+        common::error('query', 'missing');
+      }
+    }
+
+    $query = $this -> _mysqli -> buildQuery('SELECT', 'Alarm', array('alarmID' => $this -> _PARAM['alarmID']));
+    $query_rest = $this -> _mysqli -> goQuery($query, true);
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    foreach ($query_rest as $key => $value) {
+      $rest[$key] = $value;
+    }
+
+    $rest = $rest[0];
+
+    if($this -> _PARAM['alarm_time'] == 0)
+    {
+      $alarm_time = $rest['alarm_time'];
+    }
+    if($this -> _PARAM['alarm_desc'])
+    {
+      $alarm_desc = $rest['alarm_desc'];
+    }
+
+    $query_update = $this -> _mysqli -> buildQuery('UPDATE', 'Alarm', array('alarmID' => $this -> _PARAM['alarmID']),
+                                                   array('alarm_time'=> $this -> _PARAM['alarm_time'],
+                                                         'alarm_desc'=> $this -> _PARAM['alarm_desc'])
+                                                  );
+    if(!$query_rest)
+    {
+      common::error('query', 'missing');
+    }
+
+    return self::createJson(array('status'=>'OK', 'contents'=>array('code'=>'200')));
   }
 
   /**
