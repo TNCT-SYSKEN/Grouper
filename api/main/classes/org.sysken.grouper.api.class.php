@@ -190,6 +190,8 @@ class api
    * @param  string $is_tel_pub 電話番号公開フラグ
    * @param  string  $regID     Google Cloud Messege レジストレーションキー
    * @return bool               結果を返す
+   *
+   * @todo ユーザ画像を設定できるように
    */
   function regist($username, $deviceID, $tel1, $tel2, $tel3, $is_tel_pub=0, $regID)
   {
@@ -280,6 +282,8 @@ class api
    * @param string $sessionID  セッションID
    * @param string $query_mode モード[normal/disaster]
    * @return bool|array
+   *
+   * @todo グループ画像を設定できるように
    */
   function create($group_name, $group_desc, $sessionID, $userID, $query_mode)
   {
@@ -506,7 +510,7 @@ class api
       common::error('query', 'missing');
     }
 
-    $msg => array('alarmID'=>$alarmID, 'alarm_time'=> $this -> _PARAM['alarm_time'],
+    $msg = array('alarmID'=>$alarmID, 'alarm_time'=> $this -> _PARAM['alarm_time'],
                   'alarm_desc' => $this -> _PARAM['alarm_desc'], 'alarm_opt1' => $this -> _PARAM['alarm_opt1'],
                   'alarm_opt2' => $this -> _PARAM['alarm_opt2'], 'groupID' => $this -> _PARAM['groupID']);
 
@@ -522,12 +526,12 @@ class api
     $mode = 'alarm';
     // クソ
     foreach ($user as $key => $value) {
-      $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['grID']));
+      $query_user = $this -> _mysqli -> buildQuery('SELECT', 'User', array('userID'=> $this -> _PARAM['userID']));
       $user = $this -> _mysqli -> goQuery($user, true, 'select');
       $user = $user[0];
 
       // senderに送信リクエストを渡す
-      $query_II_rest = common::sender($user['regID'], $msg, $userID $mode);
+      $query_II_rest = common::sender($user['regID'], $msg, $userID, $mode);
       if(!$query_II_rest)
       {
         common::error('query', 'missing gcm');
@@ -554,7 +558,7 @@ class api
   {
     self::paramAssign('userID', '64,NOT_NULL,text', $userID);
     self::paramAssign('sessionID', '100,NOT_NULL,text', $sessionID);
-    self::paramAssign('alarmID', '100,NOT_NULL,text', $alaemID)
+    self::paramAssign('alarmID', '100,NOT_NULL,text', $alaemID);
     self::paramAssign('alart_choice', '100,NOT_NULL,text', $alart_choice);
 
     $query = $this -> _mysqli -> buildQuery('INSERT', 'Alarm_choice', array(
@@ -637,6 +641,8 @@ class api
    * @param string $group_desc グループ詳細
    * @param string $is_group_del グループ削除
    * @return bool|array
+   *
+   * @todo 画像を設定できるように
    */
   function settingGroup($userID , $sessionID, $groupID, $group_name, $group_desc, $is_group_del)
   {
@@ -718,6 +724,8 @@ class api
    * @param string $groupID     グループID
    * @param string $is_user_del ユーザ削除
    * @return bool|array
+   *
+   * @todo 画像を設定できるように
    */
   function settingUser($userID , $sessionID, $groupID, $user_name, $is_user_del)
   {
@@ -786,6 +794,8 @@ class api
    * @param string $sessionID     セッションID
    * @param string $query_mode    モード[user, group]
    * @return bool|array           連想配列
+   *
+   * @todo 画像を返すように
    */
   function getUser($userID = NULL, $sessionID, $query_mode)
   {
@@ -852,6 +862,8 @@ class api
    * @param string $groupID        ユーザID
    * @param string $query_mode 実行モード[user(グループに属すユーザ情報の取得), group(グループ名, グループ作成者のIDを取得)]
    * @return bool|array           連想配列
+   *
+   * @todo 画像を返すように
    */
   function getGroup($groupID, $query_mode)
   {
