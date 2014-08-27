@@ -1,5 +1,14 @@
 Rails.application.routes.draw do
-  resources :groups
+  resources :groups do
+    member do
+      resources :members
+      get 'add_member'
+      post 'add_member'
+    end
+  end
+
+  get 'user/find_group'
+  post 'user/find_group'
 
   devise_for :users
   # The priority is based upon order of creation: first created -> highest priority.
