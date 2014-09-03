@@ -1,0 +1,14 @@
+<div class="talk">
+<% @talks.each do |talk| %>
+  <%= user_email(talk.user_id) %> 「<%= talk.talk %>」
+  <br>
+<% end %>
+</div>
+<div id="uid" style="display:none;"><%= current_user.id %></div>
+<div id="gid" style="display:none;"><%= @group.id %></div>
+
+<%= form_tag('new', remote: true) do %>
+  <%= text_field_tag :talk, "", id: "text" %>
+  <%= submit_tag "送信", id: "send" %>
+<% end %>
+

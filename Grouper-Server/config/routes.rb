@@ -4,6 +4,9 @@ Rails.application.routes.draw do
       resources :members
       get 'add_member'
       post 'add_member'
+      get 'talk/index'
+      post 'talk/index'
+      post 'talk/new'
     end
   end
 
