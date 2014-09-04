@@ -1,11 +1,11 @@
-<h1>Listing groups</h1>
+<h1>参加しているグループ</h1>
 
 <table>
   <thead>
     <tr>
-      <th>User</th>
-      <th>Name</th>
-      <th>Description</th>
+      <th>No.</th>
+      <th>ユーザ名</th>
+      <th>詳細</th>
       <th colspan="2"></th>
     </tr>
   </thead>
@@ -16,8 +16,8 @@
         <td><%= group.user_id %></td>
         <td><%= group.name %></td>
         <td><%= group.description %></td>
-        <td><%= link_to 'Show', group %></td>
-        <td><%= link_to 'Destroy', group, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'トーク', group %></td>
+        <td><%= link_to '退会', group, method: :delete, data: { confirm: '本当に退会しますか？' } %></td>
       </tr>
     <% end %>
   </tbody>
@@ -25,4 +25,4 @@
 
 <br>
 
-<%= link_to 'New Group', new_group_path %>
+<%= link_to '新しくグループを作る', new_group_path %>
