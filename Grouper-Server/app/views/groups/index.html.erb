@@ -1,10 +1,10 @@
 <h1>参加しているグループ</h1>
-
+<!--
 <table>
   <thead>
     <tr>
-      <th>No.</th>
-      <th>ユーザ名</th>
+       <th>No.</th>
+      <th>グループ名</th>
       <th>詳細</th>
       <th colspan="2"></th>
     </tr>
@@ -12,17 +12,21 @@
 
   <tbody>
     <% @groups.each do |group| %>
-      <tr>
+      <tr class="user_group">
         <td><%= group.user_id %></td>
         <td><%= group.name %></td>
         <td><%= group.description %></td>
-        <td><%= link_to 'トーク', group %></td>
+        <td><%= link_to '詳細', group %></td>
         <td><%= link_to '退会', group, method: :delete, data: { confirm: '本当に退会しますか？' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+-->
+<% @groups.each do |group| %>
+  <%= link_to group.name, group, class: "group_link" %>
+<% end %>
 
 <br>
 
-<%= link_to '新しくグループを作る', new_group_path %>
+<%= link_to '新しくグループを作る', new_group_path, class: "new_group" %>

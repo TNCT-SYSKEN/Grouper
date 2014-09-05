@@ -12,14 +12,14 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :group_id %><br>
+    グループID<br>
     <%= f.number_field :group_id %>
   </div>
   <div class="field">
-    <%= f.label :user_id %><br>
+    ユーザID<br>
     <%= f.number_field :user_id %>
   </div>
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit class: "btn", value: "追加" %>
   </div>
 <% end %>

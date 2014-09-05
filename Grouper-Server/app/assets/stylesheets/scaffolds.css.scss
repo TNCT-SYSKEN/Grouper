@@ -1,9 +1,10 @@
 body {
   background-color: #fff;
   color: #333;
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 18px;
+  font-family: "モトヤLマルベリ",verdana, arial, helvetica, sans-serif !important;
+  font-size: 18px !important;
+  line-height: 18px !important;
+  width: 100%;
 }
 
 p, ol, ul, td {
@@ -19,14 +20,8 @@ pre {
 }
 
 a {
-  color: #000;
-  &:visited {
-    color: #666;
-  }
-  &:hover {
-    color: #fff;
-    background-color: #000;
-  }
+  color: #333 !important;
+  text-decoration: none !important;
 }
 
 div {
