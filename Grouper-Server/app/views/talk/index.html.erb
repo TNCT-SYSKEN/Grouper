@@ -9,7 +9,7 @@
 <div id="row">
 <%= form_tag('new', remote: true, class: "talk_form") do %>
   <%= text_field_tag :talk, "", id: "text" %>
-  <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
+  <%= submit_tag "送信", id: "send", class: "btn btn-primary fa fa-paper-plane" %>
 <% end %>
 </div>
 <script src="/talk.js"></script>
