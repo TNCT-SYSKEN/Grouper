@@ -1,4 +1,4 @@
-<div class="talk container">
+<div class="container">
 <% @talks.each do |talk| %>
   <%= user_email(talk.user_id) %> 「<%= talk.talk %>」
   <br>
@@ -6,11 +6,14 @@
 <div id="uid" style="display:none;"><%= current_user.id %></div>
 <div id="gid" style="display:none;"><%= @group.id %></div>
 
-<div id="row">
-<%= form_tag('new', remote: true, class: "talk_form") do %>
-  <%= text_field_tag :talk, "", id: "text" %>
-  <%= submit_tag "送信", id: "send", class: "btn btn-primary fa fa-paper-plane" %>
+<%= form_tag('new', remote: true) do %>
+  <div class="form-inline">
+    <div class="form-group">
+      <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
+    </div>
+    <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
+  </div>    
 <% end %>
 </div>
 <script src="/talk.js"></script>
-
+</div>

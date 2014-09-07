@@ -1,14 +1,16 @@
+<div class="container">
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Group:</strong>
+  <strong>参加しているグループ</strong><br>
   <%= @member.group_id %>
 </p>
 
 <p>
-  <strong>User:</strong>
+  <strong>ユーザID</strong><br>
   <%= @member.user_id %>
 </p>
 
-<%= link_to 'Edit', edit_member_path(@member) %> |
-<%= link_to 'Back', members_path %>
+<%= link_to '編集', edit_member_path(@member), class: "btn btn-warning" %>
+<%= link_to '戻る', members_path, class: "btn btn-default" %>
+</div>

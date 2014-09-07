@@ -5,7 +5,8 @@
   <%= stylesheet_link_tag    'application', media: 'all' %>
   <%= javascript_include_tag 'application' %>
   <%= csrf_meta_tags %>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <% if notice %>
@@ -13,11 +14,9 @@
   <% end %>
   <% if alert %>
     <p><%= alert %></p>
-  <% end %>
-
+  <% end%>
     <%= yield %>  
     <br>
-    <!-- アプリ側で実装予定(上部タブ) -->
     <%= link_to "トップへ", root_path, class: "btn btn-primary" %>
 </body>
 </html>
