@@ -1,29 +1,29 @@
 <p>
-  <strong>グループ名</strong><br>
-  <%= @group.name %>
+<strong>グループ名</strong><br>
+<%= @group.name %>
 </p>
 
 <p>
-  <strong>作成者</strong><br>
-  <%= user_email(@group.user_id) %>
+<strong>作成者</strong><br>
+<%= user_email(@group.user_id) %>
 </p>
 
 <p>
-  <strong>詳細</strong><br>
-  <%= @group.description %>
+<strong>詳細</strong><br>
+<%= @group.description %>
 </p>
 
 <p>
-  <strong>招待コード</strong><br>
-  <%= @group.id %>
+<strong>招待コード</strong><br>
+<%= @group.id %>
 </p>
 
 <p> 
-  <%= link_to 'メンバー', members_path %>
+<%= link_to 'メンバー', members_path %>
 </p>
 
 <p> 
 <%= link_to 'トーク', talk_index_group_path %>
 </p>
-<%= link_to '設定', edit_group_path(@group), class: "btn btn-success" %> 
-<%= link_to '戻る', groups_path, class: 'btn btn-default' %>
+<%= link_to '設定', edit_group_path(@group), class: "btn btn-success btn-lg btn-block" %> 
+<%= link_to '戻る', groups_path, class: 'btn btn-default btn-lg btn-block' %>

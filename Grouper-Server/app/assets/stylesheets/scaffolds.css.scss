@@ -30,6 +30,7 @@ div {
   display: table;
 }
 
+/*
 #error_explanation {
   width: 450px;
   border: 2px solid red;
@@ -52,20 +53,13 @@ div {
     list-style: square;
   }
 }
+*/
 
-.group_link {
-  font-size: 30px;
-}
-
-/*
 .foot {
   position: fixed;
-  width: 100%;
-  text-align: center;
-  background-color: #87cefa;
-  color: #fff;
+  bottom: 0;
 }
-*/
+
 #talk {
   .content {
     line-height: 22px;
@@ -86,6 +80,22 @@ div {
 
 .group_link {
   border-bottom: solid 0.0525em #555;
-  line-height: 0;
-  min-height: 30px;
+  line-height: 26px;
+  font-size: 25px;
+  padding: 0 0 0 67px;
+  height: 70px;
 }
+
+a[href^="/"] {
+  margin-top: 9px;
+}
+
+.btn {
+  color: #fff !important;
+}
+
+.btn-default {
+  color: #000 !important;
+}
+
+

@@ -14,15 +14,11 @@
 
     <%= form_tag('new', remote: true, class: "foot form-horizontal") do %>
       <div class="form-group form-group-sm">
-        <div class="col-sm-2">
-          <div class="btn btn-success">追加</div>
-        </div>
+        <div class="btn btn-success col-sm-2">追加</div>
         <div class="col-sm-8">
           <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
         </div>
-        <div class="col-sm-2">
-          <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
-        </div>
+        <%= submit_tag "送信", id: "send", class: "btn btn-primary col-sm-2" %>
       </div>
     <% end %>
   </div>

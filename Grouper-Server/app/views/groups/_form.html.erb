@@ -1,29 +1,34 @@
+<!-- @todo errorがあるときでもフォームに.field_with_errorsを付けないようにしたい -->
 <%= form_for(@group) do |f| %>
   <% if @group.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@group.errors.count, "") %> つのエラーがあります。</h2>
-
-      <ul>
+    <div id="error_explanation" class="alert alert-danger">
       <% @group.errors.full_messages.each do |message| %>
-        <li><%= message.delete("Name ") %></li>
+        <%= message.delete("Name ") %>
       <% end %>
-      </ul>
-    </div>
-  <% end %>
+    </ul>
+  </div>
+<% end %>
 
-  <div class="field">
+<div class="field">
+  <% if @group.errors.any? %>
+    <div class="form-group has-error">
+      <label>グループ名</label>
+      <%= f.text_field :name, class: "form-control input-lg" %>
+    </div>
+  <% else %>
     <div class="form-group">
       <label>グループ名</label>
-      <%= f.text_field :name, class: "form-control input-lg"%>
+      <%= f.text_field :name, class: "form-control input-lg" %>
     </div>
+  <% end %>
+</div>
+<div class="field">
+  <div class="form-group">
+    <label>詳細</label><br>
+    <%= f.text_area :description, class: "form-control input-lg" %>
   </div>
-  <div class="field">
-    <div class="form-group">
-      <label>詳細</label><br>
-      <%= f.text_area :description, class: "form-control input-lg" %>
-    </div>
-  </div>
-  <div class="actions">
-    <%= f.submit class:"btn btn-primary btn-lg btn-block", value: "作成"%>
-  </div>
+</div>
+<div class="actions">
+  <%= f.submit class:"btn btn-success btn-lg btn-block", value: "作成"%>
+</div>
 <% end %>
