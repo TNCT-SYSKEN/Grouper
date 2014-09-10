@@ -6,15 +6,12 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.graphics.Camera;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.widget.Button;
+import android.view.MenuItem;
 
 
 public class TabAct extends Activity {
@@ -48,14 +45,49 @@ public class TabAct extends Activity {
                         new TabListener<Setting>(
                                 this, "tag3", Setting.class)
                 ));
+        /*
+        actionBar.addTab(actionBar.newTab()
+                .setText(R.string.QRR)
+                .setTabListener(
+                        new TabListener<CameraPreviewActivity>(
+                                this, "tag4", CameraPreviewActivity.class)
+                ));
+        */
     }
 
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.my, menu);
+
         return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.QRR:
+
+                // 明示的なインテントの生成
+                Intent intent = new Intent(this, CameraPreviewActivity.class);
+
+                // アクティビティの呼び出し
+                startActivity(intent);
+
+                return true;
+
+            case R.id.QRW:
+
+                // 明示的なインテントの生成
+                Intent mintent = new Intent(this, GenerateActivity.class);
+
+                // アクティビティの呼び出し
+                startActivity(mintent);
+
+                return true;
+
+        }
+        return false;
     }
 
     public class TabListener<T extends Fragment> implements ActionBar.TabListener {

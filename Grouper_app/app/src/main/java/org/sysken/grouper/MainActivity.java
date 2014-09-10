@@ -12,13 +12,11 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(loginCheck()){ // TabActivity に遷移
+
             Intent intent = new Intent(getApplicationContext(), TabAct.class);
             startActivity(intent);
-        }else{ // LoginActivity に遷移
-            Intent intent = new Intent(getApplicationContext(), LoginAct.class);
-            startActivity(intent);
-        }
+
+
     }
 
     // ログイン判定

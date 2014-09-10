@@ -11,6 +11,7 @@
         android:protectionLevel="signature" />
     <uses-permission
         android:name="sysken.org.grouper.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
     <application
         android:allowBackup="true"
