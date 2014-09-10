@@ -10,13 +10,22 @@
 </head>
 <body>
   <% if notice %>
-     <p><%= notice %></p>
+   <div class="alert alert-success" role="alert"><%= notice %></div>
   <% end %>
   <% if alert %>
-    <p><%= alert %></p>
-  <% end%>
-    <%= yield %>  
-    <br>
-    <%= link_to "トップへ", root_path, class: "btn btn-primary" %>
+    <div class="alert alert-danger" role="alert"><%= alert %></div>
+  <% end %>
+
+  <div class="container">
+      <%= yield %>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <%= link_to "トップへ", root_path, class: "btn btn-primary btn-lg btn-block" %>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
