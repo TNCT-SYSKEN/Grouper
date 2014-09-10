@@ -5,6 +5,6 @@ $(function() {
   group_id = $('#gid').text();
   channel = dispatcher.subscribe(group_id);
   return channel.bind("new_message", function(message) {
-    return $(".talk").append("" + message.name + " 「" + message.talk + "」<br>");
+    return $(".talk").append('<div class="user"><p>' + message.name + '</p></div><div class="content"><p>' + message.talk + '</p></div>');
   });
 });

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GrouperServer</title>
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
+  <%= csrf_meta_tags %>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <!--
+  <% if notice %>
+     <p><%= notice %></p>
+  <% end %>
+  -->
+  <% if alert %>
+    <p><%= alert %></p>
+  <% end%>
+    <%= yield %>  
+</body>
+</html>
