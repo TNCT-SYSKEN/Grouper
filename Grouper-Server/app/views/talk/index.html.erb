@@ -1,18 +1,26 @@
-<div class="container">
+<div class="container talk_page">
 <% @talks.each do |talk| %>
-  <%= user_email(talk.user_id) %> 「<%= talk.talk %>」
+  <div id="talk" class="row">
+    <div class="user">
+      <p><%= user_email(talk.user_id) %></p>
+    </div>
+    <div class="content">
+      <p><%= talk.talk %></p>
+    </div>
+  </div>
   <br>
 <% end %>
 <div id="uid" style="display:none;"><%= current_user.id %></div>
 <div id="gid" style="display:none;"><%= @group.id %></div>
 
-<%= form_tag('new', remote: true) do %>
-  <div class="form-inline">
-    <div class="form-group">
-      <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
+<%= form_tag('new', remote: true, class: "foot form-inline input-append") do %>
+  <div class="form-inline foot row">
+    <div class="col-sm-9">
+      <div class="btn btn-success col-sm-3">追加</div>
+      <%= text_field_tag :talk, "", id: "text", class: "form-control form-small col-sm-6" %>
+      <%= submit_tag "送信", id: "send", class: "btn btn-primary col-sm-3" %>
     </div>
-    <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
-  </div>    
+  </div>
 <% end %>
 </div>
 <script src="/talk.js"></script>

@@ -1,23 +1,23 @@
 <div class="container">
-<p id="notice"><%= notice %></p>
+<p id="notice" class="bg-success"><%= notice %></p>
 
 <p>
-  <strong>グループ名:</strong>
+  <strong>グループ名</strong><br>
   <%= @group.name %>
 </p>
 
 <p>
-  <strong>作成者:</strong>
+  <strong>作成者</strong><br>
   <%= user_email(@group.user_id) %>
 </p>
 
 <p>
-  <strong>詳細:</strong>
+  <strong>詳細</strong><br>
   <%= @group.description %>
 </p>
 
 <p>
-  <strong>招待コード:</strong>
+  <strong>招待コード</strong><br>
   <%= @group.id %>
 </p>
 

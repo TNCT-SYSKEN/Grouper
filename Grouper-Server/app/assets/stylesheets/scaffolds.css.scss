@@ -2,17 +2,8 @@ body {
   background-color: #fff;
   color: #333;
   font-family: MotoyaLMaru,verdana, arial, helvetica, sans-serif !important;
-  font-size: 18px !important;
-  line-height: 30px !important;
-  width: 100%;
-  height: 100%;
-  overflow: scroll;
-}
-
-p, ol, ul, td {
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 30px !important;
+  line-height: 30px;
 }
 
 pre {
@@ -31,10 +22,6 @@ div {
   &.field, &.actions {
     margin-bottom: 10px;
   }
-}
-
-#notice {
-  color: green;
 }
 
 .field_with_errors {
@@ -71,6 +58,29 @@ div {
 }
 
 .foot {
-  position: absolute;
-  bottom: 0;
+  position: fixed;
+  bottom: 10px;
+}
+
+#talk {
+  .content {
+    line-height: 0.1;
+    min-width: 10px; 
+    max-width: 300px;
+    padding: 0 50px;
+    font-size: 20px;
+    a {
+      text-decoration: 0;
+    }
+  }
+  .user {
+    font-size: 10px;
+    position: relative;
+    top: 50px;
+  }
+  padding: 0 10px;
+}
+
+.group_link {
+  border-bottom: solid 0.0125em #555;
 }
