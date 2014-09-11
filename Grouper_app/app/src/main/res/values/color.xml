@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 選択 -->
+    <color name="action_bar_tab_selected_color">#0055AB</color>
+    <!-- 非選択 -->
+    <color name="action_bar_tab_un_selected_color">#0077BC</color>
+</resources>

@@ -1,11 +1,21 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/my_actionbar_style</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTab</item>
     </style>
     <style name="my_actionbar_style" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#0077BC</item>
+        <item name="android:background">#0088CC</item>
+        <item name="android:titleTextStyle">@style/titleStyle</item>
     </style>
-
+    <style name="titleStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <!-- ActionBar tabs styles -->
+    <style name="ActionBarTab" parent="android:Widget.Holo.ActionBar.TabView">
+        <!-- tab indicator -->
+        <item name="android:background">@drawable/actionbar_tab_text</item>
+        <item name="android:titleTextStyle">@style/titleStyle</item>
+    </style>
 </resources>
