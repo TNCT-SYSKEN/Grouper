@@ -9,18 +9,19 @@
       </div>
       <br>
     <% end %>
+    <div class="talk_bottom"></div>
     <div id="uid" style="display:none;"><%= current_user.id %></div>
     <div id="gid" style="display:none;"><%= @group.id %></div>
-
-    <%= form_tag('new', remote: true, class: "foot form-horizontal") do %>
-      <div class="form-group form-group-sm">
-        <div class="btn btn-success col-sm-2">追加</div>
-        <div class="col-sm-8">
+    <%= form_tag('new', remote: true, class: "foot") do %>
+      <div class="form-group">
+        <div class="btn btn-success col-xs-2">追加</div>
+        <div class="col-xs-7">
           <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
         </div>
-        <%= submit_tag "送信", id: "send", class: "btn btn-primary col-sm-2" %>
+        <%= submit_tag "送信", id: "send", class: "btn btn-primary col-xs-3" %>
       </div>
     <% end %>
   </div>
+  <!-- トップへのリンクはアプリ側で実装するので実装時には消します。デバッグ用のこしてます-->
   <script src="/talk.js"></script>
 </div>
