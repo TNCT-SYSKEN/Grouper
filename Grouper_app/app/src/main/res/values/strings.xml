@@ -13,4 +13,12 @@
     <string name="home">ホーム</string>
     <string name="group">グループ</string>
     <string name="logout">ログアウト</string>
+    <string name="update">更新</string>
+    <string name="QRR">QR読み込み</string>
+    <string name="QRW">QR表示</string>
+    <string name="QRG">QRコード生成</string>
+    <string name="generate">generate</string>
+    <string name="group_invite">グループに招待する</string>
+    <string name="group_search">グループに参加する</string>
+
 </resources>

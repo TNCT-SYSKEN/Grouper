@@ -1,8 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Setting" >
-    <item android:id="@+id/action_settings"
-        android:title="@string/settings"
-        android:orderInCategory="100"
+    tools:context=".tabAct" >
+    <item android:id="@+id/QRR"
+        android:title="@string/QRR"
         android:showAsAction="never" />
+    <item android:id="@+id/QRW"
+        android:title="@string/QRW"
+        android:showAsAction="never"
+        />
 </menu>
