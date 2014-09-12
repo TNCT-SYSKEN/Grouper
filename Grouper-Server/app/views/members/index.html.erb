@@ -1,6 +1,6 @@
 <h1>ユーザ一覧</h1>
 
-<strong>グループ名:</strong><%= @group.name %>
+<strong><%= @group.name %></strong>
 <!--
 <table>
   <thead>
@@ -21,9 +21,11 @@
   </tbody>
 </table>
 -->
+<ul>
 <% @members.each do |member| %>
-  <%= link_to user_email(member.user_id), member %>
+  <li><%= user_email(member.user_id) %></li>
 <% end %>  
-<br>
+</ul>
 
-<%= link_to 'メンバー追加', new_member_path, class: "foot add_user" %>
+<%= link_to 'メンバー追加', new_member_path, class: "foot add_user btn btn-warning btn-lg btn-block" %>
+<%= link_to '戻る', group_path, class: "foot btn btn-default btn-lg btn-block" %>

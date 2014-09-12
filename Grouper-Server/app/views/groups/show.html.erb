@@ -18,12 +18,6 @@
 <%= @group.id %>
 </p>
 
-<p> 
-<%= link_to 'メンバー', members_path %>
-</p>
-
-<p> 
-<%= link_to 'トーク', talk_index_group_path %>
-</p>
+<%= link_to 'メンバー', members_path, class: "btn btn-primary btn-lg btn-block" %>
 <%= link_to '設定', edit_group_path(@group), class: "btn btn-success btn-lg btn-block" %> 
 <%= link_to '戻る', groups_path, class: 'btn btn-default btn-lg btn-block' %>

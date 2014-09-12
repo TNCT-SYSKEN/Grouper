@@ -1,8 +1,6 @@
-<div class="container">
-  <div class="row col-md-8">
-    <h2>Grouper</h2>
-    <%= link_to 'グループを作成する', new_group_path %><br>
-    <%= link_to 'グループを見る', groups_path %><br>
-    <%= link_to 'グループに参加する', user_find_group_path %>
-  </div>
-</div>
+<h1>Grouper</h1>
+<%= link_to 'グループを作成する', new_group_path %><br>
+<%= link_to 'グループを見る', groups_path %><br>
+<%= link_to 'グループに参加する', user_find_group_path %>
+<!-- リンク先やばい（設定ファイルの場所がわからない） -->
+<%= link_to '設定', '/users/edit/' , class: "btn btn-success btn-lg btn-block" %>

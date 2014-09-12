@@ -56,7 +56,7 @@ class GroupsController < ApplicationController
     respond_to do |format|
       if @group.save
         @group.members.create(user_id: @user.id)
-        format.html { redirect_to @group, notice: 'Group was successfully created.' }
+        format.html { redirect_to @group, notice: 'グループの作成に成功しました' }
         format.json { render :show, status: :created, location: @group }
       else
         format.html { render :new }
@@ -70,7 +70,7 @@ class GroupsController < ApplicationController
   def update
     respond_to do |format|
       if @group.update(group_params)
-        format.html { redirect_to @group, notice: 'Group was successfully updated.' }
+        format.html { redirect_to @group, notice: 'グループ情報が更新されました' }
         format.json { render :show, status: :ok, location: @group }
       else
         format.html { render :edit }
@@ -84,7 +84,7 @@ class GroupsController < ApplicationController
   def destroy
     @group.destroy
     respond_to do |format|
-      format.html { redirect_to groups_url, notice: 'Group was successfully destroyed.' }
+      format.html { redirect_to groups_url, notice: 'グループが削除されました' }
       format.json { head :no_content }
     end
   end

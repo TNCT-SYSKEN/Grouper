@@ -1,15 +1,18 @@
-<div class="container">
 <p id="notice"><%= notice %></p>
+<!--
+<p>
+<strong>参加しているグループ</strong><br>
+<%= @member.group.name %>
+</p
+-->
 
 <p>
-  <strong>参加しているグループ</strong><br>
-  <%= @member.group_id %>
+<strong>ユーザID</strong><br>
+<%= @member.user_id %>
 </p>
 
 <p>
-  <strong>ユーザID</strong><br>
-  <%= @member.user_id %>
-</p>
+<strong>ユーザ名</strong><br>
+<%= user_email(@member.user_id) %>
 
-<%= link_to '戻る', members_path, class: "btn btn-default" %>
-</div>
+<%= link_to '戻る', group_path, class: "btn btn-default btn-lg btn-block" %>
