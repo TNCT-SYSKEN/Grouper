@@ -1,7 +1,17 @@
 <h1>参加グループ</h1>
-<% @groups.each do |group| %>
-  <%= image_tag 'dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;' %>
-  <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %>
-  <%= link_to '退会', group, method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
+<table>
+  <% @groups.each do |group| %>
+    <tr>
+    <th class="col-sm-2 img">
+      <%= image_tag 'dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;' %>
+    </th>
+    <th class="col-sm-9 name">
+      <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %>
+    </th>
+    <th class="col-sm-1 remove">
+      <%= link_to '退会', group, method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
+    </th>
+  </tr>
 <% end %>
+</table>
 <%= link_to '新しくグループを作る', new_group_path, class: "new_group btn btn-success btn-lg btn-block" %>
