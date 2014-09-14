@@ -32,7 +32,6 @@ public class GroupFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "hoge!", Toast.LENGTH_SHORT).show();
                 Intent mintent = new Intent(getActivity(), GenerateActivity.class);
 
                 // アクティビティの呼び出し
@@ -43,7 +42,6 @@ public class GroupFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "hoge!", Toast.LENGTH_SHORT).show();
                 Intent mintent = new Intent(getActivity(), CameraPreviewActivity.class);
 
                 // アクティビティの呼び出し

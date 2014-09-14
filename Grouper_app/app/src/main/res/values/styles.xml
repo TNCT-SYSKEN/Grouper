@@ -6,7 +6,7 @@
         <item name="android:actionBarTabStyle">@style/ActionBarTab</item>
     </style>
     <style name="my_actionbar_style" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#0088CC</item>
+        <item name="android:background">#3a8fcb</item>
         <item name="android:titleTextStyle">@style/titleStyle</item>
     </style>
     <style name="titleStyle" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
