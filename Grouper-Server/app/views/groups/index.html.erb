@@ -1,14 +1,14 @@
 <h1>参加グループ</h1>
-<table>
+<table class="group-table">
   <% @groups.each do |group| %>
     <tr>
-    <th class="col-sm-2 img">
+    <th class="col-xs-2 img">
       <%= image_tag 'dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;' %>
     </th>
-    <th class="col-sm-9 name">
+    <th class="col-xs-9 name">
       <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %>
     </th>
-    <th class="col-sm-1 remove">
+    <th class="col-xs-1 remove">
       <%= link_to '退会', group, method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
     </th>
   </tr>

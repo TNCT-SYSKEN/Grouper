@@ -31,31 +31,6 @@ div {
   display: table;
 }
 
-/*
-#error_explanation {
-  width: 450px;
-  border: 2px solid red;
-  padding: 7px;
-  padding-bottom: 0;
-  margin-bottom: 20px;
-  background-color: #f0f0f0;
-  h2 {
-    text-align: left;
-    font-weight: bold;
-    padding: 5px 5px 5px 15px;
-    font-size: 12px;
-    margin: -7px;
-    margin-bottom: 0px;
-    background-color: #c00;
-    color: #fff;
-  }
-  ul li {
-    font-size: 12px;
-    list-style: square;
-  }
-}
-*/
-
 .talk_page {
   .foot {
     position: fixed;
@@ -70,23 +45,21 @@ div {
     background-color: #fff;
     z-index: 990;
   }
-  padding-bottom: 30px;
-  margin-bottom: -30px;
+  padding-bottom: 70px;
+  margin-bottom: -70px;
 }
 
 .talk {
-  .content {
+  .content p{
     line-height: 22px;
     min-width: 10px; 
-    max-width: 300px !important;
     margin-left: 60px;
     font-size: 20px;
     background-color: #87cefa; /* 安っぽい色だな・・・ */
-    p {
-      width: 300px;
-      word-break: break-all;
-      padding: 2px 10px;
-    }
+    width: 100%;
+    word-break: break-all;
+    padding: 2px 2px;
+    margin: 10px 2px;
     a {
       text-decoration: 0;
     }
@@ -99,10 +72,9 @@ div {
 }
 
 .group_link {
-  border-bottom: solid 0.0525em #555;
   line-height: 26px;
   font-size: 25px;
-  padding: 0 0 0 67px;
+  padding: 0 0 0 6px;
   height: 70px;
 }
 
@@ -118,7 +90,14 @@ a[href^="/"] {
   color: #000 !important;
 }
 
-.group_destroy {
-  position: relative;
-  top: -45px;
+.group-table{
+  th{
+    margin: 0;
+    padding: 0;
+    a{
+      /* リンクを全体に広げたいとは思います。 */
+      display: block;
+    }
+  }
+  border-bottom: solid 0.0525em #555;  
 }
