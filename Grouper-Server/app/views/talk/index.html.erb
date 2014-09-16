@@ -1,10 +1,13 @@
 <div class="talk_page">
-  <table class="row talk">
+  <table class="talk_table">
     <tbody class="talk_tbody">
       <% @talks.each do |talk| %>
+        <tr class="talk_user_name">
+          <th colspan="3"><%= user_email(talk.user_id) %></th>
+        </tr>
         <tr class="talk_body">
           <th class="user">
-            <p><%= user_email(talk.user_id) %></p>
+            <p><%= image_tag 'dummy.png', class: 'img-circle user-img', style: 'width: 50px; height: 50px;' %>
           </th>
           <th class="content">
             <p><%= talk.talk %></p>
