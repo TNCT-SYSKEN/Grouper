@@ -21,7 +21,7 @@
   <div id="gid" style="display:none;"><%= @group.id %></div>
   <%= form_tag('new', remote: true, class: "foot") do %>
     <div class="form-group">
-    <div class="btn btn-success col-xs-2">追加</div>
+      <div class="btn btn-success col-xs-2"><i class="glyphicon glyphicon-plus"></i></div>
     <div class="col-xs-8">
       <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
     </div>
