@@ -41,6 +41,16 @@ div {
     position: fixed;
     bottom: 10px;
     z-index: 999;
+    .form-group {  
+      .btn-success {
+        height: 33px;
+        .add-file {
+          font-size: 25px; 
+          position: relative;
+          top: -8px;
+        }
+      }
+    }
   }
   .talk_bottom {
     width: 100%;
@@ -49,83 +59,83 @@ div {
     bottom: 0;
     background-color: #fff;
     z-index: 990;
+    padding-bottom: 70px;
+    margin-bottom: -70px;
   }
-  padding-bottom: 70px;
-  margin-bottom: -70px;
-}
 
-.talk_table {
-  .talk_user_name {
-    font-size: 15px;
-  }
-  .user {
-    width: 60px;
-    p {
-      text-aligin:center;
+  .talk_table {
+    .talk_user_name {
+      font-size: 15px;
     }
-  }
-  .content p{
-    line-height: 22px;
-    min-width: 10px; 
-    margin-left: 60px;
-    font-size: 20px;
-    width: 100%;
-    word-break: break-all;
-    padding: 5px;
-    margin: 10px 3px;
-    position: relative;
-    background: #87ceeb;
-    a {
-      text-decoration: 0;
+    .user {
+      width: 60px;
+      p {
+        text-aligin:center;
+      }
     }
-    &:after {
-      right: 100%;
-      top: 50%;
-      border: solid transparent;
-      content: " ";
-      height: 0;
-      width: 0;
-      position: absolute;
-      pointer-events: none;
-      border-color: rgba(136, 183, 213, 0);
-      border-right-color: #87ceeb;
-      border-width: 6px;
-      margin-top: -6px;
+    .content p{
+      line-height: 22px;
+      min-width: 10px; 
+      margin-left: 60px;
+      font-size: 20px;
+      width: 100%;
+      word-break: break-all;
+      padding: 5px;
+      margin: 10px 3px;
+      position: relative;
+      background: #87ceeb;
+      a {
+        text-decoration: 0;
+      }
+      &:after {
+        right: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-color: rgba(136, 183, 213, 0);
+        border-right-color: #87ceeb;
+        border-width: 6px;
+        margin-top: -6px;
+      }
     }
-  }
-  .user {
-    font-size: 10px;
-    position: relative;
-  }
-  padding: 0 10px;
-}
-
-.group_link {
-  line-height: 26px;
-  font-size: 25px;
-  padding: 0 0 0 6px;
-}
-
-a[href^="/"] {
-  margin-top: 9px;
-}
-
-.btn {
-  color: #fff !important;
-}
-
-.btn-default {
-  color: #000 !important;
-}
-
-.group-table{
-  th{
-    margin: 0;
-    padding: 0;
-    a{
-      /* リンクを全体に広げたいとは思います。 */
-      display: block;
+    .user {
+      font-size: 10px;
+      position: relative;
     }
+    padding: 0 10px;
   }
-  border-bottom: solid 0.0525em #555;  
+
+  .group_link {
+    line-height: 26px;
+    font-size: 25px;
+    padding: 0 0 0 6px;
+  }
+
+  a[href^="/"] {
+    margin-top: 9px;
+  }
+
+  .btn {
+    color: #fff !important;
+  }
+
+  .btn-default {
+    color: #000 !important;
+  }
+
+  .group-table{
+    th{
+      margin: 0;
+      padding: 0;
+      a{
+        /* リンクを全体に広げたいとは思います。 */
+        display: block;
+      }
+    }
+    border-bottom: solid 0.0525em #555;  
+  }
 }
