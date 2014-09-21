@@ -52,16 +52,6 @@ div {
       }
     }
   }
-  .talk_bottom {
-    width: 100%;
-    height: 50px;
-    position: fixed;
-    bottom: 0;
-    background-color: #fff !important;
-    z-index: 990;
-    padding-bottom: 70px;
-    margin-bottom: -70px;
-  }
 
   .talk_table {
     .talk_user_name {
@@ -140,7 +130,22 @@ div {
   }
 }
 
+.btn-success,
+.btn-primary,
+.btn-warning,
+.btn-danger{
+  color: #fff !important;
+}
+
 #footer {
   height: 60px;
-  margin-bottom: -60px;
+}
+
+.talk_bottom {
+  position: fixed;
+  background-color: #fff;
+  height: 60px;
+  margin-top: -60px;
+  width: 100%;
+  bottom: 0;
 }

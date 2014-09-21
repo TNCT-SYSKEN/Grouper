@@ -16,7 +16,7 @@
       <% end %>
     </tbody>
   </table>
-  <div class="talk_bottom"></div>
+  <div id="footer"></div>
   <div id="uid" style="display:none;"><%= current_user.id %></div>
   <div id="gid" style="display:none;"><%= @group.id %></div>
   <%= form_tag('new', remote: true, class: "foot") do %>
@@ -28,6 +28,6 @@
     <%= submit_tag "送信", id: "send", class: "btn btn-primary col-xs-2" %>
   </div>
 <% end %>
-  <span id="footer"></span>
+  <div class="talk_bottom"></div>
   <script src="/talk.js"></script>
 </div>
