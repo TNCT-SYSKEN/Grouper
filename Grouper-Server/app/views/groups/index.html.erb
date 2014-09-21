@@ -9,7 +9,7 @@
       <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %>
     </th>
     <th class="col-xs-1 remove">
-      <%= link_to '退会', group, method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
+      <%= link_to '退会', group.members.find_by(user_id: current_user.id), method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
     </th>
   </tr>
 <% end %>

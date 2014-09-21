@@ -57,7 +57,7 @@ class MembersController < ApplicationController
   def destroy
     @member.destroy
     respond_to do |format|
-      format.html { redirect_to root_path, notice: 'メンバーを削除しました' }
+      format.html { redirect_to root_path, notice: 'グループから退会しました' }
       format.json { head :no_content }
     end
   end
