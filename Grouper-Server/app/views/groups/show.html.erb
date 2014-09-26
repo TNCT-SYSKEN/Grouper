@@ -1,8 +1,7 @@
-<p>
-<strong>グループ名</strong><br>
-<%= @group.name %>
-</p>
+<h1 class="group-desc"><%= @group.name %></h1>
+<h2 class="group-desc"><%= @group.description %></h2>
 
+<!--
 <p>
 <strong>作成者</strong><br>
 <%= user_email(@group.user_id) %>
@@ -12,12 +11,12 @@
 <strong>詳細</strong><br>
 <%= @group.description %>
 </p>
-
 <p>
-<strong>招待コード</strong><br>
-<%= @group.id %>
+<strong>招待コード</strong>  <%= @group.id %>
 </p>
-
-<%= link_to 'メンバー', members_path, class: "btn btn-primary btn-lg btn-block" %>
-<%= link_to '設定', edit_group_path(@group), class: "btn btn-success btn-lg btn-block" %> 
-<%= link_to '戻る', groups_path, class: 'btn btn-default btn-lg btn-block' %>
+-->
+<p><%= link_to 'トーク', {:action=>"index", :controller=>"talk"}, class: "btn btn-warning btn-lg btn-block" %></p>
+<p><%= link_to 'メンバー', members_path, class: "btn btn-primary btn-lg col-xs-5" %>
+<%= link_to '設定', edit_group_path(@group), class: "btn btn-success btn-lg col-xs-6 col-xs-offset-1" %></p>
+<div class="clearfix"><p></p></div>
+<p><%= link_to '戻る', groups_path, class: 'btn btn-default btn-lg btn-block' %></p>
