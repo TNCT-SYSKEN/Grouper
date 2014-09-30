@@ -22,12 +22,12 @@
   <%= form_tag('new', remote: true, class: "foot") do %>
     <div class="form-group">
       <div class="btn btn-success col-xs-2"><span class="add-file">+</span></div>
-    <div class="col-xs-8">
-      <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
+      <div class="col-xs-8">
+        <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
+      </div>
+      <%= submit_tag "送信", id: "send", class: "btn btn-primary col-xs-2" %>
     </div>
-    <%= submit_tag "送信", id: "send", class: "btn btn-primary col-xs-2" %>
-  </div>
-<% end %>
+  <% end %>
   <div class="talk_bottom"></div>
   <script src="/talk.js"></script>
 </div>
