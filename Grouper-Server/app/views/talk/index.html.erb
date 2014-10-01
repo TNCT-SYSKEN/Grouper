@@ -19,14 +19,20 @@
   <div id="footer"></div>
   <div id="uid" style="display:none;"><%= current_user.id %></div>
   <div id="gid" style="display:none;"><%= @group.id %></div>
+  <div class="row">
   <%= form_tag('new', remote: true, class: "foot") do %>
     <div class="form-group">
-      <div class="btn btn-success col-xs-2"><span class="add-file">+</span></div>
-      <div class="col-xs-8">
+      <div class="col-xs-2">
+      <div class="btn btn-success"><span class="add-file">+</span></div>
+    </div>
+      <div class="col-xs-7 talk_message">
         <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
       </div>
-      <%= submit_tag "送信", id: "send", class: "btn btn-primary col-xs-2" %>
+      <div class="col-xs-3">
+      <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
     </div>
+    </div>
+  </div>
   <% end %>
   <div class="talk_bottom"></div>
   <script src="/talk.js"></script>
