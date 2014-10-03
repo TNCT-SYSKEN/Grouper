@@ -18,7 +18,16 @@
 
   <div class="container">
       <%= yield %>
-  </div>
-
+    </div>
+  <!-- こんな所に書くなんて人としてどうかと思ってます。 -->
+  <!-- talkにアクセスした瞬間最下部にスクロールします。 -->
+  <script>
+    $(window).load(function(){
+      function footerStart(selector){
+        $('html,body').animate({scrollTop: $(selector).offset().top},'slow');
+      };
+      footerStart("#talk_fin");
+    });
+  </script>
 </body>
 </html>

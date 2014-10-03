@@ -2,18 +2,18 @@
 
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
   <div class="form-block">
-  <%= devise_error_messages! %>
-  <label>メールアドレス</label>
-  <%= f.email_field :email, autofocus: true, class: "form-control" %>
+    <%= devise_error_messages! %>
+    <label>メールアドレス</label>
+    <%= f.email_field :email, autofocus: true, class: "form-control" %>
 
-  <label>パスワード <small>8文字以上</small></label>
+    <label>パスワード <small>8文字以上</small></label>
     <%= f.password_field :password, autocomplete: "off", class: "form-control" %>
 
-  <label>パスワード再入力</label>
+    <label>パスワード再入力</label>
     <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control" %>
-
-    <p><%= f.submit "登録" , class: "btn btn-lg btn-block btn-success"%></p>
-</div>
+  </div>
+  <br>
+  <p><%= f.submit "登録" , class: "btn btn-lg btn-block btn-success"%></p>
 <% end %>
 
 <a href="sign_in" class="btn btn-lg btn-block btn-default">ログイン</a>
