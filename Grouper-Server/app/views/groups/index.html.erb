@@ -1,9 +1,9 @@
 <h1>参加グループ</h1>
-<table class="group-table">
+<table class="group-table table table-hover">
   <% @groups.each do |group| %>
-    <tr>
+    <tr class="group-tr">
     <th class="col-xs-2 img">
-      <%= image_tag 'dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;' %>
+      <%= link_to image_tag('dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;'), {:action=>"index", :controller=>"talk", :id=>group.id}  %>
     </th>
     <th class="col-xs-9 name">
       <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %>

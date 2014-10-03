@@ -98,36 +98,29 @@ div {
     }
     padding: 0 10px;
   }
+}
 
-  .group_link {
-    line-height: 26px;
-    font-size: 25px;
-    padding: 0 0 0 6px;
-  }
+.group_link {
+  line-height: 26px;
+  font-size: 25px;
+  padding: 0 0 0 6px;
+}
 
-  a[href^="/"] {
-    margin-top: 9px;
-  }
+a[href^="/"] {
+  margin-top: 9px;
+}
 
-  .btn {
-    color: #fff !important;
-  }
+.btn {
+  color: #fff !important;
+}
 
-  .btn-default {
-    color: #000 !important;
-  }
+.btn-default {
+  color: #000 !important;
+}
 
-  .group-table{
-    th{
-      margin: 0;
-      padding: 0;
-      a{
-        /* リンクを全体に広げたいとは思います。 */
-        display: block;
-      }
-    }
-    border-bottom: solid 0.0525em #555;
-  }
+.group_link {
+  width: 100%;
+  min-height: 81px;
 }
 
 .btn-success,
