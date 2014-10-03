@@ -3,10 +3,12 @@
   <% @groups.each do |group| %>
     <tr class="group-tr">
     <th class="col-xs-2 img">
-      <%= link_to image_tag('dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;'), {:action=>"index", :controller=>"talk", :id=>group.id}  %>
+      <!-- <%= link_to image_tag('dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;'), {:action=>"index", :controller=>"talk", :id=>group.id}  %> -->
+      <%= link_to image_tag('dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;'), group %>
     </th>
     <th class="col-xs-9 name">
-      <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %>
+      <!-- <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %> -->
+      <%= link_to group.name, group %>
     </th>
     <th class="col-xs-1 remove">
       <%= link_to '退会', group.members.find_by(user_id: current_user.id), method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
