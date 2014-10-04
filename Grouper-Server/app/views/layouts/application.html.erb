@@ -20,13 +20,18 @@
     <%= yield %>
   </div>
 
-  <!-- 新しいトークがあったら最下部に移動 -->
   <script>
     $(function(){
+        // 新しいトークがあったら最下部に移動 
+        // 上にスクロールできない致命的なプログラム
         setInterval(function(){
           $('html,body').animate({scrollTop: $('#talk_fin').offset().top},'slow');
+        });
+        // 
+        $('#btnUpload').click(function(){
+          $('#exampleInputFile').click();
           });
     })();
   </script>
-</body>
-</html>
+  </body>
+  </html>
