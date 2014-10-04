@@ -24,15 +24,17 @@
     $(function(){
         // 新しいトークがあったら最下部に移動 
         // 上にスクロールできない致命的なプログラム
+        /*
         setInterval(function(){
           $('html,body').animate({scrollTop: $('#talk_fin').offset().top},'slow');
         });
+        */
         // あたかもuploadボタンが押されたかのような
         $('#btnUpload').click(function(){
           $('#exampleInputFile').click();
         });
         
-        //
+        //upload check
         $('#exampleInputFile').change(
           function() {
             if ( !this.files.length ) {
