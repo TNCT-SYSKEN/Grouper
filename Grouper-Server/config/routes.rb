@@ -7,6 +7,9 @@ Rails.application.routes.draw do
       get 'talk/index'
       post 'talk/index'
       post 'talk/new'
+      post 'talk/new_image'
+      post 'talk/get_address'
+      post 'talk/new_address'
     end
   end
 
