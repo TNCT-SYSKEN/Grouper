@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
+
   resources :groups do
     member do
       resources :members
+      resources :boards
       get 'add_member'
       post 'add_member'
       get 'talk/index'
