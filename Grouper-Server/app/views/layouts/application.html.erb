@@ -47,19 +47,18 @@
             fr.readAsDataURL(file);
           }
         );
-
-    });
-
-    // 新しいトークがあればスクロール
-    function getTr() {
-      var lenI = $("tbody").children().length;
-      if(len != lenI) {
-         $('html,body').animate({scrollTop: $("#talk_fin").offset().top},'slow');
-         len = lenI;
-      }
-    }
+  });
+  // 新しいトークがあればスクロール
+  function getTr() {
+    var lenI = $("tbody").children().length;
+    if(len != lenI) {
+       $('html,body').animate({scrollTop: $("#talk_fin").offset().top},'slow');
+       len = lenI;
+     }
+   }
 
     // トークが空でないか確認
+
   </script>
   </body>
   </html>

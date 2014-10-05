@@ -13,7 +13,7 @@
             <% if talk.content_type == "0" %>
               <p><%= talk.talk %></p>
             <% elsif talk.content_type == "1" %>
-              <img src="/img/talk/<%= talk.id %>" style="width: 100px; height: 100px; " >
+              <img src="/img/talk/<%= talk.id %>" style="height: 100px; " >
             <% else %>
               <a class="map-link" href="https://www.google.co.jp/maps/place/<%= talk.talk %>"><%= talk.talk %></a>
             <% end %>
@@ -23,14 +23,13 @@
     </tbody>
   </table>
   <div id="talk_fin"></div>
-  <div id="footer"></div>
   <div id="uid" style="display:none;"><%= current_user.id %></div>
   <div id="gid" style="display:none;"><%= @group.id %></div>
   <div class="row">
     <%= form_tag('new', remote: true, class: "foot", onSubmiti: "checkEmpty") do %>
     <div class="form-group">
       <div class="col-xs-2">
-      <div class="btn btn-success"><span class="add-file">+</span></div>
+      <div class="btn btn-success"><a class="add-file">+</span></div>
     </div>
       <div class="col-xs-7 talk_message">
         <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
@@ -41,15 +40,14 @@
     </div>
   </div>
   <% end %>
-  <div id="note1">
     <div class="form-group">
       <%= form_tag('new_image', remote: true, multipart: true) do %>
-        <%= file_field :upload, :file , id: "image" %>
-        <%= submit_tag "送信", class: "btn btn-primary" %>
+        <img src="" id="preview" style="display:none";>
+        <%= file_field :upload, :file , id: "exampleInputFile", style: "display:none;" %>
+        <a id="btnUpload" class="easyui-linkbutton btn btn-lg btn-primary" data-options="iconCls:'icon-save'">選択</a> 
+        <%= submit_tag "送信", class: "btn btn-success btn-lg" %>
       <% end %>
     </div>
-  </div>
-  <div id="note2">
     <%= form_tag('get_address', remote: true) do %>
       <%= text_field :lat, nil, id: "lat" %>
       <%= text_field :lng, nil, id: "lng" %>
@@ -60,7 +58,7 @@
       <%= text_field_tag :talk, "", id: "address" %>
       <%= submit_tag "送信", class: "btn btn-primary" %>
     <% end %>
-  </div>
+  <div id="footer"></div>
   <div class="talk_bottom"></div>
   <script src="/talk.js"></script>
   <script src="/position.js"></script>
