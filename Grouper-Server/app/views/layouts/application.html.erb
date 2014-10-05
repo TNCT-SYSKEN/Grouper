@@ -10,24 +10,55 @@
 </head>
 <body>
   <% if notice %>
-   <div class="alert alert-success" role="alert"><%= notice %></div>
-  <% end %>
+    <div class="alert alert-success" role="alert"><%= notice %></div>
+    <% end %>
   <% if alert %>
     <div class="alert alert-danger" role="alert"><%= alert %></div>
-  <% end %>
+    <% end %>
 
   <div class="container">
-      <%= yield %>
-    </div>
-  <!-- こんな所に書くなんて人としてどうかと思ってます。 -->
-  <!-- talkにアクセスした瞬間最下部にスクロールします。 -->
+    <%= yield %>
+  </div>
+
   <script>
-    $(window).load(function(){
-      function footerStart(selector){
-        $('html,body').animate({scrollTop: $(selector).offset().top},'slow');
-      };
-      footerStart("#talk_fin");
-    });
+    var len;
+    $(function(){
+        // 新しいトークがあったら最下部に移動 
+        len = $("tbody").children().length;
+        check = setInterval("getTr()", 1000);
+        
+        // あたかもuploadボタンが押されたかのような
+        $('#btnUpload').click(function(){
+          $('#exampleInputFile').click();
+        });
+        
+        //upload check
+        $('#exampleInputFile').change(
+          function() {
+            if ( !this.files.length ) {
+              return;
+            }
+
+            var file = $(this).prop('files')[0];
+            var fr = new FileReader();
+            fr.onload = function() {
+              $('#preview').attr('src', fr.result ).css('display','inline');
+            }
+            fr.readAsDataURL(file);
+          }
+        );
+  });
+  // 新しいトークがあればスクロール
+  function getTr() {
+    var lenI = $("tbody").children().length;
+    if(len != lenI) {
+       $('html,body').animate({scrollTop: $("#talk_fin").offset().top},'slow');
+       len = lenI;
+     }
+   }
+
+    // トークが空でないか確認
+
   </script>
-</body>
-</html>
+  </body>
+  </html>
