@@ -10,10 +10,10 @@
             <p><%= image_tag 'dummy.png', class: 'img-circle user-img', style: 'width: 50px; height: 50px;' %>
           </th>
           <th class="content">
-            <% if talk.content_type == 0 %>
-            <p><%= talk.talk %></p>
-            <% elsif talk.content_type == 1 %>
-            <img src="/img/talk/<%= talk.id %>" style="width: 100px; height: 100px; " >
+            <% if talk.content_type == "0" %>
+              <p><%= talk.talk %></p>
+            <% elsif talk.content_type == "1" %>
+              <img src="/img/talk/<%= talk.id %>" style="width: 100px; height: 100px; " >
             <% else %>
               <a class="map-link" href="https://www.google.co.jp/maps/place/<%= talk.talk %>"><%= talk.talk %></a>
             <% end %>
