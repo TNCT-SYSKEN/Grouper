@@ -10,11 +10,13 @@ Rails.application.routes.draw do
       post 'talk/new_image'
       post 'talk/get_address'
       post 'talk/new_address'
+      post 'new_image'
     end
   end
 
   get 'user/find_group'
   post 'user/find_group'
+  post 'users/new_image' => 'user#new_image'
 
   devise_for :users
   # The priority is based upon order of creation: first created -> highest priority.

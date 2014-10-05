@@ -29,11 +29,17 @@
 </div>
 <div class="field">
   <div class="form-group">
-    <label>画像</label>
-    <input type="file" id="exampleInputFile">
   </div>
 </div>
 <div class="actions">
   <%= f.submit class:"btn btn-success btn-lg btn-block", value: "作成"%>
 </div>
 <% end %>
+<div class="row">
+    <%= form_tag('new_image', remote: true, multipart: true) do %>
+      <label>画像</label>
+      <img src="/img/group/<%= @group.id %>">
+    <%= file_field :upload, :file, id: "image" %>
+    <%= submit_tag "画像更新", class: "btn btn-primary" %>
+    <% end %>
+  </div>

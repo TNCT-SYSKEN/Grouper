@@ -1,5 +1,7 @@
+require 'pp'
 class GroupsController < ApplicationController
   before_action :set_group, only: [:show, :edit, :update, :destroy, :add_member]
+  protect_from_forgery except: :new_image
 
   # GET /groups
   # GET /groups.json
@@ -68,6 +70,8 @@ class GroupsController < ApplicationController
   # PATCH/PUT /groups/1
   # PATCH/PUT /groups/1.json
   def update
+    pp params
+
     respond_to do |format|
       if @group.update(group_params)
         format.html { redirect_to @group, notice: 'グループを更新しました' }
@@ -87,6 +91,15 @@ class GroupsController < ApplicationController
       format.html { redirect_to groups_url, notice: 'グループを削除しました' }
       format.json { head :no_content }
     end
+  end
+
+  def new_image
+    group = Group.find(params[:id])
+    image = params[:upload]
+    File.open('./public/img/group/' + group.id.to_s, 'wb') do |of|
+      of.write(image[:file].read)
+    end
+    redirect_to edit_group_path(group)
   end
 
   private
