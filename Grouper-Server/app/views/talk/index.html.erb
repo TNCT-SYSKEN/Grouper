@@ -15,7 +15,7 @@
             <% elsif talk.content_type == 1 %>
             <img src="/img/talk/<%= talk.id %>" style="width: 100px; height: 100px; " >
             <% else %>
-              <a href="https://www.google.co.jp/maps/place/<%= talk.talk %>"><%= talk.talk %></a>
+              <a class="map-link" href="https://www.google.co.jp/maps/place/<%= talk.talk %>"><%= talk.talk %></a>
             <% end %>
           </th>
         </tr>
@@ -41,25 +41,25 @@
     </div>
   </div>
   <% end %>
-  <div class="row">
+  <div id="note1">
     <div class="form-group">
-  <%= form_tag('new_image', remote: true, multipart: true) do %>
-    <%= file_field :upload, :file , id: "image" %>
-    <%= submit_tag "送信", class: "btn btn-primary" %>
-  <% end %>
+      <%= form_tag('new_image', remote: true, multipart: true) do %>
+        <%= file_field :upload, :file , id: "image" %>
+        <%= submit_tag "送信", class: "btn btn-primary" %>
+      <% end %>
+    </div>
   </div>
-  <div class="row">
-  <%= form_tag('get_address', remote: true) do %>
-    <%= text_field :lat, nil, id: "lat" %>
-    <%= text_field :lng, nil, id: "lng" %>
-    <%= submit_tag "位置情報取得", class: "btn btn-primary" %>
-  <% end %>
-  <%= form_tag('new_address', remote: true) do %>
-    現在地: 
-    <%= text_field_tag :talk, "", id: "address" %>
-    <%= submit_tag "送信", class: "btn btn-primary" %>
-  <% end %>
-    
+  <div id="note2">
+    <%= form_tag('get_address', remote: true) do %>
+      <%= text_field :lat, nil, id: "lat" %>
+      <%= text_field :lng, nil, id: "lng" %>
+      <%= submit_tag "位置情報取得", class: "btn btn-primary" %>
+    <% end %>
+    <%= form_tag('new_address', remote: true) do %>
+      現在地: 
+      <%= text_field_tag :talk, "", id: "address" %>
+      <%= submit_tag "送信", class: "btn btn-primary" %>
+    <% end %>
   </div>
   <div class="talk_bottom"></div>
   <script src="/talk.js"></script>
