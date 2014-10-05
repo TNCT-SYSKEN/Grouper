@@ -21,7 +21,7 @@
   <div id="uid" style="display:none;"><%= current_user.id %></div>
   <div id="gid" style="display:none;"><%= @group.id %></div>
   <div class="row">
-  <%= form_tag('new', remote: true, class: "foot") do %>
+    <%= form_tag('new', remote: true, class: "foot", onSubmiti: "checkEmpty") do %>
     <div class="form-group">
       <div class="col-xs-2">
       <div class="btn btn-success"><span class="add-file">+</span></div>

@@ -25,7 +25,8 @@
     $(function(){
         // 新しいトークがあったら最下部に移動 
         len = $("tbody").children().length;
-        check=setInterval("getTr()", 1000);
+        check = setInterval("getTr()", 1000);
+        
         // あたかもuploadボタンが押されたかのような
         $('#btnUpload').click(function(){
           $('#exampleInputFile').click();
@@ -46,7 +47,9 @@
             fr.readAsDataURL(file);
           }
         );
+
     });
+
     // 新しいトークがあればスクロール
     function getTr() {
       var lenI = $("tbody").children().length;
@@ -55,6 +58,9 @@
          len = lenI;
       }
     }
+
+    // トークが空でないか確認
+    function
   </script>
   </body>
   </html>
