@@ -30,18 +30,18 @@
   </ol>
   <div class="carousel-inner">
     <div class="item active">
-      <%= image_tag('carousel.png', style: 'width: 90%') %>
+      <%= image_tag('carousel.png', style: 'width: 70%') %>
       <div class="carousel-caption">
-        hoge
+        <h3 class="board-top">災害時掲示板</h3>
       </div>
     </div>
     <% @boards.each do |board| %>
       <div class="item">
-        <%= image_tag('carousel.png', style: 'width: 90%') %> 
+        <%= image_tag('carousel.png', style: 'width: 70%') %> 
         <div class="carousel-caption">
-          <h3><%= board.title %></h3>
-          <p><%= board.description %></p>
-          <p class="board board-edit"><%= link_to 'Show', board %> <%= link_to 'Edit', edit_board_path(board) %> <%= link_to 'Destroy', board, method: :delete, data: { confirm: 'Are you sure?' } %></p>
+          <h3 class="board board-title"><%= board.title %></h3>
+          <p class="board board-description"><%= board.description %></p>
+          <p class="board board-edit"><%= link_to '編集', edit_board_path(board) %> <%= link_to '削除', board, method: :delete, data: { confirm: '削除してもいいですか？' } %></p>
         </div>
       </div>
 
