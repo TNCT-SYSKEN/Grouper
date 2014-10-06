@@ -46,7 +46,12 @@
             }
             fr.readAsDataURL(file);
           }
-        );
+          );
+
+        // カルーセルパネルを利用
+        $('.carousel').carousel({
+            interval: 2000
+        })
   });
   // 新しいトークがあればスクロール
   function getTr() {
