@@ -20,5 +20,8 @@
     <string name="generate">generate</string>
     <string name="group_invite">グループに招待する</string>
     <string name="group_search">グループに参加する</string>
-
+    <string name="disaster">掲示板</string>
+    <string name="talk">トーク</string>
+    <string name="alarm">アラーム</string>
+    <string name="invite">招待コードを入力して下さい</string>
 </resources>

@@ -10,6 +10,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -18,10 +19,19 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import org.sysken.grouper.Tab.Globals;
+
 public class GenerateActivity extends FragmentActivity {
+
+
+    Globals globals;
+    private WebView webview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+        WebView webview = new WebView(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.generate);
         findViewById(R.id.button).setOnClickListener(onClickListener);
@@ -33,6 +43,8 @@ public class GenerateActivity extends FragmentActivity {
             // EditText から文字を取得
             EditText editText = (EditText) findViewById(R.id.edit_text);
             String contents = editText.getText().toString();
+            //String contents = webview.getUrl();
+
             // 非同期でエンコードする
             Bundle bundle = new Bundle();
             bundle.putString("contents", contents);

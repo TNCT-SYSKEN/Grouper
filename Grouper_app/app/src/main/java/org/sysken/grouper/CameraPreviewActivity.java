@@ -11,6 +11,7 @@ import com.google.zxing.common.HybridBinarizer;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
@@ -24,7 +25,7 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 public class CameraPreviewActivity extends Activity{
-
+    private String text = null;
     private SurfaceView mSurfaceView;
     private Camera mCamera;
 
@@ -92,11 +93,12 @@ public class CameraPreviewActivity extends Activity{
             if (success) {
                 // 現在のプレビューをデータに変換
                 camera.setOneShotPreviewCallback(previewCallback);
+
             }
         }
     };
 
-    private PreviewCallback previewCallback = new PreviewCallback() {
+    public PreviewCallback previewCallback = new PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
             // TODO バーコード読み取り
@@ -114,11 +116,17 @@ public class CameraPreviewActivity extends Activity{
             Result result = null;
             try {
                 result = reader.decode(bitmap);
-                String text = result.getText();
+                text = result.getText();
                 Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+                if(text != null) {
+                    Intent mintent = new Intent(CameraPreviewActivity.this, WebViewAct.class);
+                    mintent.putExtra("number", text);
+                    startActivity(mintent);
+                }
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Not Found", Toast.LENGTH_SHORT).show();
             }
+
         }
     };
 

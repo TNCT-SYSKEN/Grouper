@@ -8,4 +8,7 @@
         android:title="@string/QRW"
         android:showAsAction="never"
         />
+    <item android:id="@+id/Setting"
+        android:title="@string/settings"
+        android:showAsAction="never" />
 </menu>

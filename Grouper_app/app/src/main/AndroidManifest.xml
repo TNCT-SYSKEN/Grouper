@@ -7,26 +7,48 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="Globals">
+        android:theme="@style/Theme.Grouperstyle"
+        android:name=".Tab.Globals">
 
         <activity
-            android:name=".TabAct"
+            android:name=".Tab.TabAct"
             android:label="@string/app_name" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
         <activity
             android:name=".CameraPreviewActivity"
-            android:theme="@android:style/Theme.Holo.NoActionBar"/>
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+            android:noHistory="true"/>
         <activity
-            android:name=".GenerateActivity"/>_
+            android:name=".GenerateActivity"
+            android:noHistory="true"/>
+        <activity
+            android:name=".WebViewAct"
+            android:label="@string/app_name" />
+
+
+        <receiver android:name=".Alarm.AlarmReceiver" >
+            <intent-filter>
+                <action android:name="MyAlarmAction"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".Alarm.MyAlarmService" />
+
+        <activity android:name=".Alarm.AlarmNotification" />
         </application>
 
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.NFC" />
 </manifest>
-
