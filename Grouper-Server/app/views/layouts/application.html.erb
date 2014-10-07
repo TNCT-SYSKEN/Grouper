@@ -25,7 +25,7 @@
     $(function(){
         // 新しいトークがあったら最下部に移動 
         len = $("tbody").children().length;
-        check = setInterval("getTr()", 1000);
+        check = setInterval("getTr()", 100);
         
         // あたかもuploadボタンが押されたかのような
         $('#btnUpload').click(function(){
@@ -42,7 +42,7 @@
             var file = $(this).prop('files')[0];
             var fr = new FileReader();
             fr.onload = function() {
-              $('#preview').attr('src', fr.result ).css('display','inline');
+              $('#preview').attr('src', fr.result ).css({'display':'inline', 'width':'200px'});
             }
             fr.readAsDataURL(file);
           }
@@ -51,7 +51,13 @@
         // カルーセルパネルを利用
         $('.carousel').carousel({
             interval: 5000
-        })
+         })
+
+        // collapseを利用
+        $('.collapse').collapse()
+
+        // トークがemptyではないか確認
+        sendCheck = setInterval("sendDisabled()", 10);
   });
   // 新しいトークがあればスクロール
   function getTr() {
@@ -62,8 +68,14 @@
      }
    }
 
-    // トークが空でないか確認
-
+  // トークがemptyではないか確認
+  function sendDisabled() {
+    if($("input[name='talk-send']").val() == '') {
+      $('#send').attr('disabled', true);
+    }else{
+      $('#send').attr('disabled', false);
+    }
+  }
   </script>
   </body>
   </html>

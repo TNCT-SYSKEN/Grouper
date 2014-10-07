@@ -68,12 +68,12 @@ div {
       min-width: 10px;
       margin-left: 60px;
       font-size: 20px;
-      width: 100%;
+      max-width: 100%;
       word-break: break-all;
       padding: 5px;
       margin: 10px 3px;
       position: relative;
-      background: #87ceeb;
+      background: #add8e6;
       a {
         text-decoration: 0;
       }
@@ -87,7 +87,7 @@ div {
         position: absolute;
         pointer-events: none;
         border-color: rgba(136, 183, 213, 0);
-        border-right-color: #87ceeb;
+        border-right-color: #add8e6;
         border-width: 6px;
         margin-top: -6px;
       }
@@ -201,3 +201,20 @@ h2.group-desc {
   width: 60px;
 }
 
+html,
+body,
+#add-image,
+.foot,
+.container,
+.talk_bottom{
+  background: #f5f5f5 !important;
+}
+
+.talk-img {
+  background: none;
+}
+
+.map-link {
+  color: #000080 !important;
+  text-decoration: underline !important;
+}
