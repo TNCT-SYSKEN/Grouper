@@ -27,15 +27,15 @@
     <%= f.text_area :description, class: "form-control input-lg" %>
   </div>
 </div>
-<div class="actions">
-  <%= f.submit class:"btn btn-success btn-lg btn-block", value: "作成"%>
-</div>
-<% end %>
-<div class="row">
+<div class="field">
     <%= form_tag('new_image', remote: true, multipart: true) do %>
       <label>画像</label>
       <img src="/img/group/<%= @group.id %>">
-    <%= file_field :upload, :file, id: "image" %>
-    <%= submit_tag "画像更新", class: "btn btn-primary" %>
+      <%= file_field :upload, :file, id: "exampleInputFile", style: "display: none;" %>
+      <a id="btnUpload" class="easyui-linkbutton btn btn btn-warning" data-options="iconCls:'icon-save'">画像選択</a>
     <% end %>
   </div>
+  <div class="actions">
+    <%= f.submit class:"btn btn-success btn-lg btn-block", value: "作成"%>
+  </div>
+<% end %>
