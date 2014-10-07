@@ -6,10 +6,16 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import org.sysken.grouper.CameraPreviewActivity;
 import org.sysken.grouper.GenerateActivity;
@@ -17,7 +23,11 @@ import org.sysken.grouper.R;
 
 
 public class TabAct extends Activity {
+    Globals globals;
     public static final String PREFERENCES_FILE_NAME = "preference";
+    Fragment homeFragment = new HomeFragment();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +63,22 @@ public class TabAct extends Activity {
                         new TabListener<SetAlarm>(
                                 this, "tag4", SetAlarm.class)
                 ));
+
     }
 
+
+    @Override
+    public void onBackPressed() {
+        Fragment webView = getFragmentManager().findFragmentById(R.id.container);
+        if (webView instanceof HomeFragment) {
+            boolean goBack = ((HomeFragment)webView).canGoBack();
+            if (!goBack) {
+                super.onBackPressed();
+            }else{
+                ((HomeFragment) webView).GoBack();
+            }
+        }
+    }
 
 
     @Override
@@ -87,7 +111,7 @@ public class TabAct extends Activity {
             case R.id.Setting:
 
                 // 明示的なインテントの生成
-                Intent intent2 = new Intent(this, GenerateActivity.class);
+                Intent intent2 = new Intent(this, Setting.class);
                 // アクティビティの呼び出し
                 startActivity(intent2);
 
@@ -102,6 +126,9 @@ public class TabAct extends Activity {
         private final String mTag;
         private final Class<T> mClass;
 
+        public Fragment getFragment() {
+            return mFragment;
+        }
         public TabListener(Activity activity, String tag, Class<T> clz) {
             mActivity = activity;
             mTag = tag;
@@ -109,14 +136,20 @@ public class TabAct extends Activity {
         }
 
 
+
         @Override
         public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-            //ftはnullではないが使用するとぬるぽで落ちる
+            //ftはnullではないが使用するとNullPointExceptionで落ちる
             if (mFragment == null) {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName());
-                ft.add(android.R.id.content, mFragment, mTag);
+                FragmentManager fm = mActivity.getFragmentManager();
+                fm.beginTransaction().add(R.id.container, mFragment, mTag).commit();
             } else {
-                ft.attach(mFragment);
+                //detachされていないときだけattachするよう変更
+                if (mFragment.isDetached()) {
+                    FragmentManager fm = mActivity.getFragmentManager();
+                    fm.beginTransaction().attach(mFragment).commit();
+                }
             }
         }
 
@@ -129,8 +162,11 @@ public class TabAct extends Activity {
         }
 
         @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft){
+
         }
+
+
     }
 }
 

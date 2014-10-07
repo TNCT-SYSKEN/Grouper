@@ -1,5 +1,6 @@
 package org.sysken.grouper.Tab;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,14 +9,11 @@ import android.view.ViewGroup;
 
 import org.sysken.grouper.R;
 
-public class Setting extends Fragment {
+public class Setting extends Activity {
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedinstanceState){
-        //第三引数のbooleanは"container"にreturnするViewを追加するかどうか
-        //trueにすると最終的なlayoutに再度、同じView groupが表示されてしまうのでfalseでOKらしい
-        return inflater.inflate(R.layout.setting,container,false);
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.setting);
     }
 }
