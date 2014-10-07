@@ -1,19 +1,17 @@
-<p id="notice"><%= notice %></p>
-
 <p>
-  <strong>Title:</strong>
+  <strong>タイトル</strong>
   <%= @board.title %>
 </p>
 
 <p>
-  <strong>Description:</strong>
+  <strong>詳細</strong>
   <%= @board.description %>
 </p>
 
 <p>
-  <strong>Group:</strong>
+  <strong>グループID</strong>
   <%= @board.group_id %>
 </p>
 
-<%= link_to 'Edit', edit_board_path(@board) %> |
-<%= link_to 'Back', boards_path %>
+<%= link_to '編集', edit_board_path(@board) , class: "btn btn-block btn-lg btn-success" %>
+<%= link_to '戻る', boards_path, class: "btn btn-block btn-lg btn-default" %>

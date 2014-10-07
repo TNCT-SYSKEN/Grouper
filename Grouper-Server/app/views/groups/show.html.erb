@@ -26,8 +26,10 @@
     <%= link_to '設定', edit_group_path(@group), class: "btn btn-success btn-lg btn-block" %></p>
   </div>
   <div class="col-xs-12">
+    <p><%= link_to '掲示板', boards_path, class: 'btn btn-info btn-lg btn-block' %></p>
+  </div>
+  <div class="col-xs-12">
     <p><%= link_to '戻る', groups_path, class: 'btn btn-default btn-lg btn-block' %></p>
   </div>
-  <%= link_to '掲示板', boards_path %>
 </div>
 

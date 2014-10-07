@@ -173,18 +173,31 @@ h2.group-desc {
   display: none;
 }
 
-#board,
-{
+#board {
   margin-top: 20px;
+}
+
+.board,
+.board-top {
+  font-size: 25px;
+}
+
+.board-title {
+  font-size: 27px;
 }
 
 .carousel-caption {
   color: #666 !important;
+  top: 5px;
 }
 
 .board-edit {
+  display: block;
   font-size: 20px;
-  position: relative;
-  left: 100px;
-  bottom: -60px !important;
+  position: absolute;
 }
+
+.board-edit p {
+  width: 60px;
+}
+

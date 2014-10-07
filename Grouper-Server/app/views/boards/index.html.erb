@@ -1,33 +1,11 @@
-<!--
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Description</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @boards.each do |board| %>
-      <tr>
-        <td><%= board.title %></td>
-        <td><%= board.description %></td>
-        <td><%= link_to 'Show', board %></td>
-        <td><%= link_to 'Edit', edit_board_path(board) %></td>
-        <td><%= link_to 'Destroy', board, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
--->
-
 <div id="board" class="carousel slide" data-ride="carousel">
+  <!--
   <ol class="carousel-indicators">
     <li data-target="#board" data-slide-to="0" class="active"></li>
     <li data-target="#board" data-slide-to="1"></li>
     <li data-target="#board" data-slide-to="2"></li>
   </ol>
+  -->
   <div class="carousel-inner">
     <div class="item active">
       <%= image_tag('carousel.png', style: 'width: 70%') %>
@@ -39,18 +17,25 @@
       <div class="item">
         <%= image_tag('carousel.png', style: 'width: 70%') %> 
         <div class="carousel-caption">
-          <h3 class="board board-title"><%= board.title %></h3>
-          <p class="board board-description"><%= board.description %></p>
-          <p class="board board-edit"><%= link_to '編集', edit_board_path(board) %> <%= link_to '削除', board, method: :delete, data: { confirm: '削除してもいいですか？' } %></p>
+          <div class="row">
+            <div class="board board-main col-xs-9">
+              <h3 class="board board-title"><%= board.title %></h3>
+              <p class="board board-description"><%= board.description %></p>
+            </div>
+            <div class="board board-sub col-xs-3">
+              <div class="board-edit">
+                <%= link_to '編集', edit_board_path(board), class: "board-edit-link btn btn-success" %>
+                <%= link_to '削除', board, method: :delete, data: { confirm: '削除してもいいですか？'}, class: "board-del-link btn btn-danger" %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
     <% end %>
   </div>
 
   <a class="left carousel-control" href="#board" role="button" data-slide="prev"><</a>
   <a class="right carousel-control" href="#board" role="button" data-slide="next">></a>
-    <span class="glyphicon glyphicon-forward"></span></a>
 </div>
 
-  <%= link_to 'New Board', new_board_path %>
+  <%= link_to '新しい掲示板', new_board_path, class: "btn btn-lg btn-block btn-primary" %>
