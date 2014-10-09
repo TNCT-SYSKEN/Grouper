@@ -17,18 +17,10 @@
       <div class="item">
         <%= image_tag('carousel.png', style: 'width: 70%') %> 
         <div class="carousel-caption">
-          <div class="row">
-            <div class="board board-main col-xs-9">
+            <div class="board board-main">
               <h3 class="board board-title"><%= board.title %></h3>
               <p class="board board-description"><%= board.description %></p>
             </div>
-            <div class="board board-sub col-xs-3">
-              <div class="board-edit">
-                <%= link_to '編集', edit_board_path(board), class: "board-edit-link btn btn-success" %>
-                <%= link_to '削除', board, method: :delete, data: { confirm: '削除してもいいですか？'}, class: "board-del-link btn btn-danger" %>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     <% end %>
@@ -39,3 +31,4 @@
 </div>
 
   <%= link_to '新しい掲示板', new_board_path, class: "btn btn-lg btn-block btn-primary" %>
+  <%= link_to '掲示板の編集', "boards/edit_index", class: "btn btn-lg btn-block btn-success" %>

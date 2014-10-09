@@ -3,7 +3,11 @@ Rails.application.routes.draw do
   resources :groups do
     member do
       resources :members
-      resources :boards
+      resources :boards do
+        collection do
+          get 'edit_index'
+        end
+      end
       get 'add_member'
       post 'add_member'
       get 'talk/index'

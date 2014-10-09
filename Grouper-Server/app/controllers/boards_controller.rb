@@ -7,6 +7,11 @@ class BoardsController < ApplicationController
     @boards = Board.all
   end
 
+  
+  def edit_index 
+    @boards = Board.all
+  end
+
   # GET /boards/1
   # GET /boards/1.json
   def show
