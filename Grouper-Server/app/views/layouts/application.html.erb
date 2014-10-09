@@ -70,7 +70,7 @@
 
   // トークがemptyではないか確認
   function sendDisabled() {
-    if($("input[name='talk-send']").val() == '') {
+    if($("input[class='form-control talk-send']").val() == '') {
       $('#send').attr('disabled', true);
     }else{
       $('#send').attr('disabled', false);
