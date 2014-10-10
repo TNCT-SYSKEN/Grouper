@@ -26,12 +26,12 @@
         // 新しいトークがあったら最下部に移動 
         len = $("tbody").children().length;
         check = setInterval("getTr()", 100);
-        
+
         // あたかもuploadボタンが押されたかのような
         $('#btnUpload').click(function(){
           $('#exampleInputFile').click();
         });
-        
+ 
         //upload check
         $('#exampleInputFile').change(
           function() {
@@ -46,7 +46,7 @@
             }
             fr.readAsDataURL(file);
           }
-          );
+        );
 
         // カルーセルパネルを利用
         $('.carousel').carousel({
