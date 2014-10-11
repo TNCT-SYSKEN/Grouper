@@ -24,4 +24,7 @@
     <string name="talk">トーク</string>
     <string name="alarm">アラーム</string>
     <string name="invite">招待コードを入力して下さい</string>
+    <string name="setAlarm">アラームをセット</string>
+    <string name="cancelAlarm">アラームを解除</string>
+    <string name="select">選択</string>
 </resources>

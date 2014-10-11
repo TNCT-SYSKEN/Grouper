@@ -19,8 +19,6 @@ import org.sysken.grouper.R;
 
 public class HomeFragment extends Fragment {
 
-    Globals globals;
-
     /*
     @Override
     public void onCreate(Bundle saveInstanceState){
@@ -36,7 +34,11 @@ public class HomeFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
+
         View v = inflater.inflate(R.layout.web, container, false);
+
+
+
         webView = (WebView) v.findViewById(R.id.webview);;
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
