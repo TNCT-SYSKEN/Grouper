@@ -11,7 +11,6 @@ import org.sysken.grouper.R;
 
 public class Disaster extends Fragment {
 
-    Globals globals;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -22,9 +21,5 @@ public class Disaster extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-
-
-
     }
 }

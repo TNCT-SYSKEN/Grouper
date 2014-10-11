@@ -108,6 +108,14 @@ public class TabAct extends Activity {
                 ((HomeFragment) webView).GoBack();
             }
         }
+        if(webView instanceof GroupFragment){
+            boolean goBack = ((GroupFragment)webView).canGoBack();
+            if(!goBack){
+                super.onBackPressed();
+            }else{
+                ((GroupFragment)webView).GoBack();
+            }
+        }
     }
 
 

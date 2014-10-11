@@ -9,9 +9,9 @@ $(function() {
     if (message.type == 0) {
       return $(".talk_tbody").append('<tr class="talk_user_name"><th colspan="3">' + message.name + '</tr><tr class="talk_body"><th class="user"><p></p></th><th class="content"><p>' + message.talk + '</p></th></tr>');
     } else if(message.type == 1) {
-      return $(".talk_tbody").append('<tr class="talk_user_name"><ht colspan="3">' + message.name + '</tr><tr class="talk_body"><th class="user"><p></p></th><th class="content"><p><a href="/img/talk/' + message.id + '"><img src="/img/talk/' + messsage.id + '" style="width: 100px; height: 100px;" ></a></p></th></tr>');
+      return $(".talk_tbody").append('<tr class="talk_user_name"><th colspan="3">' + message.name + '</tr><tr class="talk_body"><th class="user"><p></p></th><th class="content"><p><a href="/img/talk/' + message.id + '"><img src="/img/talk/' + messsage.id + '" style="width: 100px; height: 100px;" ></a></p></th></tr>');
     } else {
-      return $(".talk_tbody").append('<tr class="talk_user_name"><ht colspan="3">' + message.name + '</tr><tr class="talk_body"><th class="user"><p></p></th><th class="content"><p><a href="https://www.google.co.jp/maps/place/' + message.talk + '">' + message.talk + '</a></p></th></tr>');
+      return $(".talk_tbody").append('<tr class="talk_user_name"><th colspan="3">' + message.name + '</tr><tr class="talk_body"><th class="user"><p></p></th><th class="content"><p><a href="https://www.google.co.jp/maps/place/' + message.talk + '" class="map-link">' + message.talk + '</a></p></th></tr>');
     }
     
   });

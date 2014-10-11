@@ -1,51 +1,118 @@
 package org.sysken.grouper.Tab;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Picture;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
-import android.widget.Button;
+import android.webkit.JsResult;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
-import org.sysken.grouper.CameraPreviewActivity;
-import org.sysken.grouper.GenerateActivity;
 import org.sysken.grouper.R;
 
 public class GroupFragment extends Fragment {
 
+    Globals globals;
+
+    /*
+    @Override
+    public void onCreate(Bundle saveInstanceState){
+        super.onCreate(saveInstanceState);
+        setRetainInstance(true);
+    }
+*/
+
+
+    WebView webView;
+
+    //make HTML upload button work in Webview
+    private ValueCallback<Uri> mUploadMessage;
+    private final static int FILECHOOSER_RESULTCODE = 1;
+
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.group, container, false);
+        View v = inflater.inflate(R.layout.web, container, false);
+
+        webView = (WebView) v.findViewById(R.id.webview);;
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(true);
+
+        webView.setWebViewClient(new WebViewClient());
+
+        webView.setWebChromeClient(new WebChromeClient(){
+
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                Toast.makeText(webView.getContext(), message, Toast.LENGTH_LONG).show();
+                return super.onJsAlert(view, url, message, result);
+            }
+
+            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                startActivityForResult(Intent.createChooser(i, "画像選択"), FILECHOOSER_RESULTCODE);
+            }
+
+
+        });
+        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups");
+        return v;
+
     }
+
+
+    public boolean canGoBack() {
+        return  ( webView != null ) && webView.canGoBack();
+    }
+
+    public boolean GoBack(){
+        webView.goBack();
+        return true;
+    }
+
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
-        Button button1 = (Button)getActivity().findViewById(R.id.group_invite);
-        Button button2 = (Button)getActivity().findViewById(R.id.group_search);
-        button1.setOnClickListener(new View.OnClickListener() {
+        if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (null == mUploadMessage) return;
 
-            @Override
-            public void onClick(View v) {
-                Intent mintent = new Intent(getActivity(), GenerateActivity.class);
 
-                // アクティビティの呼び出し
-                startActivity(mintent);
-            }
-        });
-        button2.setOnClickListener(new View.OnClickListener() {
+            Uri result = (intent == null || resultCode != getActivity().RESULT_OK)  ? null : intent.getData();
+            mUploadMessage.onReceiveValue(result);
+            mUploadMessage = null;
+        }
 
-            @Override
-            public void onClick(View v) {
-                Intent mintent = new Intent(getActivity(), CameraPreviewActivity.class);
-
-                // アクティビティの呼び出し
-                startActivity(mintent);
-            }
-        });
     }
+
+
 }
+
+
+
+
+
+
+
+
+

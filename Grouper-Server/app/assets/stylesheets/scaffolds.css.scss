@@ -218,3 +218,23 @@ body,
   color: #000080 !important;
   text-decoration: underline !important;
 }
+
+.edit_board_all {
+  margin-top: 7px;
+  table-layout: auto;
+  border-collapse: collapse;
+  border: solid 2px #666;
+  tr{
+    border: solid 2px #666;
+  }
+  td {
+    padding: 0 4px;
+    .btn {
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.back_to_board {
+  margin-top: 10px;
+}

@@ -32,7 +32,7 @@
           <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#add-image">+</button>
         </div>
         <div class="col-xs-7 talk_message">
-          <%= text_field_tag :talk, "", id: "text", class: "form-control", name: "talk-send" %>
+          <%= text_field_tag :talk, "", id: "text", class: "form-control talk-send" %>
         </div>
         <div class="col-xs-3">
           <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
@@ -44,7 +44,7 @@
     <div class="row">
       <div class="form-group">
         <%= form_tag('new_image', remote: true, multipart: true, class: "add-img-form") do %>
-          <div class="col-sm-8"><img src="" id="preview" style="display:none";></div>
+          <div class="col-sm-8"><img src="" id="preview" style="display:none;"></div>
           <%= file_field :upload, :file , id: "exampleInputFile", style: "display:none;" %>
           <div class="col-sm-2"><a id="btnUpload" class="easyui-linkbutton btn btn btn-primary" data-options="iconCls:'icon-save'">画像選択</a></div>
           <div class="col-sm-2"><%= submit_tag "送信", class: "btn btn-success btn" %></div>

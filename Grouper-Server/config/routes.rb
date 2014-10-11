@@ -3,7 +3,11 @@ Rails.application.routes.draw do
   resources :groups do
     member do
       resources :members
-      resources :boards
+      resources :boards do
+        collection do
+          get 'edit_index'
+        end
+      end
       get 'add_member'
       post 'add_member'
       get 'talk/index'
@@ -18,7 +22,7 @@ Rails.application.routes.draw do
 
   get 'user/find_group'
   post 'user/find_group'
-  post 'users/new_image' => 'user#new_image'
+  post 'user/new_image' => 'user#new_image'
 
   devise_for :users
   # The priority is based upon order of creation: first created -> highest priority.

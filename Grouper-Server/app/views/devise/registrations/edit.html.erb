@@ -17,18 +17,12 @@
   <label>パスワード再確認</label>
   <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control" %>
 
-  <label>画像</label>
-  <BR>
-  <img src="" id="preview" style="display:none;" width="50px" height="50px">
-  <input type="file" id="exampleInputFile" style="display:none">
-  <a id="btnUpload" class="easyui-linkbutton btn btn-lg btn-primary" data-options="iconCls:'icon-save'">選択</a>
-
 </form>
 <br>
 <%= f.submit "更新", class: "btn btn-lg btn-block btn-success" %>
 <% end %>
 <div class="row">
-  <%= form_tag("new_image", remote: true, multipart: true) do %>
+  <%= form_tag("/user/new_image", remote: true, multipart: true) do %>
     <label>画像</label>
   <img src="/img/user/<%= current_user.id %>">
   <%= file_field :upload, :file, id: "image" %>

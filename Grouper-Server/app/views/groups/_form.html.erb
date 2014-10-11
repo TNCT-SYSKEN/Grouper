@@ -6,36 +6,34 @@
       <% end %>
     </ul>
   </div>
-<% end %>
-
-<div class="field">
-  <% if @group.errors.any? %>
-    <div class="form-group has-error">
-      <label>グループ名</label>
-      <%= f.text_field :name, class: "form-control input-lg" %>
-    </div>
-  <% else %>
-    <div class="form-group">
-      <label>グループ名</label>
-      <%= f.text_field :name, class: "form-control input-lg" %>
-    </div>
   <% end %>
-</div>
-<div class="field">
-  <div class="form-group">
-    <label>詳細</label>
-    <%= f.text_area :description, class: "form-control input-lg" %>
-  </div>
-</div>
-<div class="field">
-    <%= form_tag('new_image', remote: true, multipart: true) do %>
-      <label>画像</label>
-      <img src="/img/group/<%= @group.id %>">
-      <%= file_field :upload, :file, id: "exampleInputFile", style: "display: none;" %>
-      <a id="btnUpload" class="easyui-linkbutton btn btn btn-warning" data-options="iconCls:'icon-save'">画像選択</a>
+
+  <div class="field">
+    <% if @group.errors.any? %>
+      <div class="form-group has-error">
+        <label>グループ名</label>
+        <%= f.text_field :name, class: "form-control input-lg" %>
+      </div>
+    <% else %>
+      <div class="form-group">
+        <label>グループ名</label>
+        <%= f.text_field :name, class: "form-control input-lg" %>
+      </div>
     <% end %>
   </div>
-  <div class="actions">
-    <%= f.submit class:"btn btn-success btn-lg btn-block", value: "作成"%>
+  <div class="field">
+    <div class="form-group">
+      <label>詳細</label>
+      <%= f.text_area :description, class: "form-control input-lg" %>
+    </div>
   </div>
+  <div class="actions">
+    <%= submit_tag "作成", class:"btn btn-success btn-lg btn-block", value: "作成"%>
+  </div>
+<% end %>
+<%= form_tag({:controller => :groups, :action => :new_image}, remote: true, multipart: true) do %>
+      <label>画像</label>
+      <img src="/img/group/<%= @group.id %>">
+      <%= file_field :upload, :file, id: "image" %>
+  <%= submit_tag "画像更新", class:"btn btn-success btn-lg btn-block"%>
 <% end %>
