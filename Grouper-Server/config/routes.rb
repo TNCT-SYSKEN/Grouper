@@ -22,7 +22,7 @@ Rails.application.routes.draw do
 
   get 'user/find_group'
   post 'user/find_group'
-  post 'users/new_image' => 'user#new_image'
+  post 'user/new_image' => 'user#new_image'
 
   devise_for :users
   # The priority is based upon order of creation: first created -> highest priority.
