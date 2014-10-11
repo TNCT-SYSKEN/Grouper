@@ -22,7 +22,7 @@ public class HomeFragment extends Fragment {
         setRetainInstance(true);
     }
 */
-
+    Globals globals;
     public WebView webView;
 
     @Override

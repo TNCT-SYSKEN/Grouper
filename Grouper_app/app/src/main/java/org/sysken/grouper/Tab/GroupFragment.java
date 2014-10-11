@@ -24,8 +24,6 @@ import org.sysken.grouper.R;
 
 public class GroupFragment extends Fragment {
 
-    Globals globals;
-
     /*
     @Override
     public void onCreate(Bundle saveInstanceState){
