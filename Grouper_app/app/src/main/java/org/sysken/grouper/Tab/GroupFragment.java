@@ -11,7 +11,6 @@ import android.widget.Button;
 import org.sysken.grouper.CameraPreviewActivity;
 import org.sysken.grouper.GenerateActivity;
 import org.sysken.grouper.R;
-import org.sysken.grouper.Tab.Globals;
 
 public class GroupFragment extends Fragment {
 

@@ -19,8 +19,6 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import org.sysken.grouper.Tab.Globals;
-
 public class GenerateActivity extends FragmentActivity {
 
 

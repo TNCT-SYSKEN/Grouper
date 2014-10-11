@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
-import android.widget.Button;
 
-import org.sysken.grouper.Alarm.MyAlarmManager;
+import org.sysken.grouper.Globals;
 import org.sysken.grouper.R;
 
 public class Disaster extends Fragment {

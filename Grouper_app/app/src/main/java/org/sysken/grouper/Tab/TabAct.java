@@ -6,25 +6,29 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.sysken.grouper.CameraPreviewActivity;
 import org.sysken.grouper.GenerateActivity;
+import org.sysken.grouper.Globals;
 import org.sysken.grouper.R;
+
+import java.io.IOException;
 
 
 public class TabAct extends Activity {
     Globals globals;
     public static final String PREFERENCES_FILE_NAME = "preference";
+    private GoogleCloudMessaging gcm;
+    private Context context;
     Fragment homeFragment = new HomeFragment();
 
 
@@ -32,6 +36,15 @@ public class TabAct extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab);
+
+        int number = 571034875;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(number);
+
+        context = getApplicationContext();
+        globals = (Globals) this.getApplication();
+
+        registerInBackground();
 
         //アクションバーのセットアップ
         final ActionBar actionBar = getActionBar();
@@ -63,9 +76,26 @@ public class TabAct extends Activity {
                         new TabListener<SetAlarm>(
                                 this, "tag4", SetAlarm.class)
                 ));
-
     }
 
+
+    private void registerInBackground() {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null)
+                        gcm = GoogleCloudMessaging.getInstance(context);
+                    msg = gcm.register("903569435747");
+                    globals.registrationId = msg;
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+                }
+                return msg;
+            }
+        }.execute();
+    }
 
     @Override
     public void onBackPressed() {

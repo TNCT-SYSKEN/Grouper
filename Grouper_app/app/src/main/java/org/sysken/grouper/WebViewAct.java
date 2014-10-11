@@ -7,8 +7,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import org.sysken.grouper.Tab.Globals;
-
 public class WebViewAct extends Activity {
 
     Globals globals;

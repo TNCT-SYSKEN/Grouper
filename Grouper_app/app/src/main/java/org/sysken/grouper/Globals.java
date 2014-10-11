@@ -1,4 +1,4 @@
-package org.sysken.grouper.Tab;
+package org.sysken.grouper;
 
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 public class Globals extends Application {
     //グローバルに使用する変数
-    public String url_string;
+    public String url_string, registrationId;
     public WebView web;
 
     public void GlobalsAllinit() {
