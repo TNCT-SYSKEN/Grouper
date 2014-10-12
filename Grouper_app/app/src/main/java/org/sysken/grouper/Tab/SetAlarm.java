@@ -51,7 +51,7 @@ public class SetAlarm extends Fragment {
         numberPicker2 = (NumberPicker)getActivity().findViewById(R.id.number_picker2);
 
         numberPicker1.setMaxValue(23);
-        numberPicker1.setMinValue(1);
+        numberPicker1.setMinValue(0);
 
         numberPicker2.setMaxValue(59);
         numberPicker2.setMinValue(0);
