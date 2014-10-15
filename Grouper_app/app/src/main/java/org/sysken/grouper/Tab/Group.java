@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.webkit.GeolocationPermissions;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -12,16 +15,11 @@ import android.webkit.WebViewClient;
 import org.sysken.grouper.Globals;
 import org.sysken.grouper.R;
 import android.util.Log;
+import android.widget.Toast;
 
-public class HomeFragment extends Fragment {
+public class Group extends Fragment {
 
-    /*
-    @Override
-    public void onCreate(Bundle saveInstanceState){
-        super.onCreate(saveInstanceState);
-        setRetainInstance(true);
-    }
-*/
+
     Globals globals;
     public WebView webView;
 
@@ -34,15 +32,34 @@ public class HomeFragment extends Fragment {
         View v = inflater.inflate(R.layout.web, container, false);
 
 
-
-        webView = (WebView) v.findViewById(R.id.webview);;
+        webView = (WebView) v.findViewById(R.id.webview);
         WebSettings webSettings = webView.getSettings();
+        webView.getSettings().setGeolocationEnabled(true);
         webSettings.setJavaScriptEnabled(true);
+        webView.setWebChromeClient(new WebChromeClient(){
+
+            @Override
+            public void onGeolocationPermissionsShowPrompt(
+                    String origin,
+                    GeolocationPermissions.Callback callback) {
+                callback.invoke(origin, true, false);
+            }
+
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                try {
+                    Toast.makeText(webView.getContext(), message, Toast.LENGTH_LONG).show();
+                    return true;
+                } finally {
+                    result.confirm();
+                }
+            }
+        });
         webView.setWebViewClient(new ViewClient());
-        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups");
+        webView.getSettings().setGeolocationEnabled(true);
 
         globals = (Globals) getActivity().getApplication();
-
+        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups");
         return v;
     }
 
@@ -66,12 +83,3 @@ public class HomeFragment extends Fragment {
         }
     }
 }
-
-
-
-
-
-
-
-
-

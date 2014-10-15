@@ -1,6 +1,5 @@
 package org.sysken.grouper;
 
-import android.app.Activity;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,6 +12,7 @@ import android.preference.PreferenceManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import org.sysken.grouper.Alarm.MyAlarmManager;
 import org.sysken.grouper.Tab.TabAct;
 
 public class GcmIntentService extends IntentService {
@@ -32,10 +32,21 @@ public class GcmIntentService extends IntentService {
 
             sendNotification(message);
             GcmBroadcastReceiver.completeWakefulIntent(intent);
+
+        if(message.equals("alarm")){
+            String stringHour = extras.getString("hour");
+            String stringMinutes = extras.getString("min");
+            int hour = Integer.parseInt(stringHour);
+            int minute = Integer.parseInt(stringMinutes);
+            MyAlarmManager myAlarmManager = new MyAlarmManager(this);
+            myAlarmManager.addAlarm(hour,minute);
+        }
+
     }
 
     @SuppressWarnings("deprecation")
     private void sendNotification(String text) {
+
         nManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = new Notification();
         Intent intent = new Intent(this.getApplicationContext(), TabAct.class);

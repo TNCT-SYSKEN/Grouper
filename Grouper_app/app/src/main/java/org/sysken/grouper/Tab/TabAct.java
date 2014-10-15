@@ -29,7 +29,6 @@ public class TabAct extends Activity {
     public static final String PREFERENCES_FILE_NAME = "preference";
     private GoogleCloudMessaging gcm;
     private Context context;
-    Fragment homeFragment = new HomeFragment();
 
 
     @Override
@@ -46,6 +45,8 @@ public class TabAct extends Activity {
 
         registerInBackground();
 
+
+
         //アクションバーのセットアップ
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -54,15 +55,15 @@ public class TabAct extends Activity {
                 .newTab()
                 .setText(R.string.group)
                 .setTabListener(
-                        new TabListener<HomeFragment>(
-                                this, "tag1", HomeFragment.class)
+                        new TabListener<Group>(
+                                this, "tag1", Group.class)
                 ));
 
         actionBar.addTab(actionBar.newTab()
                 .setText(R.string.talk)
                 .setTabListener(
-                        new TabListener<GroupFragment>(
-                                this, "tag2", GroupFragment.class)
+                        new TabListener<Talk>(
+                                this, "tag2", Talk.class)
                 ));
         actionBar.addTab(actionBar.newTab()
                 .setText(R.string.disaster)
@@ -100,20 +101,36 @@ public class TabAct extends Activity {
     @Override
     public void onBackPressed() {
         Fragment webView = getFragmentManager().findFragmentById(R.id.container);
-        if (webView instanceof HomeFragment) {
-            boolean goBack = ((HomeFragment)webView).canGoBack();
+        if (webView instanceof Group) {
+            boolean goBack = ((Group)webView).canGoBack();
             if (!goBack) {
                 super.onBackPressed();
             }else{
-                ((HomeFragment) webView).GoBack();
+                ((Group) webView).GoBack();
             }
         }
-        if(webView instanceof GroupFragment){
-            boolean goBack = ((GroupFragment)webView).canGoBack();
+        if(webView instanceof Talk){
+            boolean goBack = ((Talk)webView).canGoBack();
             if(!goBack){
                 super.onBackPressed();
             }else{
-                ((GroupFragment)webView).GoBack();
+                ((Talk)webView).GoBack();
+            }
+        }
+        if(webView instanceof Disaster) {
+            boolean goBack = ((Disaster) webView).canGoBack();
+            if (!goBack) {
+                super.onBackPressed();
+            } else {
+                ((Disaster) webView).GoBack();
+            }
+        }
+        if(webView instanceof SetAlarm){
+            boolean goBack = ((SetAlarm)webView).canGoBack();
+            if(!goBack){
+                super.onBackPressed();
+            }else{
+                ((SetAlarm)webView).GoBack();
             }
         }
     }
@@ -164,9 +181,6 @@ public class TabAct extends Activity {
         private final String mTag;
         private final Class<T> mClass;
 
-        public Fragment getFragment() {
-            return mFragment;
-        }
         public TabListener(Activity activity, String tag, Class<T> clz) {
             mActivity = activity;
             mTag = tag;
@@ -207,5 +221,3 @@ public class TabAct extends Activity {
 
     }
 }
-
-

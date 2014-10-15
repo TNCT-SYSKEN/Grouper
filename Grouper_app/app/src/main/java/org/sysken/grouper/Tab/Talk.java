@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
+import android.webkit.GeolocationPermissions;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -22,7 +23,7 @@ import android.widget.Toast;
 
 import org.sysken.grouper.R;
 
-public class GroupFragment extends Fragment {
+public class Talk extends Fragment {
 
     /*
     @Override
@@ -52,7 +53,7 @@ public class GroupFragment extends Fragment {
         webSettings.setJavaScriptEnabled(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
-
+        webView.getSettings().setGeolocationEnabled(true);
         webView.setWebViewClient(new WebViewClient());
 
         webView.setWebChromeClient(new WebChromeClient(){
@@ -63,6 +64,13 @@ public class GroupFragment extends Fragment {
                 return super.onJsAlert(view, url, message, result);
             }
 
+            @Override
+            public void onGeolocationPermissionsShowPrompt(
+                    String origin,
+                    GeolocationPermissions.Callback callback) {
+                callback.invoke(origin, true, false);
+            }
+
             public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
                 mUploadMessage = uploadMsg;
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
@@ -71,13 +79,11 @@ public class GroupFragment extends Fragment {
                 startActivityForResult(Intent.createChooser(i, "画像選択"), FILECHOOSER_RESULTCODE);
             }
 
-
         });
-        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups");
+        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups/talk_index");
         return v;
 
     }
-
 
     public boolean canGoBack() {
         return  ( webView != null ) && webView.canGoBack();
