@@ -1,6 +1,7 @@
 package org.sysken.grouper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,33 +23,22 @@ import com.google.zxing.qrcode.QRCodeWriter;
 public class GenerateActivity extends FragmentActivity {
 
 
-    Globals globals;
-    private WebView webview;
-
+    public String number;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
-        WebView webview = new WebView(this);
+        Intent intent = getIntent();
+        // intentから指定キーの文字列を取得する
+        number = intent.getStringExtra( "number" );
         super.onCreate(savedInstanceState);
         setContentView(R.layout.generate);
-        findViewById(R.id.button).setOnClickListener(onClickListener);
+
+        // 非同期でエンコードする
+        Bundle bundle = new Bundle();
+        bundle.putString("contents", number);
+        getSupportLoaderManager().initLoader(0, bundle, callbacks);
     }
 
-    private OnClickListener onClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            // EditText から文字を取得
-            EditText editText = (EditText) findViewById(R.id.edit_text);
-            String contents = editText.getText().toString();
-            //String contents = webview.getUrl();
-
-            // 非同期でエンコードする
-            Bundle bundle = new Bundle();
-            bundle.putString("contents", contents);
-            getSupportLoaderManager().initLoader(0, bundle, callbacks);
-        }
-    };
 
     private LoaderCallbacks<Bitmap> callbacks = new LoaderCallbacks<Bitmap>() {
         @Override

@@ -46,7 +46,7 @@ public class SetAlarm extends Fragment {
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setGeolocationEnabled(true);
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups");
+        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups/alarm_index");
 
         webView.setWebChromeClient(new WebChromeClient(){
 

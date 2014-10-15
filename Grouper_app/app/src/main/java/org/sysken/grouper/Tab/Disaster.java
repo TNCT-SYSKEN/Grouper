@@ -54,7 +54,8 @@ public class Disaster extends Fragment {
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setGeolocationEnabled(true);
-        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups");
+        webView.loadUrl("http://secure-bayou-4662.herokuapp.com/groups/board_index");
+
 
         webView.setWebChromeClient(new WebChromeClient(){
 

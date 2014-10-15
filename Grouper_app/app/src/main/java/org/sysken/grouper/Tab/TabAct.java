@@ -19,6 +19,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.sysken.grouper.CameraPreviewActivity;
 import org.sysken.grouper.GenerateActivity;
 import org.sysken.grouper.Globals;
+import org.sysken.grouper.GroupSelect;
 import org.sysken.grouper.R;
 
 import java.io.IOException;
@@ -44,7 +45,6 @@ public class TabAct extends Activity {
         globals = (Globals) this.getApplication();
 
         registerInBackground();
-
 
 
         //アクションバーのセットアップ
@@ -148,27 +148,27 @@ public class TabAct extends Activity {
             case R.id.QRR:
 
                 // 明示的なインテントの生成
-                Intent intent = new Intent(this, CameraPreviewActivity.class);
+                Intent QRRIntent = new Intent(this, CameraPreviewActivity.class);
 
                 // アクティビティの呼び出し
-                startActivity(intent);
+                startActivity(QRRIntent);
 
                 return true;
 
             case R.id.QRW:
 
                 // 明示的なインテントの生成
-                Intent mintent = new Intent(this, GenerateActivity.class);
+                Intent QRWIntent = new Intent(this, GroupSelect.class);
                 // アクティビティの呼び出し
-                startActivity(mintent);
+                startActivity(QRWIntent);
 
                 return true;
             case R.id.Setting:
 
                 // 明示的なインテントの生成
-                Intent intent2 = new Intent(this, Setting.class);
+                Intent SettingIntent = new Intent(this, Setting.class);
                 // アクティビティの呼び出し
-                startActivity(intent2);
+                startActivity(SettingIntent);
 
                 return true;
         }

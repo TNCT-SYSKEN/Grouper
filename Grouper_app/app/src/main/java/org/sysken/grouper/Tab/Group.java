@@ -77,9 +77,11 @@ public class Group extends Fragment {
         @Override
         public void onPageFinished(WebView view, String url) {
             if(url.equals("http://secure-bayou-4662.herokuapp.com/users/sign_in") ||
-               url.equals("http://secure-bayou-4662.herokuapp.com/users/sign_up") )
-            webView.loadUrl("javascript:document.getElementById('regId').value = '" + globals.registrationId + "';");
-            Log.d("gid", globals.registrationId);
+               url.equals("http://secure-bayou-4662.herokuapp.com/users/sign_up") ) {
+                webView.loadUrl("javascript:document.getElementById('regId').value = '" + globals.registrationId + "';");
+                Log.d("gid", globals.registrationId);
+            }
+
         }
     }
 }
