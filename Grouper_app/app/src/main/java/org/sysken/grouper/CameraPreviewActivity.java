@@ -117,7 +117,6 @@ public class CameraPreviewActivity extends Activity{
             try {
                 result = reader.decode(bitmap);
                 text = result.getText();
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
                 if(text != null) {
                     Intent mintent = new Intent(CameraPreviewActivity.this, WebViewAct.class);
                     mintent.putExtra("number", text);

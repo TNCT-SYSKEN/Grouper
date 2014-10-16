@@ -18,11 +18,12 @@ public class WebViewAct extends Activity {
     public WebView webView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        String addMember = "/add_member/";
         String url = "http://secure-bayou-4662.herokuapp.com/groups/";
         Intent intent = getIntent();
         // intentから指定キーの文字列を取得する
         String name = intent.getStringExtra( "number" );
-        url = url + name + "add_member/";
+        String url_set =  url + name + addMember;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.web);
         webView = (WebView)findViewById(R.id.webview);
@@ -31,7 +32,7 @@ public class WebViewAct extends Activity {
         webSettings.setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
 
-        webView.loadUrl(url);
+        webView.loadUrl(url_set);
 
     }
 

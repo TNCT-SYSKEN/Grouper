@@ -21,6 +21,7 @@ import org.sysken.grouper.GenerateActivity;
 import org.sysken.grouper.Globals;
 import org.sysken.grouper.GroupSelect;
 import org.sysken.grouper.R;
+import org.sysken.grouper.WebViewSetting;
 
 import java.io.IOException;
 
@@ -166,7 +167,7 @@ public class TabAct extends Activity {
             case R.id.Setting:
 
                 // 明示的なインテントの生成
-                Intent SettingIntent = new Intent(this, Setting.class);
+                Intent SettingIntent = new Intent(this, WebViewSetting.class);
                 // アクティビティの呼び出し
                 startActivity(SettingIntent);
 

@@ -41,7 +41,6 @@ public class MyAlarmManager {
         if (cal.getTimeInMillis() < System.currentTimeMillis()) {
             cal.add(Calendar.DAY_OF_YEAR, 1);
         }
-        Toast.makeText(c, String.format("%02d時%02d分に起こします", alarmHour, alarmMinute), Toast.LENGTH_LONG).show();
         am.set(AlarmManager.RTC_WAKEUP,cal.getTimeInMillis(),mAlarmSender);
         Log.v(TAG,cal.getTimeInMillis()+"ms");
         Log.v(TAG,"アラームセット完了");

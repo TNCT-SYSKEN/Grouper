@@ -45,7 +45,8 @@
         </receiver>
 
         <service android:name=".Alarm.MyAlarmService" />
-
+        <activity android:name=".WebViewSetting"
+            android:noHistory="true"/>
         <activity android:name=".Alarm.AlarmNotification" />
         <receiver
             android:name=".GcmBroadcastReceiver"

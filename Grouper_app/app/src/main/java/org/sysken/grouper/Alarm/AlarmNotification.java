@@ -48,10 +48,10 @@ public class AlarmNotification extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopAndRelaese();
+        stopAndRelease();
     }
 
-    private void stopAndRelaese() {
+    private void stopAndRelease() {
         if (mp != null) {
             mp.stop();
             mp.release();
