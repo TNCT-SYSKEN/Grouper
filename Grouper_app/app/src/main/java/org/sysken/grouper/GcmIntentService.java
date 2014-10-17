@@ -18,7 +18,9 @@ import org.sysken.grouper.Tab.TabAct;
 public class GcmIntentService extends IntentService {
     NotificationManager nManager;
     private int number = 571034875;
+    public String title;
     SharedPreferences pref;
+    Globals globals;
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -36,8 +38,12 @@ public class GcmIntentService extends IntentService {
         if(message.equals("alarm")){
             String stringHour = extras.getString("hour");
             String stringMinutes = extras.getString("min");
+            title = extras.getString("title");
             int hour = Integer.parseInt(stringHour);
             int minute = Integer.parseInt(stringMinutes);
+            globals = (Globals) this.getApplication();
+            globals.GlobalsAllinit();
+            globals.title = title;
             MyAlarmManager myAlarmManager = new MyAlarmManager(this);
             myAlarmManager.addAlarm(hour,minute);
         }

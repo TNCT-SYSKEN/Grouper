@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.sysken.grouper.AlarmView;
 import org.sysken.grouper.Tab.TabAct;
 
 /**
@@ -17,7 +18,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // アラームを受け取って起動するActivityを指定、起動
         Toast.makeText(context, "アラーム!" , Toast.LENGTH_LONG).show();
         Log.v("ログだよ", "ログ");
-        Intent notification = new Intent(context, TabAct.class);
+        Intent notification = new Intent(context, AlarmView.class);
         // 画面起動に必要
         notification.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(notification);

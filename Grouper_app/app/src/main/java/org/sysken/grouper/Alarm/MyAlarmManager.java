@@ -24,7 +24,7 @@ public class MyAlarmManager {
         Log.v(TAG, "初期化完了");
     }
 
-    public void addAlarm(int alarmHour, int alarmMinute) {
+    public void addAlarm(int alarmHour, int alarmMinute ) {
         // アラームを設定する
         mAlarmSender = this.getPendingIntent();
 

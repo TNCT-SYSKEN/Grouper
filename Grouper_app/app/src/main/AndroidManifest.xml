@@ -43,7 +43,8 @@
                 <action android:name="MyAlarmAction"/>
             </intent-filter>
         </receiver>
-
+        <activity android:name=".AlarmView"
+            android:noHistory="true"/>
         <service android:name=".Alarm.MyAlarmService" />
         <activity android:name=".WebViewSetting"
             android:noHistory="true"/>
