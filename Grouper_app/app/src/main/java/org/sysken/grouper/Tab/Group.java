@@ -1,12 +1,16 @@
 package org.sysken.grouper.Tab;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.View;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -22,6 +26,21 @@ public class Group extends Fragment {
 
     Globals globals;
     public WebView webView;
+    private ValueCallback<Uri> mUploadMessage;
+    private final static int FILECHOOSER_RESULTCODE = 1;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+
+        if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (null == mUploadMessage) return;
+
+
+            Uri result = (intent == null || resultCode != Activity.RESULT_OK)?null:intent.getData();
+            mUploadMessage.onReceiveValue(result);
+            mUploadMessage = null;
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -54,7 +73,17 @@ public class Group extends Fragment {
                     result.confirm();
                 }
             }
+
+            // Android 4.1以上
+            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                startActivityForResult(Intent.createChooser(i, "画像選択"), FILECHOOSER_RESULTCODE);
+            }
         });
+
         webView.setWebViewClient(new ViewClient());
         webView.getSettings().setGeolocationEnabled(true);
 
@@ -77,11 +106,15 @@ public class Group extends Fragment {
         @Override
         public void onPageFinished(WebView view, String url) {
             if(url.equals("http://secure-bayou-4662.herokuapp.com/users/sign_in") ||
-               url.equals("http://secure-bayou-4662.herokuapp.com/users/sign_up") ) {
+               url.equals("http://secure-bayou-4662.herokuapp.com/users/sign_up") ||
+                    url.equals("http://secure-bayou-4662.herokuapp.com/users/edit")) {
                 webView.loadUrl("javascript:document.getElementById('regId').value = '" + globals.registrationId + "';");
                 Log.d("gid", globals.registrationId);
             }
 
         }
+
     }
+
+
 }

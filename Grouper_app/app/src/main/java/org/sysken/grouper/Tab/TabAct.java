@@ -216,7 +216,12 @@ public class TabAct extends Activity {
 
         @Override
         public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft){
-
+            if (mFragment != null) {
+                FragmentManager fm = mActivity.getFragmentManager();
+                fm.beginTransaction().detach(mFragment).commit();
+                mFragment = Fragment.instantiate(mActivity, mClass.getName());
+                fm.beginTransaction().add(R.id.container, mFragment, mTag).commit();
+            }
         }
 
 
