@@ -31,9 +31,14 @@
     <%= submit_tag "作成", class:"btn btn-success btn-lg btn-block", value: "作成"%>
   </div>
 <% end %>
-<%= form_tag({:controller => :groups, :action => :new_image}, remote: true, multipart: true) do %>
-      <label>画像</label>
-      <img src="/img/group/<%= @group.id %>">
-      <%= file_field :upload, :file, id: "image" %>
-  <%= submit_tag "画像更新", class:"btn btn-success btn-lg btn-block"%>
+<% if @group.id != nil %>
+  <%= form_tag(new_image_group_path(@group.id), remote: true, multipart: true, class: "add-img-form") do %>
+    <div class="field add-img-form">
+      <label>画像</label><br>
+      <div class="col-xs-6"><img src="" id="preview"></div>
+      <%= file_field :upload, :file , id: "exampleInputFile", style: "display:none;" %>
+      <div class="col-xs-3"><a id="btnUpload" class="easyui-linkbutton btn btn btn-primary" data-options="iconCls:'icon-save'">選択</a></div>
+      <div class="col-xs-3"><%= submit_tag "更新", class: "btn btn-success btn" %></div>
+    </div>
+  <% end %>
 <% end %>

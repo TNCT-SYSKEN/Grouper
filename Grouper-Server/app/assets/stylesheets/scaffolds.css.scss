@@ -210,6 +210,10 @@ body,
   background: #f5f5f5 !important;
 }
 
+#add-image {
+  border: solid #666 1px !important;
+}
+
 .talk-img {
   background: none;
 }
@@ -237,4 +241,12 @@ body,
 
 .back_to_board {
   margin-top: 10px;
+}
+
+.add-img-form {
+  min-height: 100px;
+}
+
+#preview {
+  max-width: 70%;
 }

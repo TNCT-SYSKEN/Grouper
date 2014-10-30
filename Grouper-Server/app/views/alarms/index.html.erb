@@ -1,0 +1,27 @@
+<h1>アラーム</h1>
+
+<table class="edit_board_all">
+  <thead>
+    <tr>
+      <th class="col-xs-4">タイトル</th>
+      <th class="col-xs-6">時刻</th>
+      <th class="col-xs-2">編集</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @alarms.each do |alarm| %>
+      <tr>
+        <td><%= alarm.title %></td>
+        <td><%= alarm.time.strftime("%H:%M") %></td>
+        <td><%= link_to "詳細" , group_alarm_path(alarm.group_id, alarm), class: "btn btn-primary" %>
+        <%= link_to '編集', edit_group_alarm_path(alarm.group_id, alarm), class: "btn btn-success" %>
+        <%= link_to '削除', group_alarm_path(alarm.group_id, alarm), method: :delete, data: { confirm: '削除してもいいですか？'}, class: "btn btn-danger"  %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to '新しいアラーム', new_group_alarm_path, class: "btn btn-lg btn-block btn-success back_to_board" %>

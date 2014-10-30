@@ -16,3 +16,5 @@
 //= require websocket_rails/main
 //~ require bootstrap
 
+//= require websocket_rails/main
+

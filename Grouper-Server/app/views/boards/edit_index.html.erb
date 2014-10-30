@@ -13,8 +13,8 @@
       <tr>
         <td><%= board.title %></td>
         <td><%= board.description %></td>
-        <td><%= link_to '編集', edit_board_path(board), class:"btn btn-success" %>
-        <%= link_to '削除', board, method: :delete, data: { confirm: '削除してもいいですか？' }, class: "btn btn-danger" %></td>
+        <td><%= link_to '編集', edit_group_board_path(board.group_id, board), class:"btn btn-success" %>
+        <%= link_to '削除', group_board_path(board.group_id, board), method: :delete, data: { confirm: '削除してもいいですか？' }, class: "btn btn-danger" %></td>
       </tr>
     <% end %>
   </tbody>

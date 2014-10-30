@@ -1,6 +1,8 @@
 <h1>Grouper</h1>
 <%= link_to 'グループを作成する', new_group_path %><br>
 <%= link_to 'グループを見る', groups_path %><br>
-<%= link_to 'グループに参加する', user_find_group_path %>
-<%= link_to '設定', '/users/edit/' , class: "btn btn-success btn-lg btn-block" %>
-
+<%= link_to 'グループに参加する', user_find_group_path %><br>
+<%= link_to 'トーク一覧', talk_index_groups_path %><br>
+<%= link_to 'アラーム一覧', alarm_index_groups_path %><br>
+<%= link_to '掲示板一覧', board_index_groups_path %><br>
+<%= link_to '設定', edit_user_registration_path, class: "btn btn-success btn-lg btn-block" %>

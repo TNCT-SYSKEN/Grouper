@@ -11,7 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141005093539) do
+ActiveRecord::Schema.define(version: 20141013060808) do
+
+  create_table "alarms", force: true do |t|
+    t.text     "title"
+    t.time     "time"
+    t.integer  "group_id"
+    t.boolean  "set"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "boards", force: true do |t|
     t.string   "title"
@@ -60,9 +69,10 @@ ActiveRecord::Schema.define(version: 20141005093539) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "username"
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  add_index "users", ["username"], name: "index_users_on_username", unique: true
 
 end

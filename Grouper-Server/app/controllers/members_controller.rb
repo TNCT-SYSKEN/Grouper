@@ -1,11 +1,11 @@
 class MembersController < ApplicationController
-  before_action :set_member, only: [:show, :edit, :update, :destroy]
+  before_action :set_member, only: [:show, :edit, :update]
 
   # GET /members
   # GET /members.json
   def index
-    @members = Member.where(group_id: params[:id])
-    @group = Group.find(params[:id])
+    @members = Member.where(group_id: params[:group_id])
+    @group = Group.find(params[:group_id])
   end
 
   # GET /members/1
@@ -55,6 +55,8 @@ class MembersController < ApplicationController
   # DELETE /members/1
   # DELETE /members/1.json
   def destroy
+    group = Group.find(params[:group_id])
+    @member = group.members.find_by(user_id: params[:id])
     @member.destroy
     respond_to do |format|
       format.html { redirect_to root_path, notice: 'グループから退会しました' }

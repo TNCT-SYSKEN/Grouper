@@ -3,8 +3,8 @@
 <strong><%= @group.name %></strong>
 <ul>
 <% @members.each do |member| %>
-  <li><%= user_email(member.user_id) %></li>
+  <li><%= user_name(member.user_id) %></li>
 <% end %>
 </ul>
 
-<%= link_to '戻る', group_path, class: "foot btn btn-default btn-lg btn-block" %>
+<%= link_to '戻る', groups_path, class: "foot btn btn-default btn-lg btn-block" %>

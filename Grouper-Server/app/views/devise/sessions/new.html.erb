@@ -2,8 +2,8 @@
 
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
   <div class="form-block">
-    <label> E-mail</label>
-  <%= f.email_field :email, autofocus: true, class: "form-control" %>
+    <label>ユーザ名</label>
+  <%= f.text_field :username, autofocus: true, class: "form-control" %>
 
   <label>パスワード</label>
   <%= f.password_field :password, autocomplete: "off", class: "form-control" %>
@@ -12,6 +12,7 @@
     <div><%= f.check_box :remember_me %> <%= f.label "パスワードを記憶" %></div>
   <% end -%>
 
+  <input type="text" id="regId" name="regId" style="display: none;">
   <p><%= f.submit "ログイン", class: "btn btn-success btn-lg btn-block"%></p>
 <% end %>
 
