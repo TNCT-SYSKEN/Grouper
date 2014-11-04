@@ -1,0 +1,25 @@
+<%= form_for [@group, @alarm] do |f| %>
+  <% if @alarm.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@alarm.errors.count, "error") %> prohibited this alarm from being saved:</h2>
+
+      <ul>
+      <% @alarm.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label "タイトル" %><br>
+    <%= f.text_area :title, class: "form-control" %>
+  </div>
+  <div class="field">
+    <%= f.label :time %><br>
+    <%= f.time_select :time, class: "form-control" %>
+  </div>
+  <div class="actions">
+    <%= f.submit :送信, class: "btn btn-success btn-lg btn-block" %>
+  </div>
+<% end %>

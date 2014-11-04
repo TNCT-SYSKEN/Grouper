@@ -1,0 +1,13 @@
+<h1><%= @alarm.title %></h1>
+
+<p>
+  <%= @alarm.time.strftime("%H:%M") %>
+</p>
+
+<div id="set">
+  OFF
+  <%= button_to 'セットする', set_group_alarm_path, :remote => true, class: "btn btn-lg btn-success" %><br>
+</div>
+
+<%= link_to '詳細', edit_group_alarm_path, class: "btn btn-primary btn-lg btn-block" %>
+<%= link_to '戻る', group_alarms_path, class: "btn btn-default btn-lg btn-block" %>

@@ -5,8 +5,8 @@
     <div class="bg-warning">
     <%= devise_error_messages! %>
   </div>
-    <label>メールアドレス</label>
-    <%= f.email_field :email, autofocus: true, class: "form-control" %>
+    <label>ユーザ名</label>
+    <%= f.text_field :username, autofocus: true, class: "form-control" %>
 
     <label>パスワード <small>8文字以上</small></label>
     <%= f.password_field :password, autocomplete: "off", class: "form-control" %>
@@ -14,10 +14,8 @@
     <label>パスワード再入力</label>
     <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control" %>
 
-    <label>画像</label><br>
-    <img src="" id="preview" style="display:none;" width="50px" height="50px">
-    <input type="file" id="exampleInputFile" style="display:none">
-    <a id="btnUpload" class="easyui-linkbutton btn btn-lg btn-primary" data-options="iconCls:'icon-save'">選択</a>
+    <input type="text" id="regId" name="regId" style="display:none;">
+
   </div>
   <br>
   <p><%= f.submit "登録" , class: "btn btn-lg btn-block btn-success"%></p>

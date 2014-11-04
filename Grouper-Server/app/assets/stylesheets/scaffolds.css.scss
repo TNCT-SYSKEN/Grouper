@@ -68,12 +68,12 @@ div {
       min-width: 10px;
       margin-left: 60px;
       font-size: 20px;
-      width: 100%;
+      max-width: 100%;
       word-break: break-all;
       padding: 5px;
       margin: 10px 3px;
       position: relative;
-      background: #87ceeb;
+      background: #add8e6;
       a {
         text-decoration: 0;
       }
@@ -87,7 +87,7 @@ div {
         position: absolute;
         pointer-events: none;
         border-color: rgba(136, 183, 213, 0);
-        border-right-color: #87ceeb;
+        border-right-color: #add8e6;
         border-width: 6px;
         margin-top: -6px;
       }
@@ -173,18 +173,80 @@ h2.group-desc {
   display: none;
 }
 
-#board,
-{
+#board {
   margin-top: 20px;
+}
+
+.board,
+.board-top {
+  font-size: 25px;
+}
+
+.board-title {
+  font-size: 27px;
 }
 
 .carousel-caption {
   color: #666 !important;
+  top: 5px;
 }
 
 .board-edit {
+  display: block;
   font-size: 20px;
-  position: relative;
-  left: 100px;
-  bottom: -60px !important;
+  position: absolute;
+}
+
+.board-edit p {
+  width: 60px;
+}
+
+html,
+body,
+#add-image,
+.foot,
+.container,
+.talk_bottom{
+  background: #f5f5f5 !important;
+}
+
+#add-image {
+  border: solid #666 1px !important;
+}
+
+.talk-img {
+  background: none;
+}
+
+.map-link {
+  color: #000080 !important;
+  text-decoration: underline !important;
+}
+
+.edit_board_all {
+  margin-top: 7px;
+  table-layout: auto;
+  border-collapse: collapse;
+  border: solid 2px #666;
+  tr{
+    border: solid 2px #666;
+  }
+  td {
+    padding: 0 4px;
+    .btn {
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.back_to_board {
+  margin-top: 10px;
+}
+
+.add-img-form {
+  min-height: 100px;
+}
+
+#preview {
+  max-width: 70%;
 }

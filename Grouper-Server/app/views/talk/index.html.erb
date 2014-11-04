@@ -3,19 +3,23 @@
     <tbody class="talk_tbody">
       <% @talks.each do |talk| %>
         <tr class="talk_user_name">
-          <th colspan="3"><%= user_email(talk.user_id) %></th>
+          <th colspan="3"><%= user_name(talk.user_id) %></th>
         </tr>
         <tr class="talk_body">
           <th class="user">
-            <p><%= image_tag 'dummy.png', class: 'img-circle user-img', style: 'width: 50px; height: 50px;' %>
+            <% if File.exist?("./public/img/user/" + current_user.id.to_s)%>
+              <img src="/img/user/<%= current_user.id %>" class="img-circle user-img" style="width: 50px; height: 50px;">
+            <% else %>
+              <img src="/user/default.png" class="img-circle user-img" style="width: 50px; height: 50px;">
+            <% end %>
           </th>
           <th class="content">
             <% if talk.content_type == "0" %>
               <p><%= talk.talk %></p>
             <% elsif talk.content_type == "1" %>
-              <img src="/img/talk/<%= talk.id %>" style="height: 100px; " >
+              <p class="talk-img"><a class="img-link" href="/img/talk/<%= talk.id %>"><img src="/img/talk/<%= talk.id %>" style="height: 100px;"></a></p>
             <% else %>
-              <a class="map-link" href="https://www.google.co.jp/maps/place/<%= talk.talk %>"><%= talk.talk %></a>
+              <p><a class="map-link" href="https://www.google.co.jp/maps/place/<%= talk.talk %>"><%= talk.talk %></a></p>
             <% end %>
           </th>
         </tr>
@@ -26,38 +30,44 @@
   <div id="uid" style="display:none;"><%= current_user.id %></div>
   <div id="gid" style="display:none;"><%= @group.id %></div>
   <div class="row">
+    <div id="chat" data-uri="<%= request.host %>/websocket"></div>
     <%= form_tag('new', remote: true, class: "foot", onSubmiti: "checkEmpty") do %>
-    <div class="form-group">
-      <div class="col-xs-2">
-      <div class="btn btn-success"><a class="add-file">+</span></div>
-    </div>
-      <div class="col-xs-7 talk_message">
-        <%= text_field_tag :talk, "", id: "text", class: "form-control" %>
+      <div class="form-group">
+        <div class="col-xs-2 add-img">
+          <button type="button" class="btn btn-success" data-toggle="collapse" data-target="#add-image">+</button>
+        </div>
+        <div class="col-xs-7 talk_message">
+          <%= text_field_tag :talk, "", id: "text", class: "form-control talk-send" %>
+        </div>
+        <div class="col-xs-3">
+          <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
+        </div>
       </div>
-      <div class="col-xs-3">
-      <%= submit_tag "送信", id: "send", class: "btn btn-primary" %>
-    </div>
-    </div>
+    <% end %>
   </div>
-  <% end %>
-    <div class="form-group">
-      <%= form_tag('new_image', remote: true, multipart: true) do %>
-        <img src="" id="preview" style="display:none";>
-        <%= file_field :upload, :file , id: "exampleInputFile", style: "display:none;" %>
-        <a id="btnUpload" class="easyui-linkbutton btn btn-lg btn-primary" data-options="iconCls:'icon-save'">選択</a> 
-        <%= submit_tag "送信", class: "btn btn-success btn-lg" %>
+  <div class="collapse in" id="add-image">
+    <div class="row">
+      <div class="form-group">
+        <%= form_tag('new_image', remote: true, multipart: true, class: "add-img-form") do %>
+          <div class="col-sm-8"><img src="" id="preview" style="display:none;"></div>
+          <%= file_field :upload, :file , id: "exampleInputFile", style: "display:none;" %>
+          <div class="col-sm-2"><a id="btnUpload" class="easyui-linkbutton btn btn btn-primary" data-options="iconCls:'icon-save'">画像選択</a></div>
+          <div class="col-sm-2"><%= submit_tag "送信", id: "send",  class: "btn btn-success btn" %></div>
+        <% end %>
+      </div>
+    </div>
+    <div class="row">
+      <%= form_tag(talk_get_address_groups_path, remote: true) do %>
+        <%= text_field :lat, nil, id: "lat" %>
+        <%= text_field :lng, nil, id: "lng" %>
+        <div class="col-sm-2"><%= submit_tag "位置取得", class: "btn btn-primary" %></div>
+      <% end %>
+      <%= form_tag('new_address', remote: true) do %>
+        <div class="col-sm-8"><%= text_field_tag :talk, "", id: "address", class: "form-control talk-send" %></div>
+        <div class="col-sm-2"><%= submit_tag "送信", id: "send", class: "btn btn-success" %></div>
       <% end %>
     </div>
-    <%= form_tag('get_address', remote: true) do %>
-      <%= text_field :lat, nil, id: "lat" %>
-      <%= text_field :lng, nil, id: "lng" %>
-      <%= submit_tag "位置情報取得", class: "btn btn-primary" %>
-    <% end %>
-    <%= form_tag('new_address', remote: true) do %>
-      現在地: 
-      <%= text_field_tag :talk, "", id: "address" %>
-      <%= submit_tag "送信", class: "btn btn-primary" %>
-    <% end %>
+  </div>
   <div id="footer"></div>
   <div class="talk_bottom"></div>
   <script src="/talk.js"></script>

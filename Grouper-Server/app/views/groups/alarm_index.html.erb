@@ -1,0 +1,25 @@
+<table class="group-table table table-hover">
+  <% @groups.each do |group| %>
+    <tr class="group-tr">
+    <th class="col-xs-2 img">
+      <!-- <%= link_to image_tag('dummy.png', class: 'img-circle group-img pull-left', style: 'width: 64px; height: 64px;'), {:action=>"index", :controller=>"talk", :id=>group.id}  %> -->
+      <a href="/groups/<%= group.id %>/alarms">
+      <% if File.exist?("./public/img/group/" + group.id.to_s) %>
+        <img src="/img/group/<%= group.id %>" class="img-circle group-img" style="width: 64px; height: 64px;">
+      <% else %>
+        <img src="/group/default.png" class="img-circle group-img" style="width: 64px; height: 64px;">
+      <% end %>
+    </a>
+    </th>
+    <th class="col-xs-9 name">
+      <!-- <%= link_to group.name, {:action=>"index", :controller=>"talk", :id=>group.id}, class: "group_link" %> -->
+      <%= link_to group.name, group_alarms_path(group) %>
+    </th>
+    <th class="col-xs-1 remove">
+      <%= link_to '退会', group_member_path(group.id, current_user.id), method: :delete, data: {confirm: '本当に退会しますか？' }, class: "btn btn-danger btn pull-right group_destroy" %>
+    </th>
+  </tr>
+<% end %>
+</table>
+<br>
+<%= link_to '新しくグループを作る', new_group_path, class: "new_group btn btn-success btn-lg btn-block" %>

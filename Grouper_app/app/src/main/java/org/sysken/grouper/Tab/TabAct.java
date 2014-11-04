@@ -6,22 +6,47 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import org.sysken.grouper.CameraPreviewActivity;
 import org.sysken.grouper.GenerateActivity;
+import org.sysken.grouper.Globals;
+import org.sysken.grouper.GroupSelect;
 import org.sysken.grouper.R;
+import org.sysken.grouper.WebViewSetting;
+
+import java.io.IOException;
 
 
 public class TabAct extends Activity {
+    Globals globals;
     public static final String PREFERENCES_FILE_NAME = "preference";
+    private GoogleCloudMessaging gcm;
+    private Context context;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab);
+
+        int number = 571034875;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(number);
+
+        context = getApplicationContext();
+        globals = (Globals) this.getApplication();
+
+        registerInBackground();
+
 
         //アクションバーのセットアップ
         final ActionBar actionBar = getActionBar();
@@ -31,15 +56,15 @@ public class TabAct extends Activity {
                 .newTab()
                 .setText(R.string.group)
                 .setTabListener(
-                        new TabListener<HomeFragment>(
-                                this, "tag1", HomeFragment.class)
+                        new TabListener<Group>(
+                                this, "tag1", Group.class)
                 ));
 
         actionBar.addTab(actionBar.newTab()
                 .setText(R.string.talk)
                 .setTabListener(
-                        new TabListener<GroupFragment>(
-                                this, "tag2", GroupFragment.class)
+                        new TabListener<Talk>(
+                                this, "tag2", Talk.class)
                 ));
         actionBar.addTab(actionBar.newTab()
                 .setText(R.string.disaster)
@@ -56,6 +81,61 @@ public class TabAct extends Activity {
     }
 
 
+    private void registerInBackground() {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null)
+                        gcm = GoogleCloudMessaging.getInstance(context);
+                    msg = gcm.register("903569435747");
+                    globals.registrationId = msg;
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+                }
+                return msg;
+            }
+        }.execute();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment webView = getFragmentManager().findFragmentById(R.id.container);
+        if (webView instanceof Group) {
+            boolean goBack = ((Group)webView).canGoBack();
+            if (!goBack) {
+                super.onBackPressed();
+            }else{
+                ((Group) webView).GoBack();
+            }
+        }
+        if(webView instanceof Talk){
+            boolean goBack = ((Talk)webView).canGoBack();
+            if(!goBack){
+                super.onBackPressed();
+            }else{
+                ((Talk)webView).GoBack();
+            }
+        }
+        if(webView instanceof Disaster) {
+            boolean goBack = ((Disaster) webView).canGoBack();
+            if (!goBack) {
+                super.onBackPressed();
+            } else {
+                ((Disaster) webView).GoBack();
+            }
+        }
+        if(webView instanceof SetAlarm){
+            boolean goBack = ((SetAlarm)webView).canGoBack();
+            if(!goBack){
+                super.onBackPressed();
+            }else{
+                ((SetAlarm)webView).GoBack();
+            }
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,27 +149,27 @@ public class TabAct extends Activity {
             case R.id.QRR:
 
                 // 明示的なインテントの生成
-                Intent intent = new Intent(this, CameraPreviewActivity.class);
+                Intent QRRIntent = new Intent(this, CameraPreviewActivity.class);
 
                 // アクティビティの呼び出し
-                startActivity(intent);
+                startActivity(QRRIntent);
 
                 return true;
 
             case R.id.QRW:
 
                 // 明示的なインテントの生成
-                Intent mintent = new Intent(this, GenerateActivity.class);
+                Intent QRWIntent = new Intent(this, GroupSelect.class);
                 // アクティビティの呼び出し
-                startActivity(mintent);
+                startActivity(QRWIntent);
 
                 return true;
             case R.id.Setting:
 
                 // 明示的なインテントの生成
-                Intent intent2 = new Intent(this, GenerateActivity.class);
+                Intent SettingIntent = new Intent(this, WebViewSetting.class);
                 // アクティビティの呼び出し
-                startActivity(intent2);
+                startActivity(SettingIntent);
 
                 return true;
         }
@@ -109,14 +189,20 @@ public class TabAct extends Activity {
         }
 
 
+
         @Override
         public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-            //ftはnullではないが使用するとぬるぽで落ちる
+            //ftはnullではないが使用するとNullPointExceptionで落ちる
             if (mFragment == null) {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName());
-                ft.add(android.R.id.content, mFragment, mTag);
+                FragmentManager fm = mActivity.getFragmentManager();
+                fm.beginTransaction().add(R.id.container, mFragment, mTag).commit();
             } else {
-                ft.attach(mFragment);
+                //detachされていないときだけattachするよう変更
+                if (mFragment.isDetached()) {
+                    FragmentManager fm = mActivity.getFragmentManager();
+                    fm.beginTransaction().attach(mFragment).commit();
+                }
             }
         }
 
@@ -129,9 +215,15 @@ public class TabAct extends Activity {
         }
 
         @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft){
+            if (mFragment != null) {
+                FragmentManager fm = mActivity.getFragmentManager();
+                fm.beginTransaction().detach(mFragment).commit();
+                mFragment = Fragment.instantiate(mActivity, mClass.getName());
+                fm.beginTransaction().add(R.id.container, mFragment, mTag).commit();
+            }
         }
+
+
     }
 }
-
-

@@ -4,7 +4,14 @@ class BoardsController < ApplicationController
   # GET /boards
   # GET /boards.json
   def index
-    @boards = Board.all
+    group = Group.find(params[:group_id])
+    @boards = group.boards
+  end
+
+  
+  def edit_index 
+    group = Group.find(params[:group_id])
+    @boards = group.boards
   end
 
   # GET /boards/1
@@ -14,22 +21,24 @@ class BoardsController < ApplicationController
 
   # GET /boards/new
   def new
+    @group = Group.find(params[:group_id])
     @board = Board.new
   end
 
   # GET /boards/1/edit
   def edit
+    @group = Group.find(params[:group_id])
   end
 
   # POST /boards
   # POST /boards.json
   def create
     @board = Board.new(board_params)
-    @board.group_id = params[:id]
+    @board.group_id = params[:group_id]
 
     respond_to do |format|
       if @board.save
-        format.html { redirect_to @board, notice: 'Board was successfully created.' }
+        format.html { redirect_to edit_index_group_boards_path(), notice: '掲示を作成しました' }
         format.json { render :show, status: :created, location: @board }
       else
         format.html { render :new }
@@ -43,7 +52,7 @@ class BoardsController < ApplicationController
   def update
     respond_to do |format|
       if @board.update(board_params)
-        format.html { redirect_to @board, notice: 'Board was successfully updated.' }
+        format.html { redirect_to edit_index_group_boards_path, notice: '掲示を更新しました' }
         format.json { render :show, status: :ok, location: @board }
       else
         format.html { render :edit }
@@ -57,7 +66,7 @@ class BoardsController < ApplicationController
   def destroy
     @board.destroy
     respond_to do |format|
-      format.html { redirect_to boards_url, notice: 'Board was successfully destroyed.' }
+      format.html { redirect_to edit_index_group_boards_path, notice: '掲示を削除しました' }
       format.json { head :no_content }
     end
   end

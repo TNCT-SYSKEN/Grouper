@@ -1,31 +1,11 @@
 <div class="container">
-<p>
-  <strong>グループ名:</strong>
-  <%= @group.name %>
-</p>
+<h2><%= @group.name %></h2>
+<h3><%= @group.description %></h3>
+
 
 <p>
-  <strong>作成者:</strong>
-  <%= @user.email %>
+<%= button_to 'このグループに参加する', add_member_group_path(@group.id, add: "true"), class: "btn btn-lg btn-primary btn-block" %>
 </p>
-
 <p>
-  <strong>詳細:</strong>
-  <%= @group.description %>
-</p>
-
-<p>
-  <strong>招待コード:</strong>
-  <%= @group.id %>
-</p>
-
-<p> 
-  <%= link_to 'メンバー', members_path %>
-</p>
-
-<br>
-
-<p>
-<%= button_to 'このグループに参加する', add_member_group_path(@group.id, add: "true") %>
-</p>
+<% link_to "戻る", :back, class: "btn btn-lg btn-block btn-default" %>
 </div>

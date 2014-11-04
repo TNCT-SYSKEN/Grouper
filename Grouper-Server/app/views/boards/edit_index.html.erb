@@ -1,0 +1,25 @@
+<div class="row">
+<table class="edit_board_all">
+  <thead>
+    <tr>
+      <th class="col-xs-4">タイトル</th>
+      <th class="col-xs-6">詳細</th>
+      <th class="col-xs-2">編集</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @boards.each do |board| %>
+      <tr>
+        <td><%= board.title %></td>
+        <td><%= board.description %></td>
+        <td><%= link_to '編集', edit_group_board_path(board.group_id, board), class:"btn btn-success" %>
+        <%= link_to '削除', group_board_path(board.group_id, board), method: :delete, data: { confirm: '削除してもいいですか？' }, class: "btn btn-danger" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<%= link_to "新しい掲示板", "../boards/new", class: "btn btn-lg btn-block btn-success back_to_board" %>
+<%= link_to "掲示板へ戻る", "../boards", class: "btn btn-lg btn-block btn-primary back_to_board" %>
+<br>
+

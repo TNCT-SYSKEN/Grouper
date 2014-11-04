@@ -13,6 +13,30 @@ class GroupsController < ApplicationController
     end
   end
 
+  def talk_index
+    members = Member.where(user_id: current_user.id)
+    @groups = Array.new
+    members.each do |member|
+      @groups.push Group.find(member.group_id)
+    end
+  end
+
+  def board_index
+    members = Member.where(user_id: current_user.id)
+    @groups = Array.new
+    members.each do |member|
+      @groups.push Group.find(member.group_id)
+    end
+  end
+
+  def alarm_index
+    members = Member.where(user_id: current_user.id)
+    @groups = Array.new
+    members.each do |member|
+      @groups.push Group.find(member.group_id)
+    end
+  end
+
   # GET /groups/1
   # GET /groups/1.json
   def show
@@ -54,6 +78,7 @@ class GroupsController < ApplicationController
     @group = Group.new(group_params)
     @user = current_user
     @group.user_id = @user.id
+
 
     respond_to do |format|
       if @group.save
