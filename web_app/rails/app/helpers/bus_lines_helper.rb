@@ -1,2 +1,0 @@
-module BusLinesHelper
-end
