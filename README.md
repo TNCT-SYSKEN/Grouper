@@ -20,7 +20,7 @@
 # About
 第25回 全国高等専門学校プログラミングコンテスト 課題部門に参加した  
 **Grouper -集まりを つながりに-** のソースコード一覧です。  
-公式Webサイト http://grouper/sysken.org/  
+公式Webサイト http://grouper.sysken.org/  
 `Grouper-Server/` : Railsアプリ(サーバサイド)  
 `grouper_app/` : Androidアプリ
 
