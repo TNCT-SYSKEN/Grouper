@@ -1,4 +1,4 @@
-# Grouper
+# Grouper -集まりを つながりに-
 
     　 　 　 　　　　　　　　　　　　　　　　　　　　　　　　 ,.へ
     　　___ 　　　　　　　 　 　 　 　 　　　　　　　　  　　ﾑ　　i
@@ -17,17 +17,28 @@
     　       　　　　| 答 |　　　　G r o u p e r 　 　│|
            　　　　　＼＿二二二二二二二二二二二二二二二二ノ
 
-##Android Studioへのインポート方法
-1. Grouperフォルダを開きます
-2. android studioで**Grouper_appをopen**します
-たぶんおｋ！
+# About
+第25回 全国高等専門学校プログラミングコンテスト 課題部門に参加した  
+**Grouper -集まりを つながりに-** のソースコード一覧です。  
+公式Webサイト http://grouper/sysken.org/  
+`Grouper-Server/` : Railsアプリ(サーバサイド)  
+`grouper_app/` : Androidアプリ
 
-##build時の設定
-* 最小APKは**15**
-* ターゲットAPIは**19**
-* buildToolsVersionhは**19.1.0**
-* いずれも**app/src/main/AndroidManifest.xml** や **app/build.gradle**で定義してあるから大丈夫なはず・・・？
+# Auther
+津山高専システム研究部  
+* さんだー (https://github.com/92thunder) // Rails
+* おやゆび (https://github.com/oyyb) // Androidアプリ
+* らりょす (https://github.com/raryosu) // Web View(Grouper-Server/app/views以下など)
 
-##その他
-* アプリのパッケージ名 : 暫定的に **org.sysken.grouper**
-* APIの仕様については別にまとめているので確認して下さい。
+# Contact
+http://grouper.sysken.org/ 内にある連絡先までご連絡ください。
+
+# License
+各ファイルに特に記載がない限りMIT License下にあります。  
+&copy; 2014 Grouper Project Team / 2003-2015 SYSKEN
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
