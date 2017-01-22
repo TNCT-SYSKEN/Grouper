@@ -24,7 +24,7 @@
 `Grouper-Server/` : Railsアプリ(サーバサイド)  
 `grouper_app/` : Androidアプリ
 
-# Auther
+# Author
 津山高専システム研究部  
 * さんだー (https://github.com/92thunder) // Rails
 * おやゆび (https://github.com/oyyb) // Androidアプリ
